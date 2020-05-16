@@ -1,6 +1,6 @@
 """ Helper functions """
-import chess
 from constants import SQUARE_STR, CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
+import chess
 
 
 def get_piece_at(board, position: str) -> str:

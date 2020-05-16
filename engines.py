@@ -62,9 +62,12 @@ class ChessEngine():
         """
         raise NotImplementedError('Function evaluate not implemented')
 
-    def move(self):
+    def move(self, board):
         """
         Selects move based on engine settings
+
+        Args:
+            board (chess.board): current board state in python-chess object
 
         Raises:
             NotImplementedError: if not redefined in child class

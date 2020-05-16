@@ -197,5 +197,5 @@ class ChessPlayground():
     def display_all_game_values(self) -> None:
         """ Wrapper for display_value_differences to plot results of
         all games """
-        for game in range(len(self.all_value_differentials)):
-            self.display_value_differences(game)
+        for game_idx in range(len(self.all_value_differentials)):
+            self.display_value_differences(game_idx)
