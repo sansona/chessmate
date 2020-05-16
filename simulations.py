@@ -22,8 +22,9 @@ class ChessPlayground():
             results
         all_move_counts (List[int]): contains count of number of moves in
             each game played
-        all_value_differentials (List[List[float]]): contains mapping of value
-            differential for each move across each game played
+        all_value_differentials (List[tuple]): contains mapping of value
+            differential for each move across each game played in form
+            (white engine evaluation, black engine evaluation) at each move
 
     Methods:
         play_game() -> None: plays a single game
@@ -47,18 +48,17 @@ class ChessPlayground():
         self.white_engine = white_engine
         self.black_engine = black_engine
 
-        self.game = None
-        self.board = None
-        self.terminal_conditions = None
-        self.all_results = []
-        self.all_move_counts = []
-        self.all_value_differentials = []
+        self.game, self.board, self.terminal_conditions = None, None, None
+        (self.all_results, self.all_move_counts,
+            self.all_value_differentials) = ([], [], [])
 
     def play_game(self) -> None:
         """ Plays single game """
-        # Initialize new game
+        # Initialize new game, reset value_differential count for each game
         self.game = chess.pgn.Game()
         self.board = self.game.board()
+        self.white_engine.reset_game_variables()
+        self.black_engine.reset_game_variables()
 
         while not self.board.is_game_over():
             # If white ends game on move, don't execute black move
@@ -78,10 +78,12 @@ class ChessPlayground():
 
         # At end of game, store number of moves in game, value of pieces on
         # board throughout game, and reason for ending game
-        result = self.evaluate_ending_board()
-        self.all_move_counts.append(self.board.fullmove_number)
+        self.all_move_counts.append(self.board.fullmove_number - 1)
         self.all_value_differentials.append(
-            self.white_engine.value_differentials)
+            tuple(zip(self.white_engine.value_differentials,
+                      self.black_engine.value_differentials)))
+
+        result = self.evaluate_ending_board()
         self.all_results.append(result)
 
     def play_multiple_games(self, N: int = 100) -> None:

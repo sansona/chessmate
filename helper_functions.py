@@ -1,6 +1,26 @@
 """ Helper functions """
 import chess
-from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
+from constants import SQUARE_STR, CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
+
+
+def get_piece_at(board, position: str) -> str:
+    """
+    Gets chess symbol of piece at position on board
+
+    Args:
+        board (chess.board): current board state in python-chess object
+        position (str):
+
+    Raises:
+        AttributeError: if no piece on board at position
+
+    Returns:
+        (str): symbol of piece at square if any
+    """
+    try:
+        return board.piece_at(SQUARE_STR.index(position.upper())).symbol()
+    except AttributeError:
+        return ""
 
 
 def tabulate_board_values(board) -> float:
@@ -28,3 +48,17 @@ def tabulate_board_values(board) -> float:
             value_difference += value
 
     return value_difference
+
+
+def display_pgn(pgn_game):
+    """
+    Displays game loaded from pgm
+    Args:
+        pgn_game (chess.png.game)
+    """
+    pgn = StringIO(str(pgn_game))
+    game = chess.pgn.read_game(pgn)
+    board = game.board()
+    for move in game.mainline_moves():
+        board.push(move)
+        print(f"{board}\n")
