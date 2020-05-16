@@ -107,6 +107,38 @@ class Random(ChessEngine):
         return random.choice([*self.legal_moves])
 
 
+class PrioritizePawnMoves(Random):
+    """ Engine that only moves pawns when an option. Default to random
+    engines if no pawn moves available"""
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Prioritize Pawn Moves"
+
+    def evaluate(self, board):
+        """ Assigns same value to each move since eventually going to choose
+        random move """
+        self.reset_move_variables()
+
+        legal_move_list = list(board.legal_moves)
+        for m in legal_move_list:
+            if get_piece_at(board, str(m)[:2].upper()) == 'P':
+                self.legal_moves[m] = 1
+
+        # If no pawn moves available, all moves are same priority
+        if not self.legal_moves:
+            self.legal_moves = {
+                legal_move_list[i]: 1 for i in range(len(legal_move_list))}
+
+        self.value_differentials.append(tabulate_board_values(board))
+
+    def move(self, board):
+        """Selects random move. See parent docstring"""
+        self.evaluate(board)
+        return random.choice([*self.legal_moves])
+
+
 class RandomCapture(ChessEngine):
     """ Engine that prioritizes capturing any piece
     if the option presents itself """
@@ -159,7 +191,7 @@ class CaptureHighestValue(ChessEngine):
 
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
-            piece_at_position = get_piece_at(board, str(m)[:2]).upper()
+            piece_at_position = get_piece_at(board, str(m)[-2:]).upper()
 
             if (not board.is_capture(m)) or (not piece_at_position):
                 self.legal_moves[m] = 0
@@ -186,3 +218,27 @@ class CaptureHighestValue(ChessEngine):
             return highest_capture_uci
 
         return list(self.legal_moves)[0]
+
+
+class AvoidCapture(RandomCapture):
+    """ Engine that prioritizes NOT capturing a piece whenver possible """
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Avoid Capture"
+
+    def evaluate(self, board):
+        """ Assigns value to no capture moves and no value to captures """
+        self.reset_move_variables()
+
+        legal_move_list = list(board.legal_moves)
+        # The only difference between this engine and RandomCapture is the
+        # not condition.
+        for m in legal_move_list:
+            if not board.is_capture(m):
+                self.legal_moves[m] = 1
+            else:
+                self.legal_moves[m] = 0
+
+        self.value_differentials.append(tabulate_board_values(board))

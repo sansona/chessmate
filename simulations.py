@@ -9,7 +9,8 @@ import chess.svg
 
 class ChessPlayground():
     """
-    Class for experimenting with different engines & algorithms
+    Class for experimenting with different engines & algorithms. This class
+    handles the analysis of the various engines, including plotting data
 
     Attributes:
         white_engine (ChessEngine): engine for determining white moves
@@ -29,10 +30,14 @@ class ChessPlayground():
     Methods:
         play_game() -> None: plays a single game
         play_multiple_games(N) -> None: plays N games
-        display_all_results() -> None: plots bar chart of all game results
-            played in instance
         evaluate_ending_board() -> str: evaluates final board state to
             determine why game over
+        display_all_results() -> None: plots bar chart of all game results
+            played in instance
+        display_value_differences(game_index) -> None: plot line chart of game
+            values as evaluated by both engines
+        display_all_results() -> None: plots all value differences for all
+            games played
     """
 
     def __init__(self, white_engine, black_engine) -> None:
@@ -100,28 +105,6 @@ class ChessPlayground():
             progress_bar.set_description(f"Playing game {game_number}")
             self.play_game()
 
-    def display_all_results(self):
-        """
-        Wrapper for matplotlib to display results of all games
-
-        Returns:
-            (collections.Counter): containing counts of all ending types
-        """
-        counts = Counter(self.all_results)
-
-        _, ax = plt.subplots()
-        ax.bar(counts.keys(), counts.values(), width=0.75, align='center')
-        ax.set_xlabel('Terminal conditions')
-        ax.set_ylabel('Number games')
-        ax.set_title('Terminal conditions')
-
-        return counts
-
-    def display_value_differences(self):
-        """ Wrapper for matplotlib to plot difference in piece total
-        values throughout game"""
-        pass
-
     def evaluate_ending_board(self) -> str:
         """
         Determines conditions leading to end of game
@@ -159,3 +142,60 @@ class ChessPlayground():
         # some variable endstate that would require further probing.
         # This would be the case if playing some variation
         return "Undetermined"
+
+    def display_all_results(self):
+        """
+        Wrapper for matplotlib to display results of all games
+
+        Returns:
+            (collections.Counter): containing counts of all ending types
+        """
+        counts = Counter(self.all_results)
+
+        _, ax = plt.subplots()
+        ax.bar(counts.keys(), counts.values(),
+               color='black', width=0.75, align='center')
+        ax.set_xlabel('Terminal conditions')
+        ax.set_ylabel('Number games')
+        ax.set_title('Terminal conditions')
+
+        return counts
+
+    def display_value_differences(self, game_index) -> None:
+        """
+        Wrapper for matplotlib to plot difference in piece total
+        values throughout game
+
+        Args:
+            game_index (int): index of game played in iteration of simulation
+                to plot
+        """
+        game_values = self.all_value_differentials[game_index]
+        white_engine_vals = [v[0] for v in game_values]
+        black_engine_vals = [-v[1] for v in game_values]
+        positive_mask = [True if e > 0 else False for e in white_engine_vals]
+
+        _, axes = plt.subplots(2, 1, sharex=True)
+        x = range(len(white_engine_vals))
+        for idx, engine in enumerate([white_engine_vals, black_engine_vals]):
+            axes[idx].fill_between(x, 0, engine, where=positive_mask,
+                                   facecolor='floralwhite', interpolate=True)
+            axes[idx].fill_between(x, 0, engine, where=[
+                not x for x in positive_mask],
+                facecolor='black', interpolate=True)
+            axes[idx].plot(x, engine, color='black', linewidth=0.75)
+            axes[idx].axhline(y=0, color='black', linewidth=0.5)
+
+            if idx == 0:
+                axes[idx].set_ylabel(
+                    f"{self.white_engine.name} (white) evaluation")
+            else:
+                axes[idx].set_ylabel(
+                    f"{self.black_engine.name} (black) evaluation")
+                axes[idx].set_xlabel('Move index')
+
+    def display_all_game_values(self) -> None:
+        """ Wrapper for display_value_differences to plot results of
+        all games """
+        for game in range(len(self.all_value_differentials)):
+            self.display_value_differences(game)
