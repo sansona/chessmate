@@ -4,6 +4,7 @@ explicitly testing the simulation objects here and NOT
 the engines themselves """
 from simulations import *
 from engines import *
+from analysis import *
 import chess
 import chess.pgn
 import pytest

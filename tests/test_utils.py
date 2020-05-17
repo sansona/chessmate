@@ -1,5 +1,6 @@
 """ Test suite for assortment of helper functions """
 from utils import *
+from analysis import *
 import chess
 import chess.pgn
 import pytest

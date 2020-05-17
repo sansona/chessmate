@@ -1,7 +1,11 @@
 """ Utility functions """
-from constants import SQUARE_STR, CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
+import time
 from io import StringIO
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from IPython.display import SVG, display, clear_output
 import chess
+from constants import SQUARE_STR
 
 
 def get_piece_at(board, position: str) -> str:
@@ -24,41 +28,15 @@ def get_piece_at(board, position: str) -> str:
         return ""
 
 
-def tabulate_board_values(board) -> float:
-    """
-    Iterate through board, and determine net piece value difference
-
-    Args:
-        board (chess.Board)
-
-    Returns:
-        (float): containing net value difference
-    """
-    value_difference = 0.0
-
-    # Go through each square, find piece at square, add value to
-    # value_difference
-    for square in chess.SQUARES:
-        piece = board.piece_type_at(square)
-        color = board.color_at(square)
-        if piece:
-            value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
-            if not color:
-                # BLACK encoded as False
-                value *= -1
-            value_difference += value
-
-    return value_difference
-
-
-def display_pgn_text(pgn_game):
+def display_pgn_text(pgn_obj) -> None:
     """
     Displays game loaded from pgn in text form
+
     Args:
-        pgn_game (chess.png.game)
+        pgn_obj (chess.png.game)
     """
-    pgn = StringIO(str(pgn_game))
-    game = chess.pgn.read_game(pgn)
+    pgn_io = StringIO(str(pgn_obj))
+    game = chess.pgn.read_game(pgn_io)
     board = game.board()
     move_count = 1
     for move in game.mainline_moves():
@@ -70,20 +48,37 @@ def display_pgn_text(pgn_game):
         move_count += 1
 
 
-def display_pgn_svg(pgn_game):
+def walkthrough_pgn(pgn_obj, delay=1.0) -> None:
     """
-    Displays game loaded from pgn in svg. Designed for
-    use in jupyter notebooks as generator
+    Allows one to walkthrough pgn game in jupyter notebooks.
+    Saves SVG object in temporary file and displays on notebooks
+    interface
+
     Args:
-        pgn_game (chess.png.game)
+        pgn_obj (chess.png.game)
+        delay(float): time between moves for display to update
     """
-    pgn = StringIO(str(pgn_game))
-    game = chess.pgn.read_game(pgn)
+
+    pgn_io = StringIO(str(pgn_obj))
+    game = chess.pgn.read_game(pgn_io)
     board = game.board()
     move_count = 1
-    for move in game.mainline_moves():
-        mover = "White" if move_count % 2 == 0 else "Black"
-        board.push(move)
-        print(f"Move: {move_count}. {mover} to move")
-        move_count += 1
-        yield board
+
+    with TemporaryDirectory() as temp:
+        for move in game.mainline_moves():
+            mover = "White" if move_count % 2 == 0 else "Black"
+
+            board.push(move)
+            boardsvg = chess.svg.board(board=board)
+
+            # Store each move as image in temp
+            fpath = Path(temp) / f"Move {move_count}_{mover} to move.SVG"
+            with open(fpath, "w") as f:
+                f.write(boardsvg)
+
+            display(SVG(str(fpath)))
+            print(fpath.stem)
+            clear_output(wait=True)
+
+            move_count += 1
+            time.sleep(delay)

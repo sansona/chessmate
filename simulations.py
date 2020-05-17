@@ -1,11 +1,9 @@
 """ Tools to simulate chess games """
-from collections import Counter
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 import chess
 import chess.pgn
 import chess.svg
-from utils import display_pgn_text, display_pgn_svg
+from analysis import evaluate_ending_board
 
 
 class ChessPlayground():
@@ -33,17 +31,6 @@ class ChessPlayground():
     Methods:
         play_game() -> None: plays a single game
         play_multiple_games(N) -> None: plays N games
-        evaluate_ending_board() -> str: evaluates final board state to
-            determine why game over
-        display_all_results() -> None: plots bar chart of all game results
-            played in instance
-        display_material_difference(game_index) -> None: plot line chart of game
-            values as evaluated by both engines
-        display_all_results() -> None: plots all value differences for all
-            games played
-        display_game_as_text(game_index) -> None: displays game at game index as text
-        display_game_as_svg(game_index): return generator
-            that displays game as svg. Designed for use in jupyter
     """
 
     def __init__(self, white_engine, black_engine) -> None:
@@ -94,7 +81,7 @@ class ChessPlayground():
                       self.black_engine.material_difference)))
 
         self.game_pgns.append(self.game)
-        self.all_results.append(self.evaluate_ending_board())
+        self.all_results.append(evaluate_ending_board(self.board))
 
     def play_multiple_games(self, N: int = 100) -> None:
         """
@@ -109,113 +96,3 @@ class ChessPlayground():
         for game_number in progress_bar:
             progress_bar.set_description(f"Playing game {game_number}")
             self.play_game()
-
-    def evaluate_ending_board(self) -> str:
-        """
-        Determines conditions leading to end of game
-
-        Returns:
-            (str): designating condition of game ending
-        """
-        result = self.board.result()
-
-        if not self.board.is_game_over():
-            return "Game not over"
-
-        if result == "1-0":
-            return "White win"
-
-        if result == "0-1":
-            return "Black win"
-
-        # A different design pattern may be to move this var to the init
-        # so as to not keep initializing it on each call, but I want to
-        # explicitly initialize it on each call since it's dependent on
-        # the current board state
-        self.terminal_conditions = {
-            'Checkmate': self.board.is_checkmate,
-            'Stalemate': self.board.is_stalemate,
-            'Insufficient material': self.board.is_insufficient_material,
-            'Seventyfive moves': self.board.is_seventyfive_moves,
-            'Fivefold repetition': self.board.is_fivefold_repetition}
-
-        for title, condition in self.terminal_conditions.items():
-            if condition():
-                return title
-
-        # If none of the defined ending states found, game ended due to
-        # some variable endstate that would require further probing.
-        # This would be the case if playing some variation
-        return "Undetermined"
-
-    def display_all_results(self):
-        """
-        Wrapper for matplotlib to display results of all games
-
-        Returns:
-            (collections.Counter): containing counts of all ending types
-        """
-        counts = Counter(self.all_results)
-
-        _, ax = plt.subplots()
-        ax.bar(counts.keys(), counts.values(),
-               color='black', width=0.75, align='center')
-        ax.set_xlabel('Terminal conditions')
-        ax.set_ylabel('Number games')
-        ax.set_title('Terminal conditions')
-
-        return counts
-
-    def display_material_difference(self, game_index) -> None:
-        """
-        Wrapper for matplotlib to plot difference in piece total
-        values throughout game
-
-        Args:
-            game_index (int): index of game played in iteration of simulation
-                to plot
-        """
-        game_values = self.all_material_differences[game_index]
-        white_engine_vals = [v[0] for v in game_values]
-        black_engine_vals = [-v[1] for v in game_values]
-        positive_mask = [True if e > 0 else False for e in white_engine_vals]
-
-        _, axes = plt.subplots(2, 1, sharex=True)
-        x = range(len(white_engine_vals))
-        for idx, engine in enumerate([white_engine_vals, black_engine_vals]):
-            axes[idx].set_title(f"Game: {game_index}")
-            axes[idx].fill_between(x, 0, engine, where=positive_mask,
-                                   facecolor='floralwhite', interpolate=True)
-            axes[idx].fill_between(x, 0, engine, where=[
-                not x for x in positive_mask],
-                facecolor='black', interpolate=True)
-            axes[idx].plot(x, engine, color='black', linewidth=0.75)
-            axes[idx].axhline(y=0, color='black', linewidth=0.5)
-
-            if idx == 0:
-                axes[idx].set_ylabel(
-                    f"{self.white_engine.name} (white) evaluation")
-            else:
-                axes[idx].set_ylabel(
-                    f"{self.black_engine.name} (black) evaluation")
-                axes[idx].set_xlabel('Move index')
-
-    def display_all_game_values(self) -> None:
-        """ Wrapper for display_material_difference to plot results of
-        all games """
-        for game_idx in range(len(self.all_material_differences)):
-            self.display_material_difference(game_idx)
-
-    def display_game_as_text(self, game_index) -> None:
-        """ Displays game object in text form """
-        display_pgn_text(self.game_pgns[game_index])
-
-    def display_game_as_svg(self, game_index):
-        """
-        Displays game as SVG object via. generator. Note that this
-        is designed to work within jupyter notebooks
-
-        Returns:
-            (generator)
-        """
-        return display_pgn_svg(self.game_pgns[game_index])

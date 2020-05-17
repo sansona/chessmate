@@ -1,5 +1,6 @@
 """ Test suite for engines """
 from engines import *
+from analysis import *
 import chess
 import chess.pgn
 import pytest
