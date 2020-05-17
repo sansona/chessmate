@@ -2,7 +2,7 @@
 Collection of chess engines that evaluate board state and select best moves
 """
 import random
-from helper_functions import get_piece_at, tabulate_board_values
+from utils import get_piece_at, tabulate_board_values
 from constants import CONVENTIONAL_PIECE_VALUES
 
 
@@ -38,13 +38,13 @@ class ChessEngine():
                 uci notation
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
-            value_differentials (List[float]): difference in value on board
-                at each end step
+            material_difference (List[float]): difference in value on board
+                at each end step based off material
         """
         self.name = None
         self.legal_moves = {}
         self.value_mapping = CONVENTIONAL_PIECE_VALUES
-        self.value_differentials = []
+        self.material_difference = []
 
     def evaluate(self, board):
         """
@@ -83,7 +83,7 @@ class ChessEngine():
 
     def reset_game_variables(self):
         """ Resets variables at end of game"""
-        self.value_differentials = []
+        self.material_difference = []
 
 
 class Random(ChessEngine):
@@ -102,7 +102,7 @@ class Random(ChessEngine):
         legal_move_list = list(board.legal_moves)
         self.legal_moves = {
             legal_move_list[i]: 1 for i in range(len(legal_move_list))}
-        self.value_differentials.append(tabulate_board_values(board))
+        self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board):
         """Selects random move. See parent docstring"""
@@ -134,7 +134,7 @@ class PrioritizePawnMoves(Random):
             self.legal_moves = {
                 legal_move_list[i]: 1 for i in range(len(legal_move_list))}
 
-        self.value_differentials.append(tabulate_board_values(board))
+        self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board):
         """Selects random move. See parent docstring"""
@@ -162,7 +162,7 @@ class RandomCapture(ChessEngine):
             else:
                 self.legal_moves[m] = 0
 
-        self.value_differentials.append(tabulate_board_values(board))
+        self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board):
         """Select move that features capture out of random moves
@@ -171,7 +171,7 @@ class RandomCapture(ChessEngine):
 
         # If no capture move available, return any key
         if not 1 in self.legal_moves.values():
-            return list(self.legal_moves)[0]
+            return random.choice([*self.legal_moves])
 
         # Return first available capture move identified
         for m in list(self.legal_moves):
@@ -194,14 +194,14 @@ class CaptureHighestValue(ChessEngine):
 
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
-            piece_at_position = get_piece_at(board, str(m)[-2:]).upper()
+            piece_at_position = get_piece_at(board, str(m)[2:4]).upper()
 
             if (not board.is_capture(m)) or (not piece_at_position):
                 self.legal_moves[m] = 0
             else:
                 self.legal_moves[m] = self.value_mapping[piece_at_position]
 
-        self.value_differentials.append(tabulate_board_values(board))
+        self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board):
         """Select move that features capture out of random moves
@@ -219,8 +219,7 @@ class CaptureHighestValue(ChessEngine):
         # return random move
         if highest_capture_uci:
             return highest_capture_uci
-
-        return list(self.legal_moves)[0]
+        return random.choice([*self.legal_moves])
 
 
 class AvoidCapture(RandomCapture):
@@ -244,4 +243,4 @@ class AvoidCapture(RandomCapture):
             else:
                 self.legal_moves[m] = 0
 
-        self.value_differentials.append(tabulate_board_values(board))
+        self.material_difference.append(tabulate_board_values(board))

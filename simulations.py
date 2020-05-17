@@ -5,6 +5,7 @@ from tqdm import tqdm
 import chess
 import chess.pgn
 import chess.svg
+from utils import display_pgn_text, display_pgn_svg
 
 
 class ChessPlayground():
@@ -19,11 +20,13 @@ class ChessPlayground():
         board (chess.board): board representation
         terminal_conditions (Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
+        game_pgns (List(chess.pgn.Game.node)): list of all pgn data for
+            games played
         all_results (List[str]): containing strings describing all game
             results
         all_move_counts (List[int]): contains count of number of moves in
             each game played
-        all_value_differentials (List[tuple]): contains mapping of value
+        all_material_differences (List[tuple]): contains mapping of value
             differential for each move across each game played in form
             (white engine evaluation, black engine evaluation) at each move
 
@@ -34,10 +37,13 @@ class ChessPlayground():
             determine why game over
         display_all_results() -> None: plots bar chart of all game results
             played in instance
-        display_value_differences(game_index) -> None: plot line chart of game
+        display_material_difference(game_index) -> None: plot line chart of game
             values as evaluated by both engines
         display_all_results() -> None: plots all value differences for all
             games played
+        display_game_as_text(game_index) -> None: displays game at game index as text
+        display_game_as_svg(game_index): return generator
+            that displays game as svg. Designed for use in jupyter
     """
 
     def __init__(self, white_engine, black_engine) -> None:
@@ -54,12 +60,11 @@ class ChessPlayground():
         self.black_engine = black_engine
 
         self.game, self.board, self.terminal_conditions = None, None, None
-        (self.all_results, self.all_move_counts,
-            self.all_value_differentials) = ([], [], [])
+        (self.game_pgns, self.all_results, self.all_move_counts,
+            self.all_material_differences) = [], [], [], []
 
     def play_game(self) -> None:
         """ Plays single game """
-        # Initialize new game, reset value_differential count for each game
         self.game = chess.pgn.Game()
         self.board = self.game.board()
         self.white_engine.reset_game_variables()
@@ -84,12 +89,12 @@ class ChessPlayground():
         # At end of game, store number of moves in game, value of pieces on
         # board throughout game, and reason for ending game
         self.all_move_counts.append(self.board.fullmove_number - 1)
-        self.all_value_differentials.append(
-            tuple(zip(self.white_engine.value_differentials,
-                      self.black_engine.value_differentials)))
+        self.all_material_differences.append(
+            tuple(zip(self.white_engine.material_difference,
+                      self.black_engine.material_difference)))
 
-        result = self.evaluate_ending_board()
-        self.all_results.append(result)
+        self.game_pgns.append(self.game)
+        self.all_results.append(self.evaluate_ending_board())
 
     def play_multiple_games(self, N: int = 100) -> None:
         """
@@ -161,7 +166,7 @@ class ChessPlayground():
 
         return counts
 
-    def display_value_differences(self, game_index) -> None:
+    def display_material_difference(self, game_index) -> None:
         """
         Wrapper for matplotlib to plot difference in piece total
         values throughout game
@@ -170,7 +175,7 @@ class ChessPlayground():
             game_index (int): index of game played in iteration of simulation
                 to plot
         """
-        game_values = self.all_value_differentials[game_index]
+        game_values = self.all_material_differences[game_index]
         white_engine_vals = [v[0] for v in game_values]
         black_engine_vals = [-v[1] for v in game_values]
         positive_mask = [True if e > 0 else False for e in white_engine_vals]
@@ -178,6 +183,7 @@ class ChessPlayground():
         _, axes = plt.subplots(2, 1, sharex=True)
         x = range(len(white_engine_vals))
         for idx, engine in enumerate([white_engine_vals, black_engine_vals]):
+            axes[idx].set_title(f"Game: {game_index}")
             axes[idx].fill_between(x, 0, engine, where=positive_mask,
                                    facecolor='floralwhite', interpolate=True)
             axes[idx].fill_between(x, 0, engine, where=[
@@ -195,7 +201,21 @@ class ChessPlayground():
                 axes[idx].set_xlabel('Move index')
 
     def display_all_game_values(self) -> None:
-        """ Wrapper for display_value_differences to plot results of
+        """ Wrapper for display_material_difference to plot results of
         all games """
-        for game_idx in range(len(self.all_value_differentials)):
-            self.display_value_differences(game_idx)
+        for game_idx in range(len(self.all_material_differences)):
+            self.display_material_difference(game_idx)
+
+    def display_game_as_text(self, game_index) -> None:
+        """ Displays game object in text form """
+        display_pgn_text(self.game_pgns[game_index])
+
+    def display_game_as_svg(self, game_index):
+        """
+        Displays game as SVG object via. generator. Note that this
+        is designed to work within jupyter notebooks
+
+        Returns:
+            (generator)
+        """
+        return display_pgn_svg(self.game_pgns[game_index])

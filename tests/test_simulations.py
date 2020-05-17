@@ -10,6 +10,8 @@ import pytest
 import sys
 sys.path.append('..')
 
+N_GAMES = 10
+
 
 @pytest.fixture
 def setup_engines():
@@ -20,28 +22,50 @@ def setup_engines():
     Returns:
             (List[ChessEngines])
     """
-    return [Random(), CaptureHighestValue()]
+    return [AvoidCapture(), CaptureHighestValue()]
 
 
-def test_single_game(setup_engines):
-    """ Tests that game metadata stored properly """
+def test_single_game_results(setup_engines):
+    """ Tests that game results stored properly """
     game = ChessPlayground(setup_engines[0], setup_engines[1])
     game.play_game()
 
     assert len(game.all_results) == 1
     assert isinstance(game.all_results[0], str)
+
+
+def test_single_game_metadata(setup_engines):
+    """ Tests that materials differences & game moves are being stored
+    properly """
+    game = ChessPlayground(setup_engines[0], setup_engines[1])
+    game.play_game()
+
     assert isinstance(game.all_move_counts[0], int)
-    assert len(game.all_value_differentials[0]) == game.all_move_counts[0]
+    assert len(game.all_material_differences[0]) == game.all_move_counts[0]
 
 
-def test_multiple_games(setup_engines, n_games=10):
-    """ Tests that multiple games can be played and data is stored properly """
+def test_multiple_games_results(setup_engines):
+    """ Tests that results for multiple games stored properly """
     simulator = ChessPlayground(setup_engines[0], setup_engines[1])
-    simulator.play_multiple_games(n_games)
+    simulator.play_multiple_games(N_GAMES)
 
-    assert len(simulator.all_results) == n_games
+    assert len(simulator.all_results) == N_GAMES
     assert all(isinstance(res, str) for res in simulator.all_results)
-    assert all(isinstance(
-        move_count, int) for move_count in simulator.all_move_counts)
+
+
+def test_multiple_games_metadata(setup_engines):
+    """ Tests that metadata for multiple games stored properly """
+    simulator = ChessPlayground(setup_engines[0], setup_engines[1])
+    simulator.play_multiple_games(N_GAMES)
+
     assert all(len(value_diff) == num_moves for value_diff, num_moves in zip(
-        simulator.all_value_differentials, simulator.all_move_counts))
+        simulator.all_material_differences, simulator.all_move_counts))
+
+
+def test_multiple_games_played(setup_engines):
+    """ Tests that each game played is unique """
+    simulator = ChessPlayground(setup_engines[0], setup_engines[1])
+    simulator.play_multiple_games(N_GAMES)
+
+    assert len(set(simulator.all_move_counts)) != 1
+    assert len(set(simulator.all_material_differences)) != 1
