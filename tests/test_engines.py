@@ -38,7 +38,7 @@ def starting_engines():
 def test_base_engine(starting_board):
     """ Tests that errors are throwing properly if
     initialized without redefining evaluate & move"""
-    eng = ChessEngine()
+    eng = BaseEngine()
     with pytest.raises(NotImplementedError):
         eng.evaluate(starting_board)
     with pytest.raises(NotImplementedError):

@@ -6,6 +6,61 @@ import chess.svg
 from analysis import evaluate_ending_board
 
 
+class PlayVsEngine():
+    """
+    Class for playing against engine move by move
+    """
+
+    def __init__(self, engine):
+        self.engine = engine
+        self.game = chess.pgn.Game()
+        self.board = self.game.board()
+        self.node = None
+
+    def player_move(self):
+        legal_move = False
+        while not legal_move:
+            try:
+                player_move = chess.Move.from_uci(str(input()))
+            except ValueError():
+                print(f"Move not recognized")
+
+            if player_move in self.board.legal_moves:
+                legal_move = True
+                self.board.push_uci(str(player_move))
+            else:
+                print(f"Not legal move - {str(player_move)}")
+
+        if self.board.fullmove_number == 1:
+            self.node = self.game.add_variation(player_move)
+        else:
+            self.node = self.node.add_variation(player_move)
+
+        return self.board
+
+    def engine_move(self):
+        eng_move = self.engine.move(self.board)
+        self.board.push_uci(str(eng_move))
+
+        if self.board.fullmove_number == 1:
+            self.node = self.game.add_variation(eng_move)
+        else:
+            self.node = self.node.add_variation(eng_move)
+
+        return self.board
+
+    def play_game(self, play_as='white'):
+        while not self.board.is_game_over():
+            if play_as == 'white':
+                self.player_move()
+                self.engine_move()
+            else:
+                self.engine_move()
+                self.player_move()
+
+        print("Game over")
+
+
 class ChessPlayground():
     """
     Class for experimenting with different engines & algorithms. This class

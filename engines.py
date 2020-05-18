@@ -7,7 +7,7 @@ from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES
 
 
-class ChessEngine():
+class BaseEngine():
     """
     Base class for defining an engine. Each engine is responsible for
     evaluating a board state and providing a move
@@ -87,7 +87,7 @@ class ChessEngine():
         self.material_difference = []
 
 
-class Random(ChessEngine):
+class Random(BaseEngine):
     """ Engine that simply chooses random legal move """
 
     def __init__(self):
@@ -143,7 +143,7 @@ class PrioritizePawnMoves(Random):
         return random.choice([*self.legal_moves])
 
 
-class RandomCapture(ChessEngine):
+class RandomCapture(BaseEngine):
     """ Engine that prioritizes capturing any piece
     if the option presents itself """
 
@@ -180,7 +180,7 @@ class RandomCapture(ChessEngine):
                 return m
 
 
-class CaptureHighestValue(ChessEngine):
+class CaptureHighestValue(BaseEngine):
     """ Engine that prioritizes capturing the highest value piece if
     the option presents itself """
 
