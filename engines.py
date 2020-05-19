@@ -108,6 +108,12 @@ class Random(BaseEngine):
     def move(self, board):
         """Selects random move. See parent docstring"""
         self.evaluate(board)
+
+        # If no legal moves available, return null move and pass turn
+        # so that board.is_game_over() is flagged
+        if not [*self.legal_moves]:
+            return chess.Move.null()
+
         return random.choice([*self.legal_moves])
 
 
@@ -137,11 +143,6 @@ class PrioritizePawnMoves(Random):
 
         self.material_difference.append(tabulate_board_values(board))
 
-    def move(self, board):
-        """Selects random move. See parent docstring"""
-        self.evaluate(board)
-        return random.choice([*self.legal_moves])
-
 
 class RandomCapture(BaseEngine):
     """ Engine that prioritizes capturing any piece
@@ -169,6 +170,9 @@ class RandomCapture(BaseEngine):
         """Select move that features capture out of random moves
         if one is available. See parent docstring"""
         self.evaluate(board)
+
+        if not [*self.legal_moves]:
+            return chess.Move.null()
 
         # If no capture move available, return any key
         if not 1 in self.legal_moves.values():
@@ -208,6 +212,10 @@ class CaptureHighestValue(BaseEngine):
         """Select move that features capture out of random moves
         if one is available. See parent docstring"""
         self.evaluate(board)
+
+        if not [*self.legal_moves]:
+            return chess.Move.null()
+
         highest_capture_val, highest_capture_uci = 0, None
 
         # Find move with highest capture value

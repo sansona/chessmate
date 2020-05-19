@@ -1,44 +1,85 @@
 """ Tools to simulate chess games """
+from tempfile import TemporaryDirectory
 from tqdm import tqdm
+from ipywidgets import Dropdown
+from IPython.display import display
+
 import chess
 import chess.pgn
 import chess.svg
 from analysis import evaluate_ending_board
+from utils import render_svg_board
+
+
+def on_dropdown_change(change):
+    if change['type'] == 'change' and change['name'] == 'value':
+        print(change)
 
 
 class PlayVsEngine():
     """
-    Class for playing against engine move by move
+    Class for playing against engine move by move in jupyter notebook
+
+    Attributes:
+        engine (engines.BaseEngine): engine to play against
+        game (chess.pgn.Game): game object
+        board (chess.board): board representation
+        node (chess.Board.node): gametree object for storing moves
+
+    Methods:
+        player_move() -> None: allows player to push UCI move
+        engine_move() -> None: allows engine to evaluate boardstate and push
+            a move
+        play_game(playas) -> None: wrapper around player_move() & engine_move()
+            with built-in logic to allow move by move play
+        display_board() -> None: generic function to display board. Wrapper
+            around utils.render_svg_board()
     """
 
     def __init__(self, engine):
+        """ Setups empty board and engine """
         self.engine = engine
         self.game = chess.pgn.Game()
         self.board = self.game.board()
         self.node = None
 
-    def player_move(self):
+    def player_move(self) -> None:
+        """ Allows player to push UCI move with current boardstate """
+
+        all_legal_moves = [str(m) for m in list(self.board.legal_moves)]
+        dropdown = Dropdown(options=all_legal_moves)
+        dropdown.observe(on_dropdown_change)
+        display(dropdown)
+        self.board.push_uci(dropdown.value)
+        """
         legal_move = False
+
         while not legal_move:
+            # Stay in loop until player enters a legal move - catches
+            # non-UCI inputs & illegal moves
             try:
-                player_move = chess.Move.from_uci(str(input()))
-            except ValueError():
-                print(f"Move not recognized")
+                move_input = chess.Move.from_uci(str(input()))
+            except ValueError:
+                self.display_board(f"Move not recognized - {str(move_input)}")
+                continue
 
-            if player_move in self.board.legal_moves:
+            if move_input in self.board.legal_moves:
                 legal_move = True
-                self.board.push_uci(str(player_move))
+                self.board.push_uci(str(move_input))
             else:
-                print(f"Not legal move - {str(player_move)}")
-
+                self.display_board(f"Not legal move - {str(move_input)}")
+        """
+        # Store data in gametree node
         if self.board.fullmove_number == 1:
-            self.node = self.game.add_variation(player_move)
+            self.node = self.game.add_variation(dropdown.value)
         else:
-            self.node = self.node.add_variation(player_move)
+            self.node = self.node.add_variation(dropdown.value)
 
-        return self.board
+        self.display_board(
+            f"Move {self.board.fullmove_number} - engine to move.")
 
-    def engine_move(self):
+    def engine_move(self) -> None:
+        """ Allows engine to evaluate board and push UCI move """
         eng_move = self.engine.move(self.board)
         self.board.push_uci(str(eng_move))
 
@@ -47,9 +88,20 @@ class PlayVsEngine():
         else:
             self.node = self.node.add_variation(eng_move)
 
-        return self.board
+        self.display_board(
+            f"Move {self.board.fullmove_number}- player to move.")
 
-    def play_game(self, play_as='white'):
+    def play_game(self, play_as='white') -> None:
+        """
+        Wrapper around player_move() & engine_move() with simple logic built in
+        to determine move order
+
+        Args:
+            play_as (str): side to play game as. Default='white'
+        """
+        self.display_board(
+            f"Move {self.board.fullmove_number} - ready for first move.")
+
         while not self.board.is_game_over():
             if play_as == 'white':
                 self.player_move()
@@ -58,7 +110,19 @@ class PlayVsEngine():
                 self.engine_move()
                 self.player_move()
 
-        print("Game over")
+        print(evaluate_ending_board(board))
+
+    def display_board(self, display_str) -> None:
+        """
+        Wrapper around utils.render_svg_board with temporary directory
+        context manager
+
+        Args:
+            display_str (str): str to display beneath board for board state
+                context
+        """
+        with TemporaryDirectory() as temp:
+            render_svg_board(self.board, temp, display_str)
 
 
 class ChessPlayground():
@@ -67,19 +131,19 @@ class ChessPlayground():
     handles the analysis of the various engines, including plotting data
 
     Attributes:
-        white_engine (ChessEngine): engine for determining white moves
-        black_engine (ChessEngine): engine for determining black moves
-        game (chess.pgn.Game): game object
-        board (chess.board): board representation
-        terminal_conditions (Dict[function]): in form "name of terminal
+        white_engine(ChessEngine): engine for determining white moves
+        black_engine(ChessEngine): engine for determining black moves
+        game(chess.pgn.Game): game object
+        board(chess.board): board representation
+        terminal_conditions(Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
-        game_pgns (List(chess.pgn.Game.node)): list of all pgn data for
+        game_pgns(List(chess.pgn.Game.node)): list of all pgn data for
             games played
-        all_results (List[str]): containing strings describing all game
+        all_results(List[str]): containing strings describing all game
             results
-        all_move_counts (List[int]): contains count of number of moves in
+        all_move_counts(List[int]): contains count of number of moves in
             each game played
-        all_material_differences (List[tuple]): contains mapping of value
+        all_material_differences(List[tuple]): contains mapping of value
             differential for each move across each game played in form
             (white engine evaluation, black engine evaluation) at each move
 
@@ -94,8 +158,8 @@ class ChessPlayground():
         Engines should evaluate board state and return a uci move
 
         Args:
-            white_engine (ChessEngine)
-            black_engine (ChessEngine)
+            white_engine(ChessEngine)
+            black_engine(ChessEngine)
         """
 
         self.white_engine = white_engine
@@ -144,7 +208,7 @@ class ChessPlayground():
         Note: results values in all_results
 
         Args:
-            N (int): number of games to play. Default=100
+            N(int): number of games to play. Default = 100
         """
         self.all_results = []
         progress_bar = tqdm(range(1, N+1))
