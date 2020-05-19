@@ -44,7 +44,7 @@ def evaluate_ending_board(board) -> str:
     result = board.result()
 
     if not board.is_game_over():
-        return "Game not over"
+        return "Game over by resignation"
     if result == "1-0":
         return "White win by mate"
     if result == "0-1":
@@ -73,7 +73,7 @@ def evaluate_ending_board(board) -> str:
 
 def display_all_results(all_results):
     """
-    Wrapper for matplotlib to display results of all games
+    Wrapper for matplotlib to display results of all games in bar chart
 
     Args:
         all_results (List[str]): containing strings describing all game

@@ -75,6 +75,8 @@ class PlayVsEngine():
         self.display_board(
             f"Move {self.board.fullmove_number}- player to move.")
 
+        return eng_move
+
     def play_game(self, play_as='white') -> None:
         """
         Wrapper around player_move() & engine_move() with simple logic built in
@@ -94,9 +96,16 @@ class PlayVsEngine():
                 # pair i.e on white's turn
                 if self.board.is_game_over():
                     break
-                self.engine_move()
+
+                # python-chess doesn't have a resign option, so if engine
+                # returns null move, take as resignation and end game
+                eng_move = self.engine_move()
+                if eng_move == chess.Move.null():
+                    break
             else:
-                self.engine_move()
+                eng_move = self.engine_move()
+                if eng_move == chess.Move.null():
+                    break
                 if self.board.is_game_over():
                     break
                 self.player_move()
@@ -170,6 +179,8 @@ class ChessPlayground():
         while not self.board.is_game_over():
             # If white ends game on move, don't execute black move
             white_move = self.white_engine.move(self.board)
+            if white_move == chess.Move.null():
+                break
             self.board.push_uci(str(white_move))
             if self.board.fullmove_number == 1:
                 # on first move, setup game tree
@@ -180,6 +191,8 @@ class ChessPlayground():
             # If white's move doesn't end game, play black's move
             if not self.board.is_game_over():
                 black_move = self.black_engine.move(self.board)
+                if black_move == chess.Move.null():
+                    break
                 self.board.push_uci(str(black_move))
                 node = node.add_variation(black_move)
 

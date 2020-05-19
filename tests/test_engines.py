@@ -32,7 +32,8 @@ def starting_engines():
             PrioritizePawnMoves(),
             RandomCapture(),
             CaptureHighestValue(),
-            AvoidCapture()]
+            AvoidCapture(),
+            ScholarsMate()]
 
 
 def test_base_engine(starting_board):

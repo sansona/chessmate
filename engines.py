@@ -254,3 +254,41 @@ class AvoidCapture(RandomCapture):
                 self.legal_moves[m] = 0
 
         self.material_difference.append(tabulate_board_values(board))
+
+
+class ScholarsMate(BaseEngine):
+    """ Engine that only executes scholar's mate. Note that since
+    scholar's mate is defined for white play, engine will forfeit
+    is on black side. """
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Scholar's Mate"
+
+    def evaluate(self, board):
+        """ Inits scholar's mate play as legal_moves """
+        self.reset_move_variables()
+
+        moves = ("e2e4", "f1c4", "d1h5", "h5f7")
+        for m in moves:
+            self.legal_moves[m] = 0
+
+        self.material_difference.append(tabulate_board_values(board))
+
+    def move(self, board):
+        """ Run through scholar's mate sequence. If any moves become
+        blocked, resign """
+        self.evaluate(board)
+
+        # If past first five moves, resign
+        if board.fullmove_number not in range(1, 5):
+            return chess.Move.null()
+
+        # If any of scholar's mate moves blocked, resign
+        move = [*self.legal_moves][board.fullmove_number - 1]
+
+        if move not in [str(m) for m in list(board.legal_moves)]:
+            return chess.Move.null()
+
+        return chess.Move.from_uci(move)
