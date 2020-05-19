@@ -1,19 +1,11 @@
 """ Tools to simulate chess games """
 from tempfile import TemporaryDirectory
 from tqdm import tqdm
-from ipywidgets import Dropdown
-from IPython.display import display
-
 import chess
 import chess.pgn
 import chess.svg
 from analysis import evaluate_ending_board
 from utils import render_svg_board
-
-
-def on_dropdown_change(change):
-    if change['type'] == 'change' and change['name'] == 'value':
-        print(change)
 
 
 class PlayVsEngine():
@@ -30,7 +22,7 @@ class PlayVsEngine():
         player_move() -> None: allows player to push UCI move
         engine_move() -> None: allows engine to evaluate boardstate and push
             a move
-        play_game(playas) -> None: wrapper around player_move() & engine_move()
+        play_game(play_as) -> None: wrapper around player_move() & engine_move()
             with built-in logic to allow move by move play
         display_board() -> None: generic function to display board. Wrapper
             around utils.render_svg_board()
@@ -45,15 +37,7 @@ class PlayVsEngine():
 
     def player_move(self) -> None:
         """ Allows player to push UCI move with current boardstate """
-
-        all_legal_moves = [str(m) for m in list(self.board.legal_moves)]
-        dropdown = Dropdown(options=all_legal_moves)
-        dropdown.observe(on_dropdown_change)
-        display(dropdown)
-        self.board.push_uci(dropdown.value)
-        """
         legal_move = False
-
         while not legal_move:
             # Stay in loop until player enters a legal move - catches
             # non-UCI inputs & illegal moves
@@ -68,12 +52,12 @@ class PlayVsEngine():
                 self.board.push_uci(str(move_input))
             else:
                 self.display_board(f"Not legal move - {str(move_input)}")
-        """
+
         # Store data in gametree node
         if self.board.fullmove_number == 1:
-            self.node = self.game.add_variation(dropdown.value)
+            self.node = self.game.add_variation(move_input)
         else:
-            self.node = self.node.add_variation(dropdown.value)
+            self.node = self.node.add_variation(move_input)
 
         self.display_board(
             f"Move {self.board.fullmove_number} - engine to move.")
@@ -105,12 +89,19 @@ class PlayVsEngine():
         while not self.board.is_game_over():
             if play_as == 'white':
                 self.player_move()
+                # Include checks after every move whether game over since
+                # python chess only checks for game over at beginning of move
+                # pair i.e on white's turn
+                if self.board.is_game_over():
+                    break
                 self.engine_move()
             else:
                 self.engine_move()
+                if self.board.is_game_over():
+                    break
                 self.player_move()
 
-        print(evaluate_ending_board(board))
+        self.display_board(f"{evaluate_ending_board(self.board)}!")
 
     def display_board(self, display_str) -> None:
         """

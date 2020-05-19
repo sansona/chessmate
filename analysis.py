@@ -46,9 +46,9 @@ def evaluate_ending_board(board) -> str:
     if not board.is_game_over():
         return "Game not over"
     if result == "1-0":
-        return "White win"
+        return "White win by mate"
     if result == "0-1":
-        return "Black win"
+        return "Black win by mate"
 
     # A different design pattern may be to move this var to the init
     # so as to not keep initializing it on each call, but I want to

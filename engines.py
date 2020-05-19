@@ -2,6 +2,7 @@
 Collection of chess engines that evaluate board state and select best moves
 """
 import random
+import chess
 from analysis import tabulate_board_values
 from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES
@@ -175,7 +176,7 @@ class RandomCapture(BaseEngine):
             return chess.Move.null()
 
         # If no capture move available, return any key
-        if not 1 in self.legal_moves.values():
+        if 1 not in self.legal_moves.values():
             return random.choice([*self.legal_moves])
 
         # Return first available capture move identified
