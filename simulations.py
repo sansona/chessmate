@@ -6,6 +6,7 @@ import chess.pgn
 import chess.svg
 from analysis import evaluate_ending_board
 from utils import render_svg_board
+from constants import COLOR_MAP
 
 
 class PlayVsEngine():
@@ -17,6 +18,9 @@ class PlayVsEngine():
         game (chess.pgn.Game): game object
         board (chess.board): board representation
         node (chess.Board.node): gametree object for storing moves
+        player_side (chess.Color/bool): chess.WHITE or chess.BLACK for
+            side to play as. Note that since python-chess encodes the color
+            as a bool, decode it as color for displaying
 
     Methods:
         player_move() -> chess.Move: allows player to push UCI move
@@ -36,7 +40,21 @@ class PlayVsEngine():
         self.game = chess.pgn.Game()
         self.board: chess.Board = self.game.board()
         self.node = None
-        self.playing_as: str = 'white'
+        self._player_side: chess.Color = chess.WHITE
+
+    @property
+    def player_side(self):
+        """ Defining getter for player_side. Since chess.Color encoded as
+        bool, remap to color string for user intepretation """
+        return COLOR_MAP[self._player_side]
+
+    @player_side.setter
+    def player_side(self, side):
+        """ Setter function for player_side - chess.Color/bool inputs valid """
+        if not isinstance(side, chess.Color):
+            raise TypeError(f"Invalid self.player_side ({self._player_side}) "
+                            "not in (chess.WHITE, chess.BLACK)")
+        self._player_side = side
 
     def player_move(self) -> chess.Move:
         """
@@ -91,6 +109,9 @@ class PlayVsEngine():
         """
         Wrapper around player_move() & engine_move() with simple logic built in
         to determine move order
+
+        Raises:
+            TypeError: on initializing invalid self._player_side type
         """
         self.display_board(
             f"Move {self.board.fullmove_number} - ready for first move.")
@@ -99,7 +120,7 @@ class PlayVsEngine():
         # move, check if move results in game over or if move is null. Null
         # represents resignation
         while not self.board.is_game_over():
-            if self.playing_as == 'white':
+            if self._player_side == chess.WHITE:
                 user_move = self.player_move()
                 if user_move == chess.Move.null():
                     break
@@ -111,7 +132,7 @@ class PlayVsEngine():
                 eng_move = self.engine_move()
                 if eng_move == chess.Move.null():
                     break
-            else:
+            if self._player_side == chess.BLACK:
                 eng_move = self.engine_move()
                 if eng_move == chess.Move.null():
                     break

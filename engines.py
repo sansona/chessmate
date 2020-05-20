@@ -281,6 +281,13 @@ class ScholarsMate(BaseEngine):
     def move(self, board: chess.Board) -> chess.Move:
         """ Run through scholar's mate sequence. If any moves become
         blocked, resign """
+
+        # Since Scholar's Mate relies on standard board setup, resign
+        # if starting board is not standard
+        if (board.fullmove_number == 1) and (
+                board.starting_fen != chess.STARTING_FEN):
+            return chess.Move.null()
+
         self.evaluate(board)
 
         # If past first five moves, resign
