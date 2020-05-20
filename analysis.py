@@ -1,11 +1,12 @@
 """ Functions for analyzing board states and results of games """
+from typing import List
 from collections import Counter
 import matplotlib.pyplot as plt
 import chess
 from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
 
 
-def tabulate_board_values(board) -> float:
+def tabulate_board_values(board: chess.Board) -> float:
     """
     Iterate through board, and determine net piece value difference
 
@@ -32,7 +33,7 @@ def tabulate_board_values(board) -> float:
     return value_difference
 
 
-def evaluate_ending_board(board) -> str:
+def evaluate_ending_board(board: chess.Board) -> str:
     """
     Determines conditions leading to end of game
 
@@ -71,7 +72,7 @@ def evaluate_ending_board(board) -> str:
     return "Undetermined"
 
 
-def display_all_results(all_results):
+def display_all_results(all_results: List[str]) -> Counter:
     """
     Wrapper for matplotlib to display results of all games in bar chart
 
@@ -93,7 +94,7 @@ def display_all_results(all_results):
     return counts
 
 
-def display_material_difference(material_differences, game_index) -> None:
+def display_material_difference(material_differences, game_index: int) -> None:
     """
     Wrapper for matplotlib to plot difference in piece total
     values throughout game

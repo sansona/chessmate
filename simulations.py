@@ -19,81 +19,90 @@ class PlayVsEngine():
         node (chess.Board.node): gametree object for storing moves
 
     Methods:
-        player_move() -> None: allows player to push UCI move
-        engine_move() -> None: allows engine to evaluate boardstate and push
-            a move
-        play_game(play_as) -> None: wrapper around player_move() & engine_move()
+        player_move() -> chess.Move: allows player to push UCI move
+        engine_move() -> chess.Move: allows engine to evaluate boardstate and
+            push a move. Null if engine resigns
+        play_game() -> None: wrapper around player_move() & engine_move()
             with built-in logic to allow move by move play
-        display_board() -> None: generic function to display board. Wrapper
-            around utils.render_svg_board()
+        append_move_to_tree (chess.Move): appends move to game tree
+            representation
+        display_board() -> None: function to display board. Wrapper around
+            utils.render_svg_board()
     """
 
     def __init__(self, engine):
         """ Setups empty board and engine """
         self.engine = engine
         self.game = chess.pgn.Game()
-        self.board = self.game.board()
+        self.board: chess.Board = self.game.board()
         self.node = None
+        self.playing_as: str = 'white'
 
-    def player_move(self) -> None:
-        """ Allows player to push UCI move with current boardstate """
+    def player_move(self) -> chess.Move:
+        """
+        Allows player to push UCI move with current boardstate
+
+        (chess.Move): UCI object of move input
+        """
         legal_move = False
         while not legal_move:
             # Stay in loop until player enters a legal move - catches
             # non-UCI inputs & illegal moves
+            input_str = str(input())
+            if input_str == 'resign':
+                return chess.Move.null()
+
             try:
-                move_input = chess.Move.from_uci(str(input()))
+                input_move = chess.Move.from_uci(input_str)
             except ValueError:
-                self.display_board(f"Move not recognized - {str(move_input)}")
+                self.display_board(f"Move not recognized - {str(input_move)}")
                 continue
 
-            if move_input in self.board.legal_moves:
+            if input_move in self.board.legal_moves:
                 legal_move = True
-                self.board.push_uci(str(move_input))
+                self.board.push_uci(str(input_move))
             else:
-                self.display_board(f"Not legal move - {str(move_input)}")
+                self.display_board(f"Not legal move - {str(input_move)}")
 
-        # Store data in gametree node
-        if self.board.fullmove_number == 1:
-            self.node = self.game.add_variation(move_input)
-        else:
-            self.node = self.node.add_variation(move_input)
-
+        self.append_move_to_tree(input_move)
         self.display_board(
             f"Move {self.board.fullmove_number} - engine to move.")
 
-    def engine_move(self) -> None:
-        """ Allows engine to evaluate board and push UCI move """
+        return input_move
+
+    def engine_move(self) -> chess.Move:
+        """
+        Allows engine to evaluate board and push UCI move
+
+        Returns:
+            (chess.Move): UCI move from engine evaluation. Null if engine
+                resigned
+        """
         eng_move = self.engine.move(self.board)
         self.board.push_uci(str(eng_move))
 
-        if self.board.fullmove_number == 1:
-            self.node = self.game.add_variation(eng_move)
-        else:
-            self.node = self.node.add_variation(eng_move)
-
+        self.append_move_to_tree(eng_move)
         self.display_board(
             f"Move {self.board.fullmove_number}- player to move.")
 
         return eng_move
 
-    def play_game(self, play_as='white') -> None:
+    def play_game(self) -> None:
         """
         Wrapper around player_move() & engine_move() with simple logic built in
         to determine move order
-
-        Args:
-            play_as (str): side to play game as. Default='white'
         """
         self.display_board(
             f"Move {self.board.fullmove_number} - ready for first move.")
 
+        # Break out of loop by checking after each move is game over. For each
+        # move, check if move results in game over or if move is null. Null
+        # represents resignation
         while not self.board.is_game_over():
-            if play_as == 'white':
-                self.player_move()
-                # Include checks after every move whether game over since
-                # python chess only checks for game over at beginning of move
-                # pair i.e on white's turn
+            if self.playing_as == 'white':
+                user_move = self.player_move()
+                if user_move == chess.Move.null():
+                    break
                 if self.board.is_game_over():
                     break
 
@@ -108,14 +117,29 @@ class PlayVsEngine():
                     break
                 if self.board.is_game_over():
                     break
-                self.player_move()
+                user_move = self.player_move()
+                if user_move == chess.Move.null():
+                    break
 
         self.display_board(f"{evaluate_ending_board(self.board)}!")
+
+    def append_move_to_tree(self, move) -> None:
+        """
+        Appends move to gametree representation
+
+        Args:
+            move (chess.Move): move in UCI object
+        """
+        if self.board.fullmove_number == 1:
+            # If first move, initiate root node
+            self.node = self.game.add_variation(move)
+        else:
+            self.node = self.node.add_variation(move)
 
     def display_board(self, display_str) -> None:
         """
         Wrapper around utils.render_svg_board with temporary directory
-        context manager
+        context manager.
 
         Args:
             display_str (str): str to display beneath board for board state
@@ -152,7 +176,7 @@ class ChessPlayground():
         play_multiple_games(N) -> None: plays N games
     """
 
-    def __init__(self, white_engine, black_engine) -> None:
+    def __init__(self, white_engine, black_engine):
         """
         Setup empty game with defined engines for both sides
         Engines should evaluate board state and return a uci move

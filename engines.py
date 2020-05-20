@@ -1,8 +1,10 @@
 """
 Collection of chess engines that evaluate board state and select best moves
 """
+from typing import List, Dict
 import random
 import chess
+import chess.pgn
 from analysis import tabulate_board_values
 from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES
@@ -44,11 +46,11 @@ class BaseEngine():
                 at each end step based off material
         """
         self.name = None
-        self.legal_moves = {}
+        self.legal_moves: Dict[chess.Move, float] = {}
         self.value_mapping = CONVENTIONAL_PIECE_VALUES
-        self.material_difference = []
+        self.material_difference: List[float] = []
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """
         Evaluates current board state and returns values of different moves
 
@@ -64,7 +66,7 @@ class BaseEngine():
         """
         raise NotImplementedError('Function evaluate not implemented')
 
-    def move(self, board):
+    def move(self, board: chess.Board):
         """
         Selects move based on engine settings
 
@@ -79,11 +81,11 @@ class BaseEngine():
         """
         raise NotImplementedError('Function move not implemented')
 
-    def reset_move_variables(self):
+    def reset_move_variables(self) -> None:
         """ Resets variables at end of move"""
         self.legal_moves = {}
 
-    def reset_game_variables(self):
+    def reset_game_variables(self) -> None:
         """ Resets variables at end of game"""
         self.material_difference = []
 
@@ -96,7 +98,7 @@ class Random(BaseEngine):
         super().__init__()
         self.name = "Random"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Assigns same value to each move since eventually going to choose
         random move """
         self.reset_move_variables()
@@ -106,7 +108,7 @@ class Random(BaseEngine):
             legal_move_list[i]: 1 for i in range(len(legal_move_list))}
         self.material_difference.append(tabulate_board_values(board))
 
-    def move(self, board):
+    def move(self, board: chess.Board) -> chess.Move:
         """Selects random move. See parent docstring"""
         self.evaluate(board)
 
@@ -127,7 +129,7 @@ class PrioritizePawnMoves(Random):
         super().__init__()
         self.name = "Prioritize Pawn Moves"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Assigns same value to each move since eventually going to choose
         random move """
         self.reset_move_variables()
@@ -154,7 +156,7 @@ class RandomCapture(BaseEngine):
         super().__init__()
         self.name = "Random Capture"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Assigns highest value to capture moves and no value to others """
         self.reset_move_variables()
 
@@ -167,7 +169,7 @@ class RandomCapture(BaseEngine):
 
         self.material_difference.append(tabulate_board_values(board))
 
-    def move(self, board):
+    def move(self, board: chess.Board) -> chess.Move:
         """Select move that features capture out of random moves
         if one is available. See parent docstring"""
         self.evaluate(board)
@@ -194,7 +196,7 @@ class CaptureHighestValue(BaseEngine):
         super().__init__()
         self.name = "Capture Highest Value"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Assigns highest value to capture moves based off value system """
         self.reset_move_variables()
 
@@ -203,13 +205,13 @@ class CaptureHighestValue(BaseEngine):
             piece_at_position = get_piece_at(board, str(m)[2:4]).upper()
 
             if (not board.is_capture(m)) or (not piece_at_position):
-                self.legal_moves[m] = 0
+                self.legal_moves[m] = 0.0
             else:
                 self.legal_moves[m] = self.value_mapping[piece_at_position]
 
         self.material_difference.append(tabulate_board_values(board))
 
-    def move(self, board):
+    def move(self, board: chess.Board) -> chess.Move:
         """Select move that features capture out of random moves
         if one is available. See parent docstring"""
         self.evaluate(board)
@@ -217,7 +219,7 @@ class CaptureHighestValue(BaseEngine):
         if not [*self.legal_moves]:
             return chess.Move.null()
 
-        highest_capture_val, highest_capture_uci = 0, None
+        highest_capture_val, highest_capture_uci = 0.0, None
 
         # Find move with highest capture value
         for m in list(self.legal_moves):
@@ -240,7 +242,7 @@ class AvoidCapture(RandomCapture):
         super().__init__()
         self.name = "Avoid Capture"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Assigns value to no capture moves and no value to captures """
         self.reset_move_variables()
 
@@ -266,7 +268,7 @@ class ScholarsMate(BaseEngine):
         super().__init__()
         self.name = "Scholar's Mate"
 
-    def evaluate(self, board):
+    def evaluate(self, board: chess.Board) -> None:
         """ Inits scholar's mate play as legal_moves """
         self.reset_move_variables()
 
@@ -276,7 +278,7 @@ class ScholarsMate(BaseEngine):
 
         self.material_difference.append(tabulate_board_values(board))
 
-    def move(self, board):
+    def move(self, board: chess.Board) -> chess.Move:
         """ Run through scholar's mate sequence. If any moves become
         blocked, resign """
         self.evaluate(board)

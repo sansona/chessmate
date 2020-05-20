@@ -8,12 +8,12 @@ import chess
 from constants import SQUARE_STR
 
 
-def get_piece_at(board, position: str) -> str:
+def get_piece_at(board: chess.Board, position: str) -> str:
     """
     Gets chess symbol of piece at position on board
 
     Args:
-        board (chess.board): current board state in python-chess object
+        board (chess.Board): current board state in python-chess object
         position (str):
 
     Raises:
@@ -28,12 +28,12 @@ def get_piece_at(board, position: str) -> str:
         return ""
 
 
-def display_pgn_text(pgn_obj) -> None:
+def display_pgn_text(pgn_obj: chess.pgn.Game) -> None:
     """
     Displays game loaded from pgn in text form
 
     Args:
-        pgn_obj (chess.png.game)
+        pgn_obj (chess.pgn.Game)
     """
     pgn_io = StringIO(str(pgn_obj))
     game = chess.pgn.read_game(pgn_io)
@@ -48,7 +48,8 @@ def display_pgn_text(pgn_obj) -> None:
         move_count += 1
 
 
-def render_svg_board(board, temp_dir, display_str):
+def render_svg_board(
+        board: chess.Board, temp_dir: str, display_str: str) -> None:
     """
     Renders board as svg object for displaying in jupyter notebook.
     Saves board state as SVG file and displays in jupyter
@@ -72,14 +73,14 @@ def render_svg_board(board, temp_dir, display_str):
     clear_output(wait=True)
 
 
-def walkthrough_pgn(pgn_obj, delay=1.0) -> None:
+def walkthrough_pgn(pgn_obj: chess.pgn.Game, delay: float = 1.0) -> None:
     """
     Allows one to walkthrough pgn game in jupyter notebooks.
     Saves SVG object in temporary file and displays on notebooks
     interface
 
     Args:
-        pgn_obj (chess.png.game)
+        pgn_obj (chess.pgn.Game)
         delay(float): time between moves for display to update
     """
 
