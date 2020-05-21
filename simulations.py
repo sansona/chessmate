@@ -9,7 +9,44 @@ from utils import render_svg_board
 from constants import COLOR_MAP
 
 
-class PlayVsEngine():
+class EnginePlay:
+    """
+    Base class for engine play. Used in classes in which engines
+    have to interact with a game state
+
+    Attributes:
+        game (chess.pgn.Game(): pgn game representation
+        board (chess.Board): board object with fen functionality"""
+
+    def __init__(self):
+        self.game = chess.pgn.Game()
+        self._board = chess.Board()
+
+    @property
+    def board(self):
+        """ Getter for board """
+        return self._board
+
+    @board.setter
+    def board(self, fen: str):
+        """ Setter for setting board with new fen """
+        if not isinstance(fen, str):
+            raise TypeError(f"Invalid FEN object type {type(fen)}")
+
+        rows = fen.split("/")
+        if len(rows) != 8:
+            raise ValueError(f"Expected 8 rows in FEN position: {fen}")
+        try:
+            self._board = chess.Board(fen=fen)
+        except ValueError:
+            raise(f"Invalid FEN: {fen}")
+
+    def play_game(self) -> None:
+        """ Main function for wrapping around game play functionality """
+        raise NotImplementedError('Function move not implemented')
+
+
+class PlayVsEngine(EnginePlay):
     """
     Class for playing against engine move by move in jupyter notebook
 
@@ -36,9 +73,10 @@ class PlayVsEngine():
 
     def __init__(self, engine):
         """ Setups empty board and engine """
+        super().__init__()
         self.engine = engine
         self.game = chess.pgn.Game()
-        self.board: chess.Board = self.game.board()
+        self._board: chess.Board = self.game.board()
         self.node = None
         self._player_side: chess.Color = chess.WHITE
 
@@ -49,7 +87,7 @@ class PlayVsEngine():
         return COLOR_MAP[self._player_side]
 
     @player_side.setter
-    def player_side(self, side):
+    def player_side(self, side: chess.Color):
         """ Setter function for player_side - chess.Color/bool inputs valid """
         if not isinstance(side, chess.Color):
             raise TypeError(f"Invalid self.player_side ({self._player_side}) "
@@ -76,15 +114,15 @@ class PlayVsEngine():
                 self.display_board(f"Move not recognized - {str(input_move)}")
                 continue
 
-            if input_move in self.board.legal_moves:
+            if input_move in self._board.legal_moves:
                 legal_move = True
-                self.board.push_uci(str(input_move))
+                self._board.push_uci(str(input_move))
             else:
                 self.display_board(f"Not legal move - {str(input_move)}")
 
         self.append_move_to_tree(input_move)
         self.display_board(
-            f"Move {self.board.fullmove_number} - engine to move.")
+            f"Move {self._board.fullmove_number} - engine to move.")
 
         return input_move
 
@@ -96,12 +134,12 @@ class PlayVsEngine():
             (chess.Move): UCI move from engine evaluation. Null if engine
                 resigned
         """
-        eng_move = self.engine.move(self.board)
-        self.board.push_uci(str(eng_move))
+        eng_move = self.engine.move(self._board)
+        self._board.push_uci(str(eng_move))
 
         self.append_move_to_tree(eng_move)
         self.display_board(
-            f"Move {self.board.fullmove_number}- player to move.")
+            f"Move {self._board.fullmove_number} - player to move.")
 
         return eng_move
 
@@ -114,17 +152,17 @@ class PlayVsEngine():
             TypeError: on initializing invalid self._player_side type
         """
         self.display_board(
-            f"Move {self.board.fullmove_number} - ready for first move.")
+            f"Move {self._board.fullmove_number} - ready for first move.")
 
         # Break out of loop by checking after each move is game over. For each
         # move, check if move results in game over or if move is null. Null
         # represents resignation
-        while not self.board.is_game_over():
+        while not self._board.is_game_over():
             if self._player_side == chess.WHITE:
                 user_move = self.player_move()
                 if user_move == chess.Move.null():
                     break
-                if self.board.is_game_over():
+                if self._board.is_game_over():
                     break
 
                 # python-chess doesn't have a resign option, so if engine
@@ -136,13 +174,13 @@ class PlayVsEngine():
                 eng_move = self.engine_move()
                 if eng_move == chess.Move.null():
                     break
-                if self.board.is_game_over():
+                if self._board.is_game_over():
                     break
                 user_move = self.player_move()
                 if user_move == chess.Move.null():
                     break
 
-        self.display_board(f"{evaluate_ending_board(self.board)}!")
+        self.display_board(f"{evaluate_ending_board(self._board)}!")
 
     def append_move_to_tree(self, move) -> None:
         """
@@ -151,7 +189,7 @@ class PlayVsEngine():
         Args:
             move (chess.Move): move in UCI object
         """
-        if self.board.fullmove_number == 1:
+        if self._board.fullmove_number == 1:
             # If first move, initiate root node
             self.node = self.game.add_variation(move)
         else:
@@ -167,10 +205,10 @@ class PlayVsEngine():
                 context
         """
         with TemporaryDirectory() as temp:
-            render_svg_board(self.board, temp, display_str)
+            render_svg_board(self._board, temp, display_str)
 
 
-class ChessPlayground():
+class ChessPlayground(EnginePlay):
     """
     Class for experimenting with different engines & algorithms. This class
     handles the analysis of the various engines, including plotting data
@@ -206,50 +244,51 @@ class ChessPlayground():
             white_engine(ChessEngine)
             black_engine(ChessEngine)
         """
-
+        super().__init__()
         self.white_engine = white_engine
         self.black_engine = black_engine
 
-        self.game, self.board, self.terminal_conditions = None, None, None
+        self._board = self.game.board()
+        self.game, self.terminal_conditions = None, None
         (self.game_pgns, self.all_results, self.all_move_counts,
             self.all_material_differences) = [], [], [], []
 
     def play_game(self) -> None:
         """ Plays single game """
         self.game = chess.pgn.Game()
-        self.board = self.game.board()
+        self._board = self.game.board()
         self.white_engine.reset_game_variables()
         self.black_engine.reset_game_variables()
 
-        while not self.board.is_game_over():
+        while not self._board.is_game_over():
             # If white ends game on move, don't execute black move
-            white_move = self.white_engine.move(self.board)
+            white_move = self.white_engine.move(self._board)
             if white_move == chess.Move.null():
                 break
-            self.board.push_uci(str(white_move))
-            if self.board.fullmove_number == 1:
+            self._board.push_uci(str(white_move))
+            if self._board.fullmove_number == 1:
                 # on first move, setup game tree
                 node = self.game.add_variation(white_move)
             else:
                 node = node.add_variation(white_move)
 
             # If white's move doesn't end game, play black's move
-            if not self.board.is_game_over():
-                black_move = self.black_engine.move(self.board)
+            if not self._board.is_game_over():
+                black_move = self.black_engine.move(self._board)
                 if black_move == chess.Move.null():
                     break
-                self.board.push_uci(str(black_move))
+                self._board.push_uci(str(black_move))
                 node = node.add_variation(black_move)
 
         # At end of game, store number of moves in game, value of pieces on
         # board throughout game, and reason for ending game
-        self.all_move_counts.append(self.board.fullmove_number - 1)
+        self.all_move_counts.append(self._board.fullmove_number - 1)
         self.all_material_differences.append(
             tuple(zip(self.white_engine.material_difference,
                       self.black_engine.material_difference)))
 
         self.game_pgns.append(self.game)
-        self.all_results.append(evaluate_ending_board(self.board))
+        self.all_results.append(evaluate_ending_board(self._board))
 
     def play_multiple_games(self, N: int = 100) -> None:
         """

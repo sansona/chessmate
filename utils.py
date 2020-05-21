@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from IPython.display import SVG, display, clear_output
 import chess
-from constants import SQUARE_STR
+from constants import make_board_repr
 
 
 def get_piece_at(board: chess.Board, position: str) -> str:
@@ -23,7 +23,8 @@ def get_piece_at(board: chess.Board, position: str) -> str:
         (str): symbol of piece at square if any
     """
     try:
-        return board.piece_at(SQUARE_STR.index(position.upper())).symbol()
+        board_rep = make_board_repr()
+        return board.piece_at(board_rep.index(position.upper())).symbol()
     except AttributeError:
         return ""
 
