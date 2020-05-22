@@ -1,11 +1,12 @@
 """ Tools to simulate chess games """
 from tempfile import TemporaryDirectory
 from tqdm import tqdm
+from typing import List, Dict, Callable, Union
 import chess
 import chess.pgn
 import chess.svg
 from analysis import evaluate_ending_board
-from utils import render_svg_board
+from utils import render_svg_board, is_valid_fen
 from constants import COLOR_MAP, FEN_MAPS
 
 
@@ -26,53 +27,61 @@ class EnginePlay:
             representation"""
 
     def __init__(self):
-        self.game = chess.pgn.Game()
-        self._board = chess.Board()
-        self._fen = FEN_MAPS['standard']
-        self.node = None
+        self.game: chess.pgn.Game = chess.pgn.Game()
+        self._fen: str = FEN_MAPS['standard']
+        self._board: chess.Board = chess.Board(fen=self._fen)
+        self.node: chess.Board.node = None
 
     @property
-    def board(self):
+    def board(self) -> chess.Board:
+        """ Getter for board """
         return self._board
 
     @board.setter
-    def board(self, fen: str):
-        """ Setter for setting board with new fen """
-        if not isinstance(fen, str):
-            raise TypeError(f"Invalid FEN object type {type(fen)}")
+    def board(self, fen_str: str) -> None:
+        """
+        Setter for setting board with new fen
 
-        rows = fen.split("/")
-        if len(rows) != 8:
-            raise ValueError(f"Expected 8 rows in FEN position: {fen}")
-        try:
-            self._board = chess.Board(fen=fen)
-        except ValueError:
-            raise(f"Invalid FEN: {fen}")
+        Args:
+            fen_str (str): fen representation of board
+
+        Raise:
+            ValueError: if FEN is invalid given board setup
+        """
+        if is_valid_fen(fen_str):
+            try:
+                self._board = chess.Board(fen=fen_str)
+            except ValueError:
+                print(f"Invalid FEN: {fen_str}")
 
     @property
-    def fen(self):
+    def fen(self) -> str:
+        """ Getter for fen """
         return self._fen
 
     @fen.setter
-    def fen(self, fen_str: str):
-        """ Updates self.fen & self.board with fen """
-        if not isinstance(fen_str, str):
-            raise TypeError(f"Invalid FEN object type {type(fen_str)}")
+    def fen(self, fen_str: str) -> None:
+        """
+        Setter for setting new fen. Updates self.board with new fen
 
-        rows = fen_str.split("/")
-        if len(rows) != 8:
-            raise ValueError(f"Expected 8 rows in FEN position: {fen_str}")
-        try:
-            self._fen = fen_str
-            self._board = chess.Board(fen=fen_str)
-        except ValueError:
-            raise(f"Invalid FEN: {fen_str}")
+        Args:
+            fen_str (str): fen representation of board
+
+        Raise:
+            ValueError: if FEN is invalid given board setup
+        """
+        if is_valid_fen(fen_str):
+            try:
+                self._fen = fen_str
+                self._board = chess.Board(fen=fen_str)
+            except ValueError:
+                print(f"Invalid FEN: {fen_str}")
 
     def play_game(self) -> None:
         """ Main function for wrapping around game play functionality """
         raise NotImplementedError('Function move not implemented')
 
-    def append_move_to_tree(self, move) -> None:
+    def append_move_to_tree(self, move: chess.Move) -> None:
         """
         Appends move to gametree representation
 
@@ -92,10 +101,7 @@ class PlayVsEngine(EnginePlay):
 
     Attributes:
         engine (engines.BaseEngine): engine to play against
-        game (chess.pgn.Game): game object
         board (chess.board): board representation
-        fen (str): fen notation of games to play. Default to standard
-        node (chess.Board.node): gametree object for storing moves
         player_side (chess.Color/bool): chess.WHITE or chess.BLACK for
             side to play as. Note that since python-chess encodes the color
             as a bool, decode it as color for displaying
@@ -114,20 +120,17 @@ class PlayVsEngine(EnginePlay):
         """ Setups empty board and engine """
         super().__init__()
         self.engine = engine
-        self.game = chess.pgn.Game()
         self._board: chess.Board = chess.Board()
-        self._fen = FEN_MAPS['standard']
-        self.node = None
-        self._player_side: chess.Color = chess.WHITE
+        self._player_side: Union[chess.Color, bool] = chess.WHITE
 
     @property
-    def player_side(self):
+    def player_side(self) -> str:
         """ Defining getter for player_side. Since chess.Color encoded as
         bool, remap to color string for user intepretation """
         return COLOR_MAP[self._player_side]
 
     @player_side.setter
-    def player_side(self, side: chess.Color):
+    def player_side(self, side: chess.Color) -> None:
         """ Setter function for player_side - chess.Color/bool inputs valid """
         if not isinstance(side, chess.Color):
             raise TypeError(f"Invalid self.player_side ({self._player_side}) "
@@ -222,7 +225,7 @@ class PlayVsEngine(EnginePlay):
 
         self.display_board(f"{evaluate_ending_board(self._board)}!")
 
-    def display_board(self, display_str) -> None:
+    def display_board(self, display_str: str) -> None:
         """
         Wrapper around utils.render_svg_board with temporary directory
         context manager.
@@ -243,13 +246,9 @@ class ChessPlayground(EnginePlay):
     Attributes:
         white_engine (ChessEngine): engine for determining white moves
         black_engine (ChessEngine): engine for determining black moves
-        game (chess.pgn.Game): game object
-        board (chess.board): board representation
-        node (chess.Board.node): gametree object for storing moves
-        fen (str): fen notation of games to play. Default to standard
         terminal_conditions (Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
-        game_pgns (List(chess.pgn.Game.node)): list of all pgn data for
+        game_pgns (List[chess.pgn.Game]): list of all pgn data for
             games played
         all_results (List[str]): containing strings describing all game
             results
@@ -276,13 +275,11 @@ class ChessPlayground(EnginePlay):
         super().__init__()
         self.white_engine = white_engine
         self.black_engine = black_engine
-        self.game = chess.pgn.Game()
-        self._fen = FEN_MAPS['standard']
-        self._board = chess.Board(self._fen)
-        self.node = None
-        self.terminal_conditions = None
-        (self.game_pgns, self.all_results, self.all_move_counts,
-            self.all_material_differences) = [], [], [], []
+        self.terminal_conditions: Dict[str, Callable] = None
+        self.game_pgns: List[chess.pgn.Game] = []
+        self.all_results: List[str] = []
+        self.all_move_counts: List[int] = []
+        self.all_material_differences: List(tuple) = []
 
     def play_game(self) -> None:
         """ Plays single game """

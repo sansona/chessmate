@@ -66,4 +66,6 @@ FEN_MAPS = {
                                      f'{standard.upper()}{suffix}'),
     'white_bishops_black_standard': (f'{standard}{central_rows}'
                                      f'{bishops_no_knights.upper()}{suffix}'),
+    'white_mayhem': (f'{standard}{central_rows}{mayhem.upper()}{suffix}'),
+    'black_mayhem': (f'{mayhem}{central_rows}{standard.upper()}{suffix}'),
     'mayhem': (f'{mayhem}{central_rows}{mayhem.upper()}{suffix}')}

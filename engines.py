@@ -38,16 +38,16 @@ class BaseEngine():
         """
         Args:
             name (str): name of engine
-            legal_moves (List): list of all legal moves available in
-                uci notation
+            legal_moves (Dict[chess.Move, float]): list of all legal moves available in
+                uci notation with values for each move
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
             material_difference (List[float]): difference in value on board
                 at each end step based off material
         """
-        self.name = None
+        self.name: str = "Base"
         self.legal_moves: Dict[chess.Move, float] = {}
-        self.value_mapping = CONVENTIONAL_PIECE_VALUES
+        self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
         self.material_difference: List[float] = []
 
     def evaluate(self, board: chess.Board) -> None:
@@ -66,7 +66,7 @@ class BaseEngine():
         """
         raise NotImplementedError('Function evaluate not implemented')
 
-    def move(self, board: chess.Board):
+    def move(self, board: chess.Board) -> chess.Move:
         """
         Selects move based on engine settings
 

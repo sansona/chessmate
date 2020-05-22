@@ -2,10 +2,35 @@
 import time
 from io import StringIO
 from pathlib import Path
+from typing import Union
 from tempfile import TemporaryDirectory
 from IPython.display import SVG, display, clear_output
 import chess
 from constants import make_board_repr, FEN_MAPS
+
+
+def is_valid_fen(fen: str) -> bool:
+    """
+    Parses FEN string to see if format is valid
+
+    Args:
+        fen (str): fen notation of board
+
+    Raises:
+        TypeError: if type(fen) not str
+        ValueError: if fen is string but isn't in FEN format
+
+    Returns:
+        (bool): True if valid
+    """
+    if not isinstance(fen, str):
+        raise TypeError(f"Invalid FEN object type {type(fen)}")
+
+    rows = fen.split("/")
+    if len(rows) != 8:
+        raise ValueError(f"Expected 8 rows in FEN position: {fen}")
+
+    return True
 
 
 def get_piece_at(board: chess.Board, position: str) -> str:
@@ -26,6 +51,7 @@ def get_piece_at(board: chess.Board, position: str) -> str:
         board_rep = make_board_repr()
         return board.piece_at(board_rep.index(position.upper())).symbol()
     except AttributeError:
+        print(f"No piece at position.upper()")
         return ""
 
 
@@ -49,8 +75,8 @@ def display_pgn_text(pgn_obj: chess.pgn.Game) -> None:
         move_count += 1
 
 
-def render_svg_board(
-        board: chess.Board, temp_dir: str, display_str: str) -> None:
+def render_svg_board(board: chess.Board, temp_dir: Union[str, Path],
+                     display_str: str) -> None:
     """
     Renders board as svg object for displaying in jupyter notebook.
     Saves board state as SVG file and displays in jupyter

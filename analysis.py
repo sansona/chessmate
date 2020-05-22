@@ -94,7 +94,8 @@ def display_all_results(all_results: List[str]) -> Counter:
     return counts
 
 
-def display_material_difference(material_differences, game_index: int) -> None:
+def display_material_difference(material_differences: List[tuple],
+                                game_index: int) -> None:
     """
     Wrapper for matplotlib to plot difference in piece total
     values throughout game
@@ -130,7 +131,7 @@ def display_material_difference(material_differences, game_index: int) -> None:
             axes[idx].set_xlabel('Move index')
 
 
-def display_all_material_differences(material_differences) -> None:
+def display_all_material_differences(material_differences: List[tuple]) -> None:
     """
     Wrapper for display_material_difference to plot results of
     all games
