@@ -16,12 +16,20 @@ class EnginePlay:
 
     Attributes:
         game (chess.pgn.Game(): pgn game representation
-        board (chess.Board): board object with fen functionality"""
+        board (chess.Board): board object with fen functionality
+        fen (str): FEN representation of board setup
+        node (chess.Board.node): gametree object for storing moves
+
+    Methods:
+        play_game (): general function to play a standalone game
+        append_move_to_tree (chess.Move): appends move to game tree
+            representation"""
 
     def __init__(self):
         self.game = chess.pgn.Game()
         self._board = chess.Board()
         self._fen = FEN_MAPS['standard']
+        self.node = None
 
     @property
     def board(self):
@@ -64,6 +72,19 @@ class EnginePlay:
         """ Main function for wrapping around game play functionality """
         raise NotImplementedError('Function move not implemented')
 
+    def append_move_to_tree(self, move) -> None:
+        """
+        Appends move to gametree representation
+
+        Args:
+            move (chess.Move): move in UCI object
+        """
+        if self._board.fullmove_number == 1:
+            # If first move, initiate root node
+            self.node = self.game.add_variation(move)
+        else:
+            self.node = self.node.add_variation(move)
+
 
 class PlayVsEngine(EnginePlay):
     """
@@ -85,8 +106,6 @@ class PlayVsEngine(EnginePlay):
             push a move. Null if engine resigns
         play_game() -> None: wrapper around player_move() & engine_move()
             with built-in logic to allow move by move play
-        append_move_to_tree (chess.Move): appends move to game tree
-            representation
         display_board() -> None: function to display board. Wrapper around
             utils.render_svg_board()
     """
@@ -203,19 +222,6 @@ class PlayVsEngine(EnginePlay):
 
         self.display_board(f"{evaluate_ending_board(self._board)}!")
 
-    def append_move_to_tree(self, move) -> None:
-        """
-        Appends move to gametree representation
-
-        Args:
-            move (chess.Move): move in UCI object
-        """
-        if self._board.fullmove_number == 1:
-            # If first move, initiate root node
-            self.node = self.game.add_variation(move)
-        else:
-            self.node = self.node.add_variation(move)
-
     def display_board(self, display_str) -> None:
         """
         Wrapper around utils.render_svg_board with temporary directory
@@ -239,6 +245,7 @@ class ChessPlayground(EnginePlay):
         black_engine (ChessEngine): engine for determining black moves
         game (chess.pgn.Game): game object
         board (chess.board): board representation
+        node (chess.Board.node): gametree object for storing moves
         fen (str): fen notation of games to play. Default to standard
         terminal_conditions (Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
@@ -272,6 +279,7 @@ class ChessPlayground(EnginePlay):
         self.game = chess.pgn.Game()
         self._fen = FEN_MAPS['standard']
         self._board = chess.Board(self._fen)
+        self.node = None
         self.terminal_conditions = None
         (self.game_pgns, self.all_results, self.all_move_counts,
             self.all_material_differences) = [], [], [], []
@@ -295,11 +303,7 @@ class ChessPlayground(EnginePlay):
             if white_move == chess.Move.null():
                 break
             self._board.push_uci(str(white_move))
-            if self._board.fullmove_number == 1:
-                # on first move, setup game tree
-                node = self.game.add_variation(white_move)
-            else:
-                node = node.add_variation(white_move)
+            self.append_move_to_tree(white_move)
 
             # If white's move doesn't end game, play black's move
             if not self._board.is_game_over():
@@ -307,7 +311,7 @@ class ChessPlayground(EnginePlay):
                 if black_move == chess.Move.null():
                     break
                 self._board.push_uci(str(black_move))
-                node = node.add_variation(black_move)
+                self.append_move_to_tree(black_move)
 
         # At end of game, store number of moves in game, value of pieces on
         # board throughout game, and reason for ending game
