@@ -5,7 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from IPython.display import SVG, display, clear_output
 import chess
-from constants import make_board_repr
+from constants import make_board_repr, FEN_MAPS
 
 
 def get_piece_at(board: chess.Board, position: str) -> str:
@@ -74,7 +74,8 @@ def render_svg_board(
     clear_output(wait=True)
 
 
-def walkthrough_pgn(pgn_obj: chess.pgn.Game, delay: float = 1.0) -> None:
+def walkthrough_pgn(pgn_obj: chess.pgn.Game, fen: str = FEN_MAPS['standard'],
+                    delay: float = 1.0) -> None:
     """
     Allows one to walkthrough pgn game in jupyter notebooks.
     Saves SVG object in temporary file and displays on notebooks
@@ -82,12 +83,13 @@ def walkthrough_pgn(pgn_obj: chess.pgn.Game, delay: float = 1.0) -> None:
 
     Args:
         pgn_obj (chess.pgn.Game)
+        fen (str): fen notation of board. Default to standard
         delay(float): time between moves for display to update
     """
-
     pgn_io = StringIO(str(pgn_obj))
     game = chess.pgn.read_game(pgn_io)
-    board = game.board()
+    board = chess.Board(fen=fen)
+    game.setup(board=board)
     move_count = 1
 
     with TemporaryDirectory() as temp:

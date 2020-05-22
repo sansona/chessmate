@@ -6,7 +6,7 @@ import chess.pgn
 import chess.svg
 from analysis import evaluate_ending_board
 from utils import render_svg_board
-from constants import COLOR_MAP
+from constants import COLOR_MAP, FEN_MAPS
 
 
 class EnginePlay:
@@ -21,10 +21,10 @@ class EnginePlay:
     def __init__(self):
         self.game = chess.pgn.Game()
         self._board = chess.Board()
+        self._fen = FEN_MAPS['standard']
 
     @property
     def board(self):
-        """ Getter for board """
         return self._board
 
     @board.setter
@@ -41,6 +41,25 @@ class EnginePlay:
         except ValueError:
             raise(f"Invalid FEN: {fen}")
 
+    @property
+    def fen(self):
+        return self._fen
+
+    @fen.setter
+    def fen(self, fen_str: str):
+        """ Updates self.fen & self.board with fen """
+        if not isinstance(fen_str, str):
+            raise TypeError(f"Invalid FEN object type {type(fen_str)}")
+
+        rows = fen_str.split("/")
+        if len(rows) != 8:
+            raise ValueError(f"Expected 8 rows in FEN position: {fen_str}")
+        try:
+            self._fen = fen_str
+            self._board = chess.Board(fen=fen_str)
+        except ValueError:
+            raise(f"Invalid FEN: {fen_str}")
+
     def play_game(self) -> None:
         """ Main function for wrapping around game play functionality """
         raise NotImplementedError('Function move not implemented')
@@ -54,6 +73,7 @@ class PlayVsEngine(EnginePlay):
         engine (engines.BaseEngine): engine to play against
         game (chess.pgn.Game): game object
         board (chess.board): board representation
+        fen (str): fen notation of games to play. Default to standard
         node (chess.Board.node): gametree object for storing moves
         player_side (chess.Color/bool): chess.WHITE or chess.BLACK for
             side to play as. Note that since python-chess encodes the color
@@ -76,7 +96,8 @@ class PlayVsEngine(EnginePlay):
         super().__init__()
         self.engine = engine
         self.game = chess.pgn.Game()
-        self._board: chess.Board = self.game.board()
+        self._board: chess.Board = chess.Board()
+        self._fen = FEN_MAPS['standard']
         self.node = None
         self._player_side: chess.Color = chess.WHITE
 
@@ -214,19 +235,20 @@ class ChessPlayground(EnginePlay):
     handles the analysis of the various engines, including plotting data
 
     Attributes:
-        white_engine(ChessEngine): engine for determining white moves
-        black_engine(ChessEngine): engine for determining black moves
-        game(chess.pgn.Game): game object
-        board(chess.board): board representation
-        terminal_conditions(Dict[function]): in form "name of terminal
+        white_engine (ChessEngine): engine for determining white moves
+        black_engine (ChessEngine): engine for determining black moves
+        game (chess.pgn.Game): game object
+        board (chess.board): board representation
+        fen (str): fen notation of games to play. Default to standard
+        terminal_conditions (Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
-        game_pgns(List(chess.pgn.Game.node)): list of all pgn data for
+        game_pgns (List(chess.pgn.Game.node)): list of all pgn data for
             games played
-        all_results(List[str]): containing strings describing all game
+        all_results (List[str]): containing strings describing all game
             results
-        all_move_counts(List[int]): contains count of number of moves in
+        all_move_counts (List[int]): contains count of number of moves in
             each game played
-        all_material_differences(List[tuple]): contains mapping of value
+        all_material_differences (List[tuple]): contains mapping of value
             differential for each move across each game played in form
             (white engine evaluation, black engine evaluation) at each move
 
@@ -241,22 +263,29 @@ class ChessPlayground(EnginePlay):
         Engines should evaluate board state and return a uci move
 
         Args:
-            white_engine(ChessEngine)
-            black_engine(ChessEngine)
+            white_engine (ChessEngine)
+            black_engine (ChessEngine)
         """
         super().__init__()
         self.white_engine = white_engine
         self.black_engine = black_engine
-
-        self._board = self.game.board()
-        self.game, self.terminal_conditions = None, None
+        self.game = chess.pgn.Game()
+        self._fen = FEN_MAPS['standard']
+        self._board = chess.Board(self._fen)
+        self.terminal_conditions = None
         (self.game_pgns, self.all_results, self.all_move_counts,
             self.all_material_differences) = [], [], [], []
 
     def play_game(self) -> None:
         """ Plays single game """
         self.game = chess.pgn.Game()
-        self._board = self.game.board()
+        self.game.setup(self._fen)
+        # All game variables have to be reset from game to game. By default
+        # reset() resets the board to starting fen, so set _board to
+        # starting board to ensure set fen carries over
+        starting_board = chess.Board(self._fen)
+        self._board.reset()
+        self._board = starting_board
         self.white_engine.reset_game_variables()
         self.black_engine.reset_game_variables()
 
