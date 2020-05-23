@@ -130,9 +130,9 @@ class PlayVsEngine(EnginePlay):
         return COLOR_MAP[self._player_side]
 
     @player_side.setter
-    def player_side(self, side: chess.Color) -> None:
+    def player_side(self, side: Union[chess.Color, bool]) -> None:
         """ Setter function for player_side - chess.Color/bool inputs valid """
-        if not isinstance(side, chess.Color):
+        if not isinstance(side, bool):
             raise TypeError(f"Invalid self.player_side ({self._player_side}) "
                             "not in (chess.WHITE, chess.BLACK)")
         self._player_side = side

@@ -1,12 +1,26 @@
 """ Utility functions """
 import time
+from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
 from typing import Union
 from tempfile import TemporaryDirectory
+import pytest
 from IPython.display import SVG, display, clear_output
 import chess
 from constants import make_board_repr, FEN_MAPS
+
+
+@contextmanager
+def not_raises(exception):
+    """
+    Opposite of pytest raises for when everything works fine
+    https://stackoverflow.com/questions/20274987/how-to-use-pytest-to-check-that-error-is-not-raised
+    """
+    try:
+        yield
+    except exception:
+        raise pytest.fail(f"DID RAISE {exception}")
 
 
 def is_valid_fen(fen: str) -> bool:
@@ -51,7 +65,7 @@ def get_piece_at(board: chess.Board, position: str) -> str:
         board_rep = make_board_repr()
         return board.piece_at(board_rep.index(position.upper())).symbol()
     except AttributeError:
-        print(f"No piece at position.upper()")
+        print(f"No piece at {position.upper()}")
         return ""
 
 

@@ -3,19 +3,19 @@
 # Since python-chess doesn't provide functionality for getting piece
 # at square via. string notation, setup own board to map strings to
 # squares
-from typing import List
+from typing import Dict
 
 
-def make_board_repr() -> List[str]:
+def make_board_repr() -> Dict[str, float]:
     """
     Make representation of board
 
     Returns:
-            List[str]
+        Dict[str, float]
     """
     SQUARE_STR = []
     for letter in 'ABCDEFGH':
-        file = [f"{letter}{r}" for r in range(1, 9)]
+        file = [f"{letter}{r}" for r in reversed(range(1, 9,))]
         SQUARE_STR.extend(file)
     return SQUARE_STR
 
@@ -68,4 +68,6 @@ FEN_MAPS = {
                                      f'{bishops_no_knights.upper()}{suffix}'),
     'white_mayhem': (f'{standard}{central_rows}{mayhem.upper()}{suffix}'),
     'black_mayhem': (f'{mayhem}{central_rows}{standard.upper()}{suffix}'),
-    'mayhem': (f'{mayhem}{central_rows}{mayhem.upper()}{suffix}')}
+    'mayhem': (f'{mayhem}{central_rows}{mayhem.upper()}{suffix}'),
+    'pandemonium': (f'{mayhem}/{mayhem}/{river}/'
+                    f'{mayhem.upper()}/{mayhem.upper()}{suffix}')}
