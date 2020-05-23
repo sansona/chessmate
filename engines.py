@@ -2,6 +2,7 @@
 Collection of chess engines that evaluate board state and select best moves
 """
 from typing import List, Dict
+from pprint import pprint
 import random
 import chess  # type: ignore
 import chess.pgn  # type: ignore
@@ -49,6 +50,13 @@ class BaseEngine():
         self.legal_moves: Dict[chess.Move, float] = {}
         self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
         self.material_difference: List[float] = []
+
+    def __repr__(self):
+        """ Print out current state of engine """
+        return f"""name: {self.name}
+                legal_moves: {self.legal_moves}
+                value mapping: {self.value_mapping}
+                material difference: {self.material_difference}"""
 
     def evaluate(self, board: chess.Board) -> None:
         """

@@ -123,6 +123,12 @@ class PlayVsEngine(EnginePlay):
         self._board: chess.Board = chess.Board()
         self._player_side: Union[chess.Color, bool] = chess.WHITE
 
+    def __repr__(self):
+        """ Print out current state of playvsengine """
+        return f"""engine: {self.engine}
+                player_side: {self._player_side}
+                FEN: {self._board.fen}"""
+
     @property
     def player_side(self) -> str:
         """ Defining getter for player_side. Since chess.Color encoded as
@@ -280,6 +286,13 @@ class ChessPlayground(EnginePlay):
         self.all_results: List[str] = []
         self.all_move_counts: List[int] = []
         self.all_material_differences: List(tuple) = []
+
+    def __repr__(self):
+        """ Print out current state of playground """
+        return f"""white engine: {self.white_engine}
+                black engine: {self.black_engine}
+                all_results: {self.all_results}
+                all_move_counts: {self.all_move_counts}"""
 
     def play_game(self) -> None:
         """ Plays single game """
