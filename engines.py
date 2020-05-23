@@ -3,8 +3,8 @@ Collection of chess engines that evaluate board state and select best moves
 """
 from typing import List, Dict
 import random
-import chess
-import chess.pgn
+import chess  # type: ignore
+import chess.pgn  # type: ignore
 from analysis import tabulate_board_values
 from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES

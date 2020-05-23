@@ -1,7 +1,7 @@
 """ Functions for analyzing board states and results of games """
 from typing import List
 from collections import Counter
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt  # type: ignore
 import chess
 from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
 

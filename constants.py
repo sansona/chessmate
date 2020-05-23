@@ -3,21 +3,7 @@
 # Since python-chess doesn't provide functionality for getting piece
 # at square via. string notation, setup own board to map strings to
 # squares
-from typing import Dict
-
-
-def make_board_repr() -> Dict[str, float]:
-    """
-    Make representation of board
-
-    Returns:
-        Dict[str, float]
-    """
-    SQUARE_STR = []
-    for letter in 'ABCDEFGH':
-        file = [f"{letter}{r}" for r in reversed(range(1, 9,))]
-        SQUARE_STR.extend(file)
-    return SQUARE_STR
+from typing import List
 
 
 CONVENTIONAL_PIECE_VALUES = {'P': 1.,

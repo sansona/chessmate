@@ -5,10 +5,11 @@ from io import StringIO
 from pathlib import Path
 from typing import Union
 from tempfile import TemporaryDirectory
-import pytest
-from IPython.display import SVG, display, clear_output
+import pytest  # type: ignore
+from IPython.display import SVG, display, clear_output  # type: ignore
 import chess
-from constants import make_board_repr, FEN_MAPS
+import chess.pgn
+from constants import FEN_MAPS
 
 
 @contextmanager
@@ -61,11 +62,14 @@ def get_piece_at(board: chess.Board, position: str) -> str:
     Returns:
         (str): symbol of piece at square if any
     """
-    try:
-        board_rep = make_board_repr()
-        return board.piece_at(board_rep.index(position.upper())).symbol()
-    except AttributeError:
-        print(f"No piece at {position.upper()}")
+    # Convert position to chess.Square
+    file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
+    square = chess.square(file, rank)
+    piece = board.piece_at(square)
+
+    if piece:
+        return piece.symbol()
+    else:
         return ""
 
 

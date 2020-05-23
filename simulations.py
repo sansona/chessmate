@@ -1,10 +1,10 @@
 """ Tools to simulate chess games """
 from tempfile import TemporaryDirectory
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore
 from typing import List, Dict, Callable, Union
-import chess
-import chess.pgn
-import chess.svg
+import chess  # type: ignore
+import chess.pgn  # type: ignore
+import chess.svg  # type: ignore
 from analysis import evaluate_ending_board
 from utils import render_svg_board, is_valid_fen
 from constants import COLOR_MAP, FEN_MAPS
