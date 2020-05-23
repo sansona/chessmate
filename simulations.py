@@ -1,7 +1,7 @@
 """ Tools to simulate chess games """
+from typing import List, Dict, Callable, Union
 from tempfile import TemporaryDirectory
 from tqdm import tqdm  # type: ignore
-from typing import List, Dict, Callable, Union
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import chess.svg  # type: ignore
@@ -19,7 +19,7 @@ class EnginePlay:
         game (chess.pgn.Game(): pgn game representation
         board (chess.Board): board object with fen functionality
         fen (str): FEN representation of board setup
-        node (chess.Board.node): gametree object for storing moves
+        node (chess.pgn.GameNode): gametree object for storing moves
 
     Methods:
         play_game (): general function to play a standalone game
@@ -30,7 +30,7 @@ class EnginePlay:
         self.game: chess.pgn.Game = chess.pgn.Game()
         self._fen: str = FEN_MAPS['standard']
         self._board: chess.Board = chess.Board(fen=self._fen)
-        self.node: chess.Board.node = None
+        self.node: chess.pgn.GameNode = None
 
     @property
     def board(self) -> chess.Board:

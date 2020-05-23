@@ -48,13 +48,13 @@ def is_valid_fen(fen: str) -> bool:
     return True
 
 
-def get_piece_at(board: chess.Board, position: str) -> str:
+def get_piece_at(board: chess.Board, position: Union[str, chess.Square]) -> str:
     """
     Gets chess symbol of piece at position on board
 
     Args:
         board (chess.Board): current board state in python-chess object
-        position (str):
+        position (str/chess.Square): position of square i.e chess.A1 or "A1"
 
     Raises:
         AttributeError: if no piece on board at position
@@ -63,14 +63,17 @@ def get_piece_at(board: chess.Board, position: str) -> str:
         (str): symbol of piece at square if any
     """
     # Convert position to chess.Square
-    file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
-    square = chess.square(file, rank)
+    if isinstance(position, str):
+        file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
+        square = chess.square(file, rank)
+    elif isinstance(position, chess.Square):
+        square = position
+
     piece = board.piece_at(square)
 
     if piece:
         return piece.symbol()
-    else:
-        return ""
+    return ""
 
 
 def display_pgn_text(pgn_obj: chess.pgn.Game) -> None:

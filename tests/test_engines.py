@@ -1,10 +1,9 @@
 """ Test suite for engines """
-from engines import *
-from analysis import *
+import sys
+import pytest
 import chess
 import chess.pgn
-import pytest
-import sys
+from engines import *
 sys.path.append('..')
 
 
@@ -83,11 +82,66 @@ def test_move_function(starting_engines, starting_board):
         assert isinstance(engine_move, chess.Move)
 
 
-'''
+def test_random_capture_move(modified_boards):
+    """ Tests that RandomCapture captures piece when available instead
+    of moving randomly """
+    engine = RandomCapture()
+    black_knight_board = modified_boards[0][0]
+    rec_move = modified_boards[0][1]
+    move = engine.move(black_knight_board)
+    assert str(move) == rec_move
+
+
 def test_capture_highest_value_move(modified_boards):
     """ Tests that CaptureHighestValue captures highest value piece """
     engine = CaptureHighestValue()
     for board, rec_move in modified_boards:
         move = engine.move(board)
         assert str(move) == rec_move
-'''
+
+
+def test_avoid_capture_move(modified_boards):
+    """ Tests that AvoidCapture avoids captures """
+    engine = AvoidCapture()
+    for board, rec_move in modified_boards:
+        move = engine.move(board)
+        assert str(move) != rec_move
+
+
+def test_scholars_mate_interrupt_resign():
+    """ Tests that ScholarsMate resigns when any move is blocked """
+    engine = ScholarsMate()
+
+    # In both board states, white is interrupted from completed sequence
+    blocked_queen_fen = ('r1bqkbnr/pppp1p1p/2n3p1/4p2Q/'
+                         '2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1')
+    captured_queen_fen = ('r1b1kbnr/pppp1ppp/2n5/4p2q/'
+                          '2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1')
+
+    for interrupted_fen in (blocked_queen_fen, captured_queen_fen):
+        board = chess.Board(fen=interrupted_fen)
+        assert engine.move(board) == chess.Move.null()
+
+
+def test_scholars_mate_black_resign():
+    """ Tests that ScholarsMate resigns if played on black """
+    engine = ScholarsMate()
+
+    board = chess.Board()
+    board.push_uci('e2e4')
+    assert engine.move(board) == chess.Move.null()
+
+
+def test_scholars_mate_resign_failed_mate():
+    """ Tests that ScholarsMate resigns if mate is not achieved
+    after move sequence """
+    engine = ScholarsMate()
+    board = chess.Board()
+
+    # After this sequence, white fails to mate black
+    black_moves = ('e7e5', 'd7d5', 'b8c6', 'e8f7')
+    for move in black_moves:
+        board.push_uci(str(engine.move(board)))
+        board.push_uci(move)
+
+    assert engine.move(board) == chess.Move.null()
