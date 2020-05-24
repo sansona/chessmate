@@ -8,7 +8,7 @@ import chess  # type: ignore
 import chess.pgn  # type: ignore
 from analysis import tabulate_board_values
 from utils import get_piece_at
-from constants import CONVENTIONAL_PIECE_VALUES
+from constants import CONVENTIONAL_PIECE_VALUES, COLOR_MAP
 
 
 class BaseEngine():
@@ -309,3 +309,65 @@ class ScholarsMate(BaseEngine):
             return chess.Move.null()
 
         return chess.Move.from_uci(move)
+
+
+class MiniMax(BaseEngine):
+    """ Base class for set of Minimax algorithms"""
+
+    def __init__(self):
+        super().__init__()
+        self.name = "MiniMax"
+        self.side: bool = True
+        self.depth: int = 3
+        self.rec_move = chess.Move.null()
+
+    def minimax(self, base_board: chess.Board, white: bool, depth: int):
+        """
+        Evaluate result of each legal move on board
+
+        Args:
+            base_board (chess.Board): current board state
+            white (bool): True for white, False for black
+            depth (int): current depth. Init at self.depth for base
+        """
+        if depth == 0 or base_board.is_game_over():
+            return tabulate_board_values(base_board)
+
+        if white:
+            max_val = -float('inf')
+            # Evaluate position after each legal move, store result of
+            # best move
+            for move in list(base_board.legal_moves):
+                base_board.push_uci(str(move))
+                val = self.minimax(base_board, False, depth=depth - 1)
+                if val > max_val:
+                    max_val = val
+                    self.rec_move = move
+                base_board.pop()
+            return max_val
+
+        elif not white:
+            min_val = float('inf')
+            self.rec_move = chess.Move.null()
+
+            for move in list(base_board.legal_moves):
+                base_board.push_uci(str(move))
+                val = self.minimax(base_board, True, depth=depth - 1)
+                if val < min_val:
+                    min_val = val
+                    #self.rec_move = move
+                base_board.pop()
+
+            return min_val
+
+    def evaluate(self, board: chess.Board) -> None:
+        """ Inits scholar's mate play as legal_moves """
+        self.reset_move_variables()
+        if isinstance(self.side, bool):
+            self.minimax(board, True, depth=self.depth)
+        else:
+            raise ValueError(f"self.side value {self.side} not in (White, Black)")
+
+    def move(self, board: chess.Board) -> chess.Move:
+        self.evaluate(board)
+        return self.rec_move
