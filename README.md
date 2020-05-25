@@ -41,7 +41,9 @@ simulation.play_multiple_games(1000)
 ---
 ### Basic analysis
 
-To evaluate the results of a simulation. Since the ScholarsMate engine either successfully mates or resigns, we'd expect a small percentage of games to be won by white mating and the rest black by resignation.
+To evaluate the results of a simulation:
+
+Since the ScholarsMate engine either successfully mates or resigns, we'd expect a small percentage of games to be won by white mating and the rest black by resignation.
 ```
 from chessmate.analysis import display_all_results
 display_all_results(simulation.all_results)
@@ -61,7 +63,7 @@ display_material_difference(simulation.game_pgns, game_index=4)
 ![game_0](https://user-images.githubusercontent.com/17757035/82768042-21e3c880-9de1-11ea-98a9-6c7804a37113.png)
 ![game 4](https://user-images.githubusercontent.com/17757035/82768041-214b3200-9de1-11ea-83b7-9439652ac777.png)
 
-To visualize the events of a game move by move, chessnut comes with IPython functionality to display games in the console
+To visualize the events of a game, chessmate comes with IPython functionality to display games in the console move by move
 ```
 from chess.utils import walkthrough_pgn
 walkthrough_pgn(simulation.game_pgns[0])
