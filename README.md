@@ -64,10 +64,8 @@ from chessmate.analysis import display_material_difference
 simulation = ChessPlayground(CaptureHighestValue(), Random())
 simulation.play_multiple_games(10)
 display_material_difference(simulation.game_pgns, game_index=0)
-display_material_difference(simulation.game_pgns, game_index=4)
 ```
-![game_0](https://user-images.githubusercontent.com/17757035/82768042-21e3c880-9de1-11ea-98a9-6c7804a37113.png)
-![game 4](https://user-images.githubusercontent.com/17757035/82768041-214b3200-9de1-11ea-83b7-9439652ac777.png)
+![game_0](https://user-images.githubusercontent.com/17757035/82845850-0210db00-9e9b-11ea-8183-48958edbc418.png)
 
 To visualize the events of a game, chessmate comes with IPython functionality to display games in the console move by move
 ```
