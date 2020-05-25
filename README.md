@@ -63,7 +63,7 @@ display_material_difference(simulation.game_pgns, game_index=4)
 
 To visualize the events of a game move by move, chessnut comes with IPython functionality to display games in the console
 ```
-from utils import walkthrough_pgn
+from chess.utils import walkthrough_pgn
 walkthrough_pgn(simulation.game_pgns[0])
 ```
 ![display](https://user-images.githubusercontent.com/17757035/82768462-07f7b500-9de4-11ea-83ec-97975e9e9017.png)
