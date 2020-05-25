@@ -4,7 +4,7 @@
 ## Usage example
 
 ### Engines
-The basic building block of chessmate is the engine. All engines are expected to inherit
+The basic building block of chessmate is the engine. All engines inherit
 from ```chess.engines.BaseEngine``` and obey an evaluate-move progression wherein the engine evaluates the current board
 state by some metric and/or algorithm and returns a single move it deems best.
 
@@ -14,12 +14,12 @@ Examples of some simple engines are:
   3. ```CaptureHighestValue``` - prioritize capturing the highest value piece available
   4. ```ScholarsMate``` - obeys standard Scholar's Mate sequence and resigns if unsuccessful
   
-Since most chess engines can be boiled down to this basic progression, the chessnut engine schema provides a simple but
+Since most chess engines can be boiled down to this basic progression, the chessmate engine schema provides a simple but
 powerful framework for developing and analyzing engines
 
 ---
 ### Game simulations
-Once engines are defined, one can perform analysis via the classes available in chess.simulations. Some example functionality includes:
+Once engines are defined, one can perform analysis via the classes available in ```chess.simulations```. Some example functionality includes:
 
 Simulating a game between two engines:
 

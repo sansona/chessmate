@@ -108,27 +108,20 @@ def display_material_difference(material_differences: List[tuple],
             to plot
     """
     game_values = material_differences[game_index]
-    white_engine_vals = [v[0] for v in game_values]
-    black_engine_vals = [-v[1] for v in game_values]
-    positive_mask = [True if e > 0 else False for e in white_engine_vals]
+    engine_vals = [v[0] for v in game_values]
+    positive_mask = [True if e > 0 else False for e in engine_vals]
 
-    _, axes = plt.subplots(2, 1, sharex=True)
-    x = range(len(white_engine_vals))
-    for idx, engine in enumerate([white_engine_vals, black_engine_vals]):
-        axes[idx].set_title(f"Game: {game_index}")
-        axes[idx].fill_between(x, 0, engine, where=positive_mask,
-                               facecolor='floralwhite', interpolate=True)
-        axes[idx].fill_between(x, 0, engine, where=[
-            not x for x in positive_mask],
-            facecolor='black', interpolate=True)
-        axes[idx].plot(x, engine, color='black', linewidth=0.75)
-        axes[idx].axhline(y=0, color='black', linewidth=0.5)
-
-        if idx == 0:
-            axes[idx].set_ylabel("White evaluation")
-        else:
-            axes[idx].set_ylabel("Black evaluation")
-            axes[idx].set_xlabel('Move index')
+    _, ax = plt.subplots(1, 1)
+    x = range(len(engine_vals))
+    ax.set_title(f"Game: {game_index}")
+    ax.fill_between(x, 0, engine_vals, where=positive_mask,
+                    facecolor='floralwhite', interpolate=True)
+    ax.fill_between(x, 0, engine_vals, where=[not x for x in positive_mask],
+                    facecolor='black', interpolate=True)
+    ax.plot(x, engine_vals, color='black', linewidth=0.75)
+    ax.axhline(y=0, color='black', linewidth=0.5)
+    ax.set_ylabel("Material difference")
+    ax.set_xlabel('Move index')
 
 
 def display_all_material_differences(material_differences: List[tuple]) -> None:
