@@ -312,62 +312,73 @@ class ScholarsMate(BaseEngine):
 
 
 class MiniMax(BaseEngine):
-    """ Base class for set of Minimax algorithms"""
+    """ Base class for set of Minimax algorithms """
 
-    def __init__(self):
+    def __init__(self, color: [chess.Color, bool]):
         super().__init__()
         self.name = "MiniMax"
-        self.side: bool = True
-        self.depth: int = 3
-        self.rec_move = chess.Move.null()
+        self.color = color
+        self.depth: int = 2
+        self.best_move = chess.Move.null()
 
-    def minimax(self, base_board: chess.Board, white: bool, depth: int):
+    def minimax(self, base_board: chess.Board, maximizing: bool, depth: int):
         """
-        Evaluate result of each legal move on board
+        Evaluate result of each legal move on board via. minimax algorithm
 
         Args:
             base_board (chess.Board): current board state
-            white (bool): True for white, False for black
-            depth (int): current depth. Init at self.depth for base
+            maxiizing (bool): True for white, False for black
+            depth (int): depth to search. Init at self.depth for base. Note:
+                depth=>3 will be computationally slow for most CPUs
         """
         if depth == 0 or base_board.is_game_over():
             return tabulate_board_values(base_board)
 
-        if white:
+        # Evaluate position after each legal move, store result of
+        # best move
+        if maximizing:
             max_val = -float('inf')
-            # Evaluate position after each legal move, store result of
-            # best move
-            for move in list(base_board.legal_moves):
+            # Shuffle moves to prevent move ordering from impacting game results
+            legal_moves = list(base_board.legal_moves)
+            random.shuffle(legal_moves)
+            for move in legal_moves:
                 base_board.push_uci(str(move))
                 val = self.minimax(base_board, False, depth=depth - 1)
+                popped_move = base_board.pop()
+
                 if val > max_val:
                     max_val = val
-                    self.rec_move = move
-                base_board.pop()
+                    # Keep only best moves for own color and at the root of
+                    # the move tree corresponding to the best move
+                    if (self.color) and (depth == self.depth):
+                        self.best_move = popped_move
             return max_val
 
-        elif not white:
+        else:
             min_val = float('inf')
-            self.rec_move = chess.Move.null()
+            legal_moves = list(base_board.legal_moves)
+            random.shuffle(legal_moves)
 
-            for move in list(base_board.legal_moves):
+            for move in legal_moves:
                 base_board.push_uci(str(move))
                 val = self.minimax(base_board, True, depth=depth - 1)
+                popped_move = base_board.pop()
                 if val < min_val:
                     min_val = val
-                    #self.rec_move = move
-                base_board.pop()
+                    if (not self.color) and (depth == self.depth):
+                        self.best_move = popped_move
 
             return min_val
 
     def evaluate(self, board: chess.Board) -> None:
-        """ Inits scholar's mate play as legal_moves """
-        self.reset_move_variables()
-        if isinstance(self.side, bool):
-            self.minimax(board, True, depth=self.depth)
+        if isinstance(self.color, bool):
+            self.minimax(board, self.color, depth=self.depth)
         else:
-            raise ValueError(f"self.side value {self.side} not in (White, Black)")
+            raise ValueError(
+                f"self.color value {self.color} not in (White, Black)")
+
+        self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board: chess.Board) -> chess.Move:
         self.evaluate(board)
-        return self.rec_move
+        return self.best_move

@@ -185,7 +185,6 @@ class PlayVsEngine(EnginePlay):
         """
         eng_move = self.engine.move(self._board)
         self._board.push_uci(str(eng_move))
-
         self.append_move_to_tree(eng_move)
         self.display_board(
             f"Move {self._board.fullmove_number} - player to move.")
@@ -312,6 +311,7 @@ class ChessPlayground(EnginePlay):
             white_move = self.white_engine.move(self._board)
             if white_move == chess.Move.null():
                 break
+
             self._board.push_uci(str(white_move))
             self.append_move_to_tree(white_move)
 

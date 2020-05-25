@@ -56,4 +56,6 @@ FEN_MAPS = {
     'black_mayhem': (f'{mayhem}{central_rows}{standard.upper()}{suffix}'),
     'mayhem': (f'{mayhem}{central_rows}{mayhem.upper()}{suffix}'),
     'pandemonium': (f'{mayhem}/{mayhem}/{river}/'
-                    f'{mayhem.upper()}/{mayhem.upper()}{suffix}')}
+                    f'{mayhem.upper()}/{mayhem.upper()}{suffix}'),
+    'easy_white_win': '8/5k2/1P2q3/3n4/3B4/6Q1/4K3/1R6 w - - 0 1',
+    'easy_black_win': '6r1/4k3/2q3n1/8/8/3Q1N2/4K3/8 w - - 0 1'}
