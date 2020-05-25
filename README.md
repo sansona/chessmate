@@ -38,6 +38,12 @@ Simulating multiple games
 simulation.play_multiple_games(1000)
 ```
 
+You can also play directly against an engine in the IPython console:
+```
+playvs = PlayVsEngine(CaptureHighestValue())
+playvs.play_game()
+```
+
 ---
 ### Basic analysis
 
