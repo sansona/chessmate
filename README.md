@@ -4,15 +4,15 @@
 ## Usage example
 
 ### Engines
-The basic building block of chessmate is the Engine. All engines are expected to inherit
-from chess.engines.BaseEngine and obey an evaluate-move progression wherein the engine evaluates the current board
+The basic building block of chessmate is the engine. All engines are expected to inherit
+from ```chess.engines.BaseEngine``` and obey an evaluate-move progression wherein the engine evaluates the current board
 state by some metric and/or algorithm and returns a single move it deems best.
 
 Examples of some simple engines are:
-  1. Random - returns a random move
-  2. PrioritizePawnMoves - prioritizes all moves pawn related 
-  3. CaptureHighestValue - prioritize capturing the highest value piece available
-  4. ScholarsMate - obeys standard Scholar's Mate sequence and resigns if unsuccessful
+  1. ```Random``` - returns a random move
+  2. ```PrioritizePawnMoves``` - prioritizes all moves pawn related 
+  3. ```CaptureHighestValue``` - prioritize capturing the highest value piece available
+  4. ```ScholarsMate``` - obeys standard Scholar's Mate sequence and resigns if unsuccessful
   
 Since most chess engines can be boiled down to this basic progression, the chessnut engine schema provides a simple but
 powerful framework for developing and analyzing engines
@@ -43,7 +43,7 @@ simulation.play_multiple_games(1000)
 
 To evaluate the results of a simulation:
 
-Since the ScholarsMate engine either successfully mates or resigns, we'd expect a small percentage of games to be won by white mating and the rest black by resignation.
+Since the ```ScholarsMate``` engine either successfully mates or resigns, we'd expect a small percentage of games to be won by white mating and the rest black by resignation.
 ```
 from chessmate.analysis import display_all_results
 display_all_results(simulation.all_results)
