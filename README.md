@@ -10,10 +10,10 @@ state by some metric and/or algorithm and returns a single move it deems best.
 
 Examples of some simple engines are:
   1. ```Random``` - returns a random move
-  2. ```PrioritizePawnMoves``` - prioritizes all moves pawn related 
+  2. ```PrioritizePawnMoves``` - prioritizes all moves pawn related
   3. ```CaptureHighestValue``` - prioritize capturing the highest value piece available
   4. ```ScholarsMate``` - obeys standard Scholar's Mate sequence and resigns if unsuccessful
-  
+
 Since most chess engines can be boiled down to this basic progression, the chessmate engine schema provides a simple but
 powerful framework for developing and analyzing engines
 
@@ -23,7 +23,7 @@ Once engines are defined, one can perform analysis via the classes available in 
 
 Simulating a game between two engines:
 
-``` 
+```
 from chessmate.simulations import ChessPlayground
 from chessmate.engines import CaptureHighestValue, Random
 

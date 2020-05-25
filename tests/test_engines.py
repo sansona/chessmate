@@ -61,12 +61,13 @@ def starting_engines():
 @pytest.fixture
 def minimax_engines():
     """
-    Sets up initializations of base minimax engines
+    Sets up initializations of base minimax engines w/ depth 1
     Returns:
         (List)
     """
-    return [MiniMax(color=chess.WHITE),
-            MiniMax(color=chess.BLACK)]
+
+    return [MiniMax(color=chess.WHITE, depth=1),
+            MiniMax(color=chess.BLACK, depth=1)]
 
 
 def test_base_engine(starting_board):
@@ -164,7 +165,6 @@ def test_scholars_mate_resign_failed_mate():
 def test_minimax_depth_1_and_2_completion(minimax_engines):
     """ Tests that minimax at depths 1 & 2 doesn't hang """
     mm1 = minimax_engines[0]
-    mm1.depth = 1
     mm2 = minimax_engines[1]
     mm2.depth = 2
     simulation = ChessPlayground(mm1, mm2)
@@ -207,10 +207,11 @@ def test_minimax_depth_2_evaluation(minimax_engines):
     """ Tests that minimax at depth 2 sees moves 2 steps ahead
     i.e obvious forks """
     black_knight_fork_fen = ('rnb1kb1r/ppppp1pp/8/8/3n4/8/'
-                             'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+                             'PPPP1PPP/RNB1KBNR b KQkq - 0 1')
     fork_boards = [(chess.Board(fen=black_knight_fork_fen), 'd4c2')]
 
     engine = minimax_engines[1]
+    engine.alpha_beta_pruning = False
     for board, rec_move in fork_boards:
         move = engine.move(board)
         assert str(move) == rec_move
@@ -221,6 +222,27 @@ def test_minimax_eval_side(minimax_engines):
     for own side i.e doesn't return best move for black when playing
     as white"""
     white_minimax, black_minimax = minimax_engines
+
+    capture_black_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
+                           f'PPPPPPPP/RNB1KBNR w KQkq - 0 1')
+    capture_white_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
+                           f'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+
+    # White should capture blacks queen and vice-versa
+    board = chess.Board(fen=capture_black_queen)
+    assert str(white_minimax.move(board)) == 'f4c4'
+
+    board = chess.Board(fen=capture_white_queen)
+    assert str(black_minimax.move(board)) == 'c4f4'
+
+
+@pytest.mark.slow
+def test_minimax_no_pruning(minimax_engines):
+    """ Test that without alpha beta pruning, minimax still evaluates
+    obvious positions """
+    white_minimax, black_minimax = minimax_engines
+    white_minimax.alpha_beta_pruning = False
+    black_minimax.alpha_beta_pruning = False
 
     capture_black_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
                            f'PPPPPPPP/RNB1KBNR w KQkq - 0 1')

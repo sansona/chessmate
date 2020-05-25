@@ -18,7 +18,7 @@ class BaseEngine():
     Attributes:
         name (str): name of engine
         legal_moves (Dict{chess.Move: float}): Dict of all current legal moves
-            and value of those moves
+                and value of those moves
         value_mapping (Dict{string: float}): maps type of piece to value sytem
 
     Methods:
@@ -38,8 +38,8 @@ class BaseEngine():
         """
         Args:
             name (str): name of engine
-            legal_moves (Dict[chess.Move, float]): list of all legal moves available in
-                uci notation with values for each move
+            legal_moves (Dict[chess.Move, float]): list of all legal moves
+                available in uci notation with values for each move
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
             material_difference (List[float]): difference in value on board
@@ -312,43 +312,66 @@ class ScholarsMate(BaseEngine):
 
 class MiniMax(BaseEngine):
     """
-    Base class for engines utilizing the MiniMax algorithm
+    Base class for engines utilizing the MiniMax algorithm. Inherits from
+    BaseEngine.
 
     Attributes:
         name (str): name of engine
-        legal_moves (Dict{chess.Move: float}): Dict of all current legal moves
-            and value of those moves
-        value_mapping (Dict{string: float}): maps type of piece to value sytem
+        color (Union[chess.Color, bool]): color for MiniMax to evaluate board
+            from
+        depth (int): number of child nodes to traverse in algorithm
+        best_move (chess.Move): move evaluated as best by minimax algorithm.
+            Default to null
+        alpha_beta_pruning (bool): if want to prune trees. Default=True
+        alpha (float): alpha value in pruning, default=-inf
+        beta (float): beta value in pruning, default= inf
 
     Methods:
-        evaluate(board): unique to each engine, needs to be redefined when
-            engine requires evaluation. Responsible for
-            evaluating a board state based off engine criteria
-        move(board): unique to each engine, needs to be redefined in each case.
-            Responsible for selecting a move
-            based on engine evaluation. Should return a UCI move object
-        reset_move_variables(): reinitialize variables for beginning of move
-            evaluation
-        reset_game_variables(): reinitialize variables for beginning of new
-            game
+        minimax(base_board, maximizing, depth): main algorithmic loop for
+            minimax algorithm.
     """
 
-    def __init__(self, color: Union[chess.Color, bool]):
+    def __init__(self, color: Union[chess.Color, bool], depth: int):
         super().__init__()
         self.name = "MiniMax"
-        self.color = color
-        self.depth: int = 2
-        self.best_move = chess.Move.null()
+        self.color: Union[chess.Color, bool] = color
+        self._depth: int = depth
+        self.best_move: chess.Move = chess.Move.null()
+        self.alpha_beta_pruning: bool = True
+        self.alpha: float = float('-inf')
+        self.beta: float = float('inf')
 
-    def minimax(self, base_board: chess.Board, maximizing: bool, depth: int):
+    @property
+    def depth(self) -> int:
+        """ Getter for depth """
+        return self._depth
+
+    @depth.setter
+    def depth(self, depth_val: int) -> None:
+        """
+        Setter for setting new depth after initialzation with new fen
+
+        Args:
+            depth_val (int)
+
+        Raise:
+            TypeError: if non-int depth set
+        """
+        if not isinstance(depth_val, int):
+            raise TypeError(f"depth {depth_val} of type {type(depth_val)}")
+        self._depth = depth_val
+
+    def minimax(self, base_board: chess.Board, maximizing: bool, depth: int,
+                alpha: float, beta: float) -> float:
         """
         Evaluate result of each legal move on board via. minimax algorithm
+        Reference: https://www.youtube.com/watch?v=l-hh51ncgDI
 
         Args:
             base_board (chess.Board): current board state
-            maxiizing (bool): True for white, False for black
-            depth (int): depth to search. Init at self.depth for base. Note:
-                depth=>3 will be computationally slow for most CPUs
+            maximizing (bool): True for white, False for black
+            depth (int): depth to search. Init at self._depth for base. Note:
+                    depth=>3 will be computationally slow for most CPUs
         """
         if depth == 0 or base_board.is_game_over():
             return tabulate_board_values(base_board)
@@ -357,20 +380,28 @@ class MiniMax(BaseEngine):
         # best move
         if maximizing:
             max_val = -float('inf')
-            # Shuffle moves to prevent move ordering from impacting game results
+            # Shuffle moves to prevent move ordering from impacting game
+            # results
             legal_moves = list(base_board.legal_moves)
             random.shuffle(legal_moves)
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, False, depth=depth - 1)
+                val = self.minimax(
+                    base_board, False, depth - 1, alpha, beta)
                 popped_move = base_board.pop()
 
                 if val > max_val:
                     max_val = val
                     # Keep only best moves for own color and at the root of
                     # the move tree corresponding to the best move
-                    if (self.color) and (depth == self.depth):
+                    if (self.color) and (depth == self._depth):
                         self.best_move = popped_move
+
+                if self.alpha_beta_pruning:
+                    alpha = max(alpha, val)
+                    if beta <= alpha:
+                        break
+
             return max_val
 
         # elif not strictly necessary but increasing readability
@@ -381,19 +412,25 @@ class MiniMax(BaseEngine):
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, True, depth=depth - 1)
+                val = self.minimax(
+                    base_board, True, depth - 1, alpha, beta)
                 popped_move = base_board.pop()
                 if val < min_val:
                     min_val = val
-                    if (not self.color) and (depth == self.depth):
+                    if (not self.color) and (depth == self._depth):
                         self.best_move = popped_move
+                if self.alpha_beta_pruning:
+                    beta = min(beta, val)
+                    if beta <= alpha:
+                        break
 
             return min_val
 
     def evaluate(self, board: chess.Board) -> None:
         """ Evaluates board from perspective of side playing on """
         if isinstance(self.color, bool):
-            self.minimax(board, self.color, depth=self.depth)
+            self.minimax(board, self.color, depth=self._depth, alpha=self.alpha,
+                         beta=self.beta)
         else:
             raise ValueError(
                 f"self.color value {self.color} not in (White, Black)")
