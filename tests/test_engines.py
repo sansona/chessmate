@@ -147,7 +147,7 @@ def test_scholars_mate_black_resign():
 
 def test_scholars_mate_resign_failed_mate():
     """ Tests that ScholarsMate resigns if mate is not achieved
-    after move sequence """5
+    after move sequence """
     engine = ScholarsMate()
     board = chess.Board()
 

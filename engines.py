@@ -1,14 +1,13 @@
 """
 Collection of chess engines that evaluate board state and select best moves
 """
-from typing import List, Dict
-from pprint import pprint
+from typing import List, Dict, Union
 import random
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 from analysis import tabulate_board_values
 from utils import get_piece_at
-from constants import CONVENTIONAL_PIECE_VALUES, COLOR_MAP
+from constants import CONVENTIONAL_PIECE_VALUES
 
 
 class BaseEngine():
@@ -312,9 +311,29 @@ class ScholarsMate(BaseEngine):
 
 
 class MiniMax(BaseEngine):
-    """ Base class for set of Minimax algorithms """
+    """
+    Base class for engines utilizing the MiniMax algorithm
 
-    def __init__(self, color: [chess.Color, bool]):
+    Attributes:
+        name (str): name of engine
+        legal_moves (Dict{chess.Move: float}): Dict of all current legal moves
+            and value of those moves
+        value_mapping (Dict{string: float}): maps type of piece to value sytem
+
+    Methods:
+        evaluate(board): unique to each engine, needs to be redefined when
+            engine requires evaluation. Responsible for
+            evaluating a board state based off engine criteria
+        move(board): unique to each engine, needs to be redefined in each case.
+            Responsible for selecting a move
+            based on engine evaluation. Should return a UCI move object
+        reset_move_variables(): reinitialize variables for beginning of move
+            evaluation
+        reset_game_variables(): reinitialize variables for beginning of new
+            game
+    """
+
+    def __init__(self, color: Union[chess.Color, bool]):
         super().__init__()
         self.name = "MiniMax"
         self.color = color
@@ -354,7 +373,8 @@ class MiniMax(BaseEngine):
                         self.best_move = popped_move
             return max_val
 
-        else:
+        # elif not strictly necessary but increasing readability
+        elif not maximizing:
             min_val = float('inf')
             legal_moves = list(base_board.legal_moves)
             random.shuffle(legal_moves)
@@ -371,6 +391,7 @@ class MiniMax(BaseEngine):
             return min_val
 
     def evaluate(self, board: chess.Board) -> None:
+        """ Evaluates board from perspective of side playing on """
         if isinstance(self.color, bool):
             self.minimax(board, self.color, depth=self.depth)
         else:
@@ -380,5 +401,6 @@ class MiniMax(BaseEngine):
         self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board: chess.Board) -> chess.Move:
+        """ Returns best move as selected by minimax algorithm """
         self.evaluate(board)
         return self.best_move
