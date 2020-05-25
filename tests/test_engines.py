@@ -3,6 +3,8 @@ import sys
 import pytest
 import chess
 import chess.pgn
+from simulations import ChessPlayground
+from constants import FEN_MAPS
 from engines import *
 sys.path.append('..')
 
@@ -54,6 +56,17 @@ def starting_engines():
             CaptureHighestValue(),
             AvoidCapture(),
             ScholarsMate()]
+
+
+@pytest.fixture
+def minimax_engines():
+    """
+    Sets up initializations of base minimax engines
+    Returns:
+        (List)
+    """
+    return [MiniMax(color=chess.WHITE),
+            MiniMax(color=chess.BLACK)]
 
 
 def test_base_engine(starting_board):
@@ -145,3 +158,78 @@ def test_scholars_mate_resign_failed_mate():
         board.push_uci(move)
 
     assert engine.move(board) == chess.Move.null()
+
+
+@pytest.mark.slow
+def test_minimax_depth_1_and_2_completion(minimax_engines):
+    """ Tests that minimax at depths 1 & 2 doesn't hang """
+    mm1 = minimax_engines[0]
+    mm1.depth = 1
+    mm2 = minimax_engines[1]
+    mm2.depth = 2
+    simulation = ChessPlayground(mm1, mm2)
+    simulation.fen = FEN_MAPS['easy_white_win']
+    simulation.play_game()
+
+
+@pytest.mark.slow
+def test_minimax_depth_3_completion(minimax_engines):
+    """ Tests that minimax at depth 3 doesn't hang or return illegal moves.
+    @ depth>=3, minimax evaluates own position in recursive call whereas @ depth<3,
+    minimax only evaluates own position and opponents position once.
+    This revisiting of own side's future position can lead to obscure bugs"""
+    mm3 = minimax_engines[0]
+    mm3.depth = 3
+    simulation = ChessPlayground(mm3, ScholarsMate())
+    simulation.fen = FEN_MAPS['easy_white_win']
+    simulation.play_game()
+
+
+@pytest.mark.slow
+def test_minimax_depth_4_completion(minimax_engines):
+    """ Tests that minimax at depth 4 doesn't hang """
+    engine = minimax_engines[1]
+    engine.depth = 4
+    simulation = ChessPlayground(CaptureHighestValue(), engine)
+    simulation.fen = FEN_MAPS['easy_black_win']
+    simulation.play_game()
+
+
+def test_minimax_depth_1_evaluation(minimax_engines, modified_boards):
+    """ Tests that minimax depth 1 takes obvious captures """
+    engine = minimax_engines[0]
+    for board, rec_move in modified_boards:
+        move = engine.move(board)
+        assert str(move) == rec_move
+
+
+def test_minimax_depth_2_evaluation(minimax_engines):
+    """ Tests that minimax at depth 2 sees moves 2 steps ahead
+    i.e obvious forks """
+    black_knight_fork_fen = ('rnb1kb1r/ppppp1pp/8/8/3n4/8/'
+                             'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+    fork_boards = [(chess.Board(fen=black_knight_fork_fen), 'd4c2')]
+
+    engine = minimax_engines[1]
+    for board, rec_move in fork_boards:
+        move = engine.move(board)
+        assert str(move) == rec_move
+
+
+def test_minimax_eval_side(minimax_engines):
+    """ Tests that minimax evaluate function returns best move
+    for own side i.e doesn't return best move for black when playing
+    as white"""
+    white_minimax, black_minimax = minimax_engines
+
+    capture_black_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
+                           f'PPPPPPPP/RNB1KBNR w KQkq - 0 1')
+    capture_white_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
+                           f'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+
+    # White should capture blacks queen and vice-versa
+    board = chess.Board(fen=capture_black_queen)
+    assert str(white_minimax.move(board)) == 'f4c4'
+
+    board = chess.Board(fen=capture_white_queen)
+    assert str(black_minimax.move(board)) == 'c4f4'

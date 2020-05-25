@@ -112,10 +112,9 @@ def render_svg_board(board: chess.Board, temp_dir: Union[str, Path],
     boardsvg = chess.svg.board(board=board)
 
     # Store each move as image in temp
-    fpath = Path(temp_dir) / f"{display_str}.SVG"
+    fpath = Path(temp_dir) / f"{display_str}"
     with open(fpath, "w") as f:
         f.write(boardsvg)
-
     display(SVG(str(fpath)))
     print(fpath.stem)
     clear_output(wait=True)
