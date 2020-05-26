@@ -1,10 +1,12 @@
 """ Test suite for assortment of helper functions """
 import sys
-import pytest
+
 import chess
 import chess.pgn
-from utils import *
+import pytest
+
 from analysis import tabulate_board_values
+from utils import *
 
 sys.path.append("..")
 

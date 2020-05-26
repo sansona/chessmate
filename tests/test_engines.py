@@ -1,11 +1,13 @@
 """ Test suite for engines """
 import sys
-import pytest
+
 import chess
 import chess.pgn
-from simulations import ChessPlayground
+import pytest
+
 from constants import FEN_MAPS
 from engines import *
+from simulations import ChessPlayground
 
 sys.path.append("..")
 

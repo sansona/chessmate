@@ -3,12 +3,14 @@ import time
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from typing import Union
 from tempfile import TemporaryDirectory
-import pytest  # type: ignore
-from IPython.display import SVG, display, clear_output  # type: ignore
+from typing import Union
+
 import chess
 import chess.pgn
+import pytest  # type: ignore
+from IPython.display import SVG, clear_output, display  # type: ignore
+
 from constants import FEN_MAPS
 
 

@@ -1,13 +1,15 @@
 """
 Collection of chess engines that evaluate board state and select best moves
 """
-from typing import List, Dict, Union
 import random
+from typing import Dict, List, Union
+
 import chess  # type: ignore
 import chess.pgn  # type: ignore
+
 from analysis import tabulate_board_values
-from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES
+from utils import get_piece_at
 
 
 class BaseEngine:

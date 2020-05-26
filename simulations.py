@@ -1,13 +1,15 @@
 """ Tools to simulate chess games """
-from typing import List, Dict, Callable, Union
 from tempfile import TemporaryDirectory
-from tqdm import tqdm  # type: ignore
+from typing import Callable, Dict, List, Union
+
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import chess.svg  # type: ignore
+from tqdm import tqdm  # type: ignore
+
 from analysis import evaluate_ending_board
-from utils import render_svg_board, is_valid_fen
 from constants import COLOR_MAP, FEN_MAPS
+from utils import is_valid_fen, render_svg_board
 
 
 class EnginePlay:

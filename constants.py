@@ -3,9 +3,6 @@
 # Since python-chess doesn't provide functionality for getting piece
 # at square via. string notation, setup own board to map strings to
 # squares
-from typing import List
-
-
 CONVENTIONAL_PIECE_VALUES = {
     "P": 1.0,
     "N": 3.0,

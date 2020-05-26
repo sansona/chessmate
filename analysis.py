@@ -1,8 +1,10 @@
 """ Functions for analyzing board states and results of games """
-from typing import List
 from collections import Counter
-import matplotlib.pyplot as plt  # type: ignore
+from typing import List
+
 import chess
+import matplotlib.pyplot as plt  # type: ignore
+
 from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
 
 
@@ -144,7 +146,7 @@ def display_material_difference(
 
 
 def display_all_material_differences(
-    material_differences: List[tuple]
+    material_differences: List[tuple],
 ) -> None:
     """
     Wrapper for display_material_difference to plot results of

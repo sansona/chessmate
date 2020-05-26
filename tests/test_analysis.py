@@ -1,8 +1,10 @@
 """ Test suite for assortment of analysis functions """
 import sys
-import pytest
+
 import chess
 import chess.pgn
+import pytest
+
 from analysis import *
 from engines import ScholarsMate
 from simulations import ChessPlayground
