@@ -10,7 +10,7 @@ from utils import get_piece_at
 from constants import CONVENTIONAL_PIECE_VALUES
 
 
-class BaseEngine():
+class BaseEngine:
     """
     Base class for defining an engine. Each engine is responsible for
     evaluating a board state and providing a move
@@ -71,7 +71,7 @@ class BaseEngine():
             (Dict[chess.Move: float]): dict mapping uci moves to
                 evaluated value metric
         """
-        raise NotImplementedError('Function evaluate not implemented')
+        raise NotImplementedError("Function evaluate not implemented")
 
     def move(self, board: chess.Board) -> chess.Move:
         """
@@ -86,7 +86,7 @@ class BaseEngine():
         Returns:
             (chess.Move): uci notation object of chosen move
         """
-        raise NotImplementedError('Function move not implemented')
+        raise NotImplementedError("Function move not implemented")
 
     def reset_move_variables(self) -> None:
         """ Resets variables at end of move"""
@@ -112,7 +112,8 @@ class Random(BaseEngine):
 
         legal_move_list = list(board.legal_moves)
         self.legal_moves = {
-            legal_move_list[i]: 1 for i in range(len(legal_move_list))}
+            legal_move_list[i]: 1 for i in range(len(legal_move_list))
+        }
         self.material_difference.append(tabulate_board_values(board))
 
     def move(self, board: chess.Board) -> chess.Move:
@@ -143,13 +144,14 @@ class PrioritizePawnMoves(Random):
 
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
-            if get_piece_at(board, str(m)[:2].upper()) == 'P':
+            if get_piece_at(board, str(m)[:2].upper()) == "P":
                 self.legal_moves[m] = 1
 
         # If no pawn moves available, all moves are same priority
         if not self.legal_moves:
             self.legal_moves = {
-                legal_move_list[i]: 1 for i in range(len(legal_move_list))}
+                legal_move_list[i]: 1 for i in range(len(legal_move_list))
+            }
 
         self.material_difference.append(tabulate_board_values(board))
 
@@ -232,7 +234,9 @@ class CaptureHighestValue(BaseEngine):
         for m in list(self.legal_moves):
             if self.legal_moves[m] > highest_capture_val:
                 highest_capture_val, highest_capture_uci = (
-                    self.legal_moves[m], m)
+                    self.legal_moves[m],
+                    m,
+                )
 
         # If any captures available, return highest value capture. Else,
         # return random move
@@ -292,7 +296,8 @@ class ScholarsMate(BaseEngine):
         # Since Scholar's Mate relies on standard board setup, resign
         # if starting board is not standard
         if (board.fullmove_number == 1) and (
-                board.starting_fen != chess.STARTING_FEN):
+            board.starting_fen != chess.STARTING_FEN
+        ):
             return chess.Move.null()
 
         self.evaluate(board)
@@ -338,8 +343,8 @@ class MiniMax(BaseEngine):
         self._depth: int = depth
         self.best_move: chess.Move = chess.Move.null()
         self.alpha_beta_pruning: bool = True
-        self.alpha: float = float('-inf')
-        self.beta: float = float('inf')
+        self.alpha: float = float("-inf")
+        self.beta: float = float("inf")
 
     @property
     def depth(self) -> int:
@@ -361,8 +366,14 @@ class MiniMax(BaseEngine):
             raise TypeError(f"depth {depth_val} of type {type(depth_val)}")
         self._depth = depth_val
 
-    def minimax(self, base_board: chess.Board, maximizing: bool, depth: int,
-                alpha: float, beta: float) -> float:
+    def minimax(
+        self,
+        base_board: chess.Board,
+        maximizing: bool,
+        depth: int,
+        alpha: float,
+        beta: float,
+    ) -> float:
         """
         Evaluate result of each legal move on board via. minimax algorithm
         Reference: https://www.youtube.com/watch?v=l-hh51ncgDI
@@ -379,15 +390,14 @@ class MiniMax(BaseEngine):
         # Evaluate position after each legal move, store result of
         # best move
         if maximizing:
-            max_val = -float('inf')
+            max_val = -float("inf")
             # Shuffle moves to prevent move ordering from impacting game
             # results
             legal_moves = list(base_board.legal_moves)
             random.shuffle(legal_moves)
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(
-                    base_board, False, depth - 1, alpha, beta)
+                val = self.minimax(base_board, False, depth - 1, alpha, beta)
                 popped_move = base_board.pop()
 
                 if val > max_val:
@@ -406,14 +416,13 @@ class MiniMax(BaseEngine):
 
         # elif not strictly necessary but increasing readability
         elif not maximizing:
-            min_val = float('inf')
+            min_val = float("inf")
             legal_moves = list(base_board.legal_moves)
             random.shuffle(legal_moves)
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(
-                    base_board, True, depth - 1, alpha, beta)
+                val = self.minimax(base_board, True, depth - 1, alpha, beta)
                 popped_move = base_board.pop()
                 if val < min_val:
                     min_val = val
@@ -429,11 +438,17 @@ class MiniMax(BaseEngine):
     def evaluate(self, board: chess.Board) -> None:
         """ Evaluates board from perspective of side playing on """
         if isinstance(self.color, bool):
-            self.minimax(board, self.color, depth=self._depth, alpha=self.alpha,
-                         beta=self.beta)
+            self.minimax(
+                board,
+                self.color,
+                depth=self._depth,
+                alpha=self.alpha,
+                beta=self.beta,
+            )
         else:
             raise ValueError(
-                f"self.color value {self.color} not in (White, Black)")
+                f"self.color value {self.color} not in (White, Black)"
+            )
 
         self.material_difference.append(tabulate_board_values(board))
 

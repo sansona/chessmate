@@ -56,11 +56,12 @@ def evaluate_ending_board(board: chess.Board) -> str:
     # explicitly initialize it on each call since it's dependent on
     # the current board state
     terminal_conditions = {
-        'Checkmate': board.is_checkmate,
-        'Stalemate': board.is_stalemate,
-        'Insufficient material': board.is_insufficient_material,
-        'Seventyfive moves': board.is_seventyfive_moves,
-        'Fivefold repetition': board.is_fivefold_repetition}
+        "Checkmate": board.is_checkmate,
+        "Stalemate": board.is_stalemate,
+        "Insufficient material": board.is_insufficient_material,
+        "Seventyfive moves": board.is_seventyfive_moves,
+        "Fivefold repetition": board.is_fivefold_repetition,
+    }
 
     for title, condition in terminal_conditions.items():
         if condition():
@@ -85,17 +86,23 @@ def display_all_results(all_results: List[str]) -> Counter:
     counts = Counter(all_results)
 
     _, ax = plt.subplots()
-    ax.bar(counts.keys(), counts.values(),
-           color='black', width=0.75, align='center')
-    ax.set_xlabel('Terminal conditions')
-    ax.set_ylabel('Number games')
-    ax.set_title('Terminal conditions')
+    ax.bar(
+        counts.keys(),
+        counts.values(),
+        color="black",
+        width=0.75,
+        align="center",
+    )
+    ax.set_xlabel("Terminal conditions")
+    ax.set_ylabel("Number games")
+    ax.set_title("Terminal conditions")
 
     return counts
 
 
-def display_material_difference(material_differences: List[tuple],
-                                game_index: int) -> None:
+def display_material_difference(
+    material_differences: List[tuple], game_index: int
+) -> None:
     """
     Wrapper for matplotlib to plot difference in piece total
     values throughout game
@@ -114,17 +121,31 @@ def display_material_difference(material_differences: List[tuple],
     _, ax = plt.subplots(1, 1)
     x = range(len(engine_vals))
     ax.set_title(f"Game: {game_index}")
-    ax.fill_between(x, 0, engine_vals, where=positive_mask,
-                    facecolor='floralwhite', interpolate=True)
-    ax.fill_between(x, 0, engine_vals, where=[not x for x in positive_mask],
-                    facecolor='black', interpolate=True)
-    ax.plot(x, engine_vals, color='black', linewidth=0.75)
-    ax.axhline(y=0, color='black', linewidth=0.5)
+    ax.fill_between(
+        x,
+        0,
+        engine_vals,
+        where=positive_mask,
+        facecolor="floralwhite",
+        interpolate=True,
+    )
+    ax.fill_between(
+        x,
+        0,
+        engine_vals,
+        where=[not x for x in positive_mask],
+        facecolor="black",
+        interpolate=True,
+    )
+    ax.plot(x, engine_vals, color="black", linewidth=0.75)
+    ax.axhline(y=0, color="black", linewidth=0.5)
     ax.set_ylabel("Material difference")
-    ax.set_xlabel('Move index')
+    ax.set_xlabel("Move index")
 
 
-def display_all_material_differences(material_differences: List[tuple]) -> None:
+def display_all_material_differences(
+    material_differences: List[tuple]
+) -> None:
     """
     Wrapper for display_material_difference to plot results of
     all games

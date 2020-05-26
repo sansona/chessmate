@@ -5,7 +5,8 @@ import chess
 import chess.pgn
 from utils import *
 from analysis import tabulate_board_values
-sys.path.append('..')
+
+sys.path.append("..")
 
 
 @pytest.fixture
@@ -29,8 +30,9 @@ def in_progress_board():
     Returns:
         (chess.Board)
     """
-    in_progress_fen = ('2kr1bnr/2ppqppp/p7/2p1p3/'
-                       '3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0 1')
+    in_progress_fen = (
+        "2kr1bnr/2ppqppp/p7/2p1p3/" "3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0 1"
+    )
     board = chess.Board(fen=in_progress_fen)
     return board
 
@@ -44,8 +46,8 @@ def test_starting_board_piece_at_function(starting_board):
     empty_piece = get_piece_at(starting_board, "C3")
 
     assert rook == "r"
-    assert king == 'K'
-    assert pawn == 'P'
+    assert king == "K"
+    assert pawn == "P"
     assert not empty_piece
 
 
@@ -57,7 +59,7 @@ def test_inprogress_board_piece_at_function(in_progress_board):
     empty_piece = get_piece_at(in_progress_board, "F1")
 
     assert pawn == "P"
-    assert queen == 'q'
+    assert queen == "q"
     assert not empty_piece
 
 

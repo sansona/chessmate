@@ -7,7 +7,7 @@ from analysis import *
 from engines import ScholarsMate
 from simulations import ChessPlayground
 
-sys.path.append('..')
+sys.path.append("..")
 
 
 @pytest.fixture
@@ -18,10 +18,13 @@ def not_mated_boards():
     Returns:
             List[chess.Board]
     """
-    not_mated_fen = [('r1b1kbnr/ppp1qQp1/2np3p/4p3/'
-                      '2BNP3/8/PPPP1PPP/RNB1K2R w KQkq - 0 1'),
-                     ('rnbqkbnr/pp1ppppp/2p5/8/'
-                      '4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2')]
+    not_mated_fen = [
+        (
+            "r1b1kbnr/ppp1qQp1/2np3p/4p3/"
+            "2BNP3/8/PPPP1PPP/RNB1K2R w KQkq - 0 1"
+        ),
+        ("rnbqkbnr/pp1ppppp/2p5/8/" "4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"),
+    ]
 
     return [chess.Board(fen=f) for f in not_mated_fen]
 
@@ -34,8 +37,10 @@ def stalemate_boards():
     Returns:
             List[chess.Board]
     """
-    stalemate_fen = ['8/8/8/8/8/4k3/4p3/4K3 w - - 0 1',
-                     '8/8/8/8/8/4k3/4p3/4K3 w - - 0 1']
+    stalemate_fen = [
+        "8/8/8/8/8/4k3/4p3/4K3 w - - 0 1",
+        "8/8/8/8/8/4k3/4p3/4K3 w - - 0 1",
+    ]
 
     return [chess.Board(fen=f) for f in stalemate_fen]
 

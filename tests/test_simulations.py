@@ -11,7 +11,7 @@ from simulations import *
 from engines import AvoidCapture, CaptureHighestValue
 from utils import not_raises
 
-sys.path.append('..')
+sys.path.append("..")
 
 N_GAMES = 10
 
@@ -61,8 +61,12 @@ def test_playground_multiple_games_metadata(setup_engines):
     simulator = ChessPlayground(setup_engines[0], setup_engines[1])
     simulator.play_multiple_games(N_GAMES)
 
-    assert all(len(value_diff) == num_moves for value_diff, num_moves in zip(
-        simulator.all_material_differences, simulator.all_move_counts))
+    assert all(
+        len(value_diff) == num_moves
+        for value_diff, num_moves in zip(
+            simulator.all_material_differences, simulator.all_move_counts
+        )
+    )
 
 
 def test_playground_multiple_games_played(setup_engines):
@@ -78,7 +82,7 @@ def test_playvs_fen(setup_engines):
     """ Tests that setting up simulation w/ proper FEN works """
     playvs = PlayVsEngine(setup_engines[0])
     with not_raises(ValueError):
-        playvs.fen = FEN_MAPS['standard']
+        playvs.fen = FEN_MAPS["standard"]
 
 
 def test_playvs_invalid_fen(setup_engines):
@@ -86,7 +90,7 @@ def test_playvs_invalid_fen(setup_engines):
     in PlayVsEngine"""
     playvs = PlayVsEngine(setup_engines[0])
     with pytest.raises(ValueError):
-        playvs.fen = 'FAKE FEN STR'
+        playvs.fen = "FAKE FEN STR"
     with pytest.raises(TypeError):
         playvs.fen = 0
 
@@ -95,7 +99,7 @@ def test_playground_valid_fen(setup_engines):
     """ Tests that setting up simulation w/ proper fen works"""
     simulator = ChessPlayground(setup_engines[0], setup_engines[1])
     with not_raises(ValueError):
-        simulator.fen = FEN_MAPS['standard']
+        simulator.fen = FEN_MAPS["standard"]
 
 
 def test_playground_invalid_fen(setup_engines):
@@ -103,7 +107,7 @@ def test_playground_invalid_fen(setup_engines):
     in ChessPlayground"""
     simulator = ChessPlayground(setup_engines[0], setup_engines[1])
     with pytest.raises(ValueError):
-        simulator.fen = 'FAKE FEN STR'
+        simulator.fen = "FAKE FEN STR"
     with pytest.raises(TypeError):
         simulator.fen = 0
 
@@ -122,7 +126,7 @@ def test_playvs_invalid_player_side(setup_engines):
     in PlayVsEngine"""
     playvs = PlayVsEngine(setup_engines[1])
     with pytest.raises(TypeError):
-        playvs.player_side = 'FAKE SIDE STR'
+        playvs.player_side = "FAKE SIDE STR"
     with pytest.raises(TypeError):
         playvs.fen = 2
 
@@ -131,9 +135,9 @@ def test_playground_fen_retained(setup_engines):
     """ Tests that self.fen remains same value after playing games
     in ChessPlayground """
     simulator = ChessPlayground(setup_engines[0], setup_engines[1])
-    simulator.fen = FEN_MAPS['mayhem']
+    simulator.fen = FEN_MAPS["mayhem"]
     simulator.play_multiple_games(N=N_GAMES)
-    assert simulator.fen == FEN_MAPS['mayhem']
+    assert simulator.fen == FEN_MAPS["mayhem"]
 
 
 def test_all_fens_valid(setup_engines):

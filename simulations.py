@@ -28,7 +28,7 @@ class EnginePlay:
 
     def __init__(self):
         self.game: chess.pgn.Game = chess.pgn.Game()
-        self._fen: str = FEN_MAPS['standard']
+        self._fen: str = FEN_MAPS["standard"]
         self._board: chess.Board = chess.Board(fen=self._fen)
         self.node: chess.pgn.GameNode = None
 
@@ -79,7 +79,7 @@ class EnginePlay:
 
     def play_game(self) -> None:
         """ Main function for wrapping around game play functionality """
-        raise NotImplementedError('Function move not implemented')
+        raise NotImplementedError("Function move not implemented")
 
     def append_move_to_tree(self, move: chess.Move) -> None:
         """
@@ -139,8 +139,10 @@ class PlayVsEngine(EnginePlay):
     def player_side(self, side: Union[chess.Color, bool]) -> None:
         """ Setter function for player_side - chess.Color/bool inputs valid """
         if not isinstance(side, bool):
-            raise TypeError(f"Invalid self.player_side ({self._player_side}) "
-                            "not in (chess.WHITE, chess.BLACK)")
+            raise TypeError(
+                f"Invalid self.player_side ({self._player_side}) "
+                "not in (chess.WHITE, chess.BLACK)"
+            )
         self._player_side = side
 
     def player_move(self) -> chess.Move:
@@ -154,7 +156,7 @@ class PlayVsEngine(EnginePlay):
             # Stay in loop until player enters a legal move - catches
             # non-UCI inputs & illegal moves
             input_str = str(input())
-            if input_str == 'resign':
+            if input_str == "resign":
                 return chess.Move.null()
 
             try:
@@ -171,7 +173,8 @@ class PlayVsEngine(EnginePlay):
 
         self.append_move_to_tree(input_move)
         self.display_board(
-            f"Move {self._board.fullmove_number} - engine to move.")
+            f"Move {self._board.fullmove_number} - engine to move."
+        )
 
         return input_move
 
@@ -187,7 +190,8 @@ class PlayVsEngine(EnginePlay):
         self._board.push_uci(str(eng_move))
         self.append_move_to_tree(eng_move)
         self.display_board(
-            f"Move {self._board.fullmove_number} - player to move.")
+            f"Move {self._board.fullmove_number} - player to move."
+        )
 
         return eng_move
 
@@ -200,7 +204,8 @@ class PlayVsEngine(EnginePlay):
             TypeError: on initializing invalid self._player_side type
         """
         self.display_board(
-            f"Move {self._board.fullmove_number} - ready for first move.")
+            f"Move {self._board.fullmove_number} - ready for first move."
+        )
 
         # Break out of loop by checking after each move is game over. For each
         # move, check if move results in game over or if move is null. Null
@@ -327,8 +332,13 @@ class ChessPlayground(EnginePlay):
         # board throughout game, and reason for ending game
         self.all_move_counts.append(self._board.fullmove_number - 1)
         self.all_material_differences.append(
-            tuple(zip(self.white_engine.material_difference,
-                      self.black_engine.material_difference)))
+            tuple(
+                zip(
+                    self.white_engine.material_difference,
+                    self.black_engine.material_difference,
+                )
+            )
+        )
 
         self.game_pgns.append(self.game)
         self.all_results.append(evaluate_ending_board(self._board))
@@ -342,7 +352,7 @@ class ChessPlayground(EnginePlay):
             N(int): number of games to play. Default = 100
         """
         self.all_results = []
-        progress_bar = tqdm(range(1, N+1))
+        progress_bar = tqdm(range(1, N + 1))
         for game_number in progress_bar:
             progress_bar.set_description(f"Playing game {game_number}")
             self.play_game()

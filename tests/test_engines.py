@@ -6,7 +6,8 @@ import chess.pgn
 from simulations import ChessPlayground
 from constants import FEN_MAPS
 from engines import *
-sys.path.append('..')
+
+sys.path.append("..")
 
 
 @pytest.fixture
@@ -31,16 +32,21 @@ def modified_boards() -> List[tuple]:
     Returns:
         {List[tuple]}
     """
-    capture_black_knight = ('r1bqkbnr/ppp1pppp/8/3p4/3nP3/'
-                            '2N2N2/PPP2PPP/R1B1KB1R w KQkq - 0 1')
-    capture_black_queen = ('rnb1kbnr/pppp1ppp/8/3qp3/'
-                           '4P3/5N2/PPP1QPPP/RNB1KB1R w KQkq - 0 1')
-    capture_rook_or_knight = ('r1bqkbnr/pppppp1p/6p1/8/1n1B4/'
-                              '2P5/PP2PPPP/RN1QKBNR w KQkq - 0 1')
+    capture_black_knight = (
+        "r1bqkbnr/ppp1pppp/8/3p4/3nP3/" "2N2N2/PPP2PPP/R1B1KB1R w KQkq - 0 1"
+    )
+    capture_black_queen = (
+        "rnb1kbnr/pppp1ppp/8/3qp3/" "4P3/5N2/PPP1QPPP/RNB1KB1R w KQkq - 0 1"
+    )
+    capture_rook_or_knight = (
+        "r1bqkbnr/pppppp1p/6p1/8/1n1B4/" "2P5/PP2PPPP/RN1QKBNR w KQkq - 0 1"
+    )
 
-    return [(chess.Board(fen=capture_black_knight), 'f3d4'),
-            (chess.Board(fen=capture_black_queen), 'e4d5'),
-            (chess.Board(fen=capture_rook_or_knight), 'd4h8')]
+    return [
+        (chess.Board(fen=capture_black_knight), "f3d4"),
+        (chess.Board(fen=capture_black_queen), "e4d5"),
+        (chess.Board(fen=capture_rook_or_knight), "d4h8"),
+    ]
 
 
 @pytest.fixture
@@ -50,12 +56,14 @@ def starting_engines():
     Returns:
         (List)
     """
-    return [Random(),
-            PrioritizePawnMoves(),
-            RandomCapture(),
-            CaptureHighestValue(),
-            AvoidCapture(),
-            ScholarsMate()]
+    return [
+        Random(),
+        PrioritizePawnMoves(),
+        RandomCapture(),
+        CaptureHighestValue(),
+        AvoidCapture(),
+        ScholarsMate(),
+    ]
 
 
 @pytest.fixture
@@ -66,8 +74,10 @@ def minimax_engines():
         (List)
     """
 
-    return [MiniMax(color=chess.WHITE, depth=1),
-            MiniMax(color=chess.BLACK, depth=1)]
+    return [
+        MiniMax(color=chess.WHITE, depth=1),
+        MiniMax(color=chess.BLACK, depth=1),
+    ]
 
 
 def test_base_engine(starting_board):
@@ -127,10 +137,13 @@ def test_scholars_mate_interrupt_resign():
     engine = ScholarsMate()
 
     # In both board states, white is interrupted from completed sequence
-    blocked_queen_fen = ('r1bqkbnr/pppp1p1p/2n3p1/4p2Q/'
-                         '2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1')
-    captured_queen_fen = ('r1b1kbnr/pppp1ppp/2n5/4p2q/'
-                          '2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1')
+    blocked_queen_fen = (
+        "r1bqkbnr/pppp1p1p/2n3p1/4p2Q/"
+        "2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
+    )
+    captured_queen_fen = (
+        "r1b1kbnr/pppp1ppp/2n5/4p2q/" "2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
+    )
 
     for interrupted_fen in (blocked_queen_fen, captured_queen_fen):
         board = chess.Board(fen=interrupted_fen)
@@ -142,7 +155,7 @@ def test_scholars_mate_black_resign():
     engine = ScholarsMate()
 
     board = chess.Board()
-    board.push_uci('e2e4')
+    board.push_uci("e2e4")
     assert engine.move(board) == chess.Move.null()
 
 
@@ -153,7 +166,7 @@ def test_scholars_mate_resign_failed_mate():
     board = chess.Board()
 
     # After this sequence, white fails to mate black
-    black_moves = ('e7e5', 'd7d5', 'b8c6', 'e8f7')
+    black_moves = ("e7e5", "d7d5", "b8c6", "e8f7")
     for move in black_moves:
         board.push_uci(str(engine.move(board)))
         board.push_uci(move)
@@ -168,7 +181,7 @@ def test_minimax_depth_1_and_2_completion(minimax_engines):
     mm2 = minimax_engines[1]
     mm2.depth = 2
     simulation = ChessPlayground(mm1, mm2)
-    simulation.fen = FEN_MAPS['easy_white_win']
+    simulation.fen = FEN_MAPS["easy_white_win"]
     simulation.play_game()
 
 
@@ -181,7 +194,7 @@ def test_minimax_depth_3_completion(minimax_engines):
     mm3 = minimax_engines[0]
     mm3.depth = 3
     simulation = ChessPlayground(mm3, ScholarsMate())
-    simulation.fen = FEN_MAPS['easy_white_win']
+    simulation.fen = FEN_MAPS["easy_white_win"]
     simulation.play_game()
 
 
@@ -191,7 +204,7 @@ def test_minimax_depth_4_completion(minimax_engines):
     engine = minimax_engines[1]
     engine.depth = 4
     simulation = ChessPlayground(CaptureHighestValue(), engine)
-    simulation.fen = FEN_MAPS['easy_black_win']
+    simulation.fen = FEN_MAPS["easy_black_win"]
     simulation.play_game()
 
 
@@ -206,9 +219,10 @@ def test_minimax_depth_1_evaluation(minimax_engines, modified_boards):
 def test_minimax_depth_2_evaluation(minimax_engines):
     """ Tests that minimax at depth 2 sees moves 2 steps ahead
     i.e obvious forks """
-    black_knight_fork_fen = ('rnb1kb1r/ppppp1pp/8/8/3n4/8/'
-                             'PPPP1PPP/RNB1KBNR b KQkq - 0 1')
-    fork_boards = [(chess.Board(fen=black_knight_fork_fen), 'd4c2')]
+    black_knight_fork_fen = (
+        "rnb1kb1r/ppppp1pp/8/8/3n4/8/" "PPPP1PPP/RNB1KBNR b KQkq - 0 1"
+    )
+    fork_boards = [(chess.Board(fen=black_knight_fork_fen), "d4c2")]
 
     engine = minimax_engines[1]
     engine.alpha_beta_pruning = False
@@ -223,17 +237,19 @@ def test_minimax_eval_side(minimax_engines):
     as white"""
     white_minimax, black_minimax = minimax_engines
 
-    capture_black_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
-                           f'PPPPPPPP/RNB1KBNR w KQkq - 0 1')
-    capture_white_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
-                           f'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+    capture_black_queen = (
+        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR w KQkq - 0 1"
+    )
+    capture_white_queen = (
+        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR b KQkq - 0 1"
+    )
 
     # White should capture blacks queen and vice-versa
     board = chess.Board(fen=capture_black_queen)
-    assert str(white_minimax.move(board)) == 'f4c4'
+    assert str(white_minimax.move(board)) == "f4c4"
 
     board = chess.Board(fen=capture_white_queen)
-    assert str(black_minimax.move(board)) == 'c4f4'
+    assert str(black_minimax.move(board)) == "c4f4"
 
 
 @pytest.mark.slow
@@ -244,14 +260,16 @@ def test_minimax_no_pruning(minimax_engines):
     white_minimax.alpha_beta_pruning = False
     black_minimax.alpha_beta_pruning = False
 
-    capture_black_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
-                           f'PPPPPPPP/RNB1KBNR w KQkq - 0 1')
-    capture_white_queen = (f'rnb1kbnr/pppppppp/8/8/2q2Q2/8/'
-                           f'PPPPPPPP/RNB1KBNR b KQkq - 0 1')
+    capture_black_queen = (
+        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR w KQkq - 0 1"
+    )
+    capture_white_queen = (
+        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR b KQkq - 0 1"
+    )
 
     # White should capture blacks queen and vice-versa
     board = chess.Board(fen=capture_black_queen)
-    assert str(white_minimax.move(board)) == 'f4c4'
+    assert str(white_minimax.move(board)) == "f4c4"
 
     board = chess.Board(fen=capture_white_queen)
-    assert str(black_minimax.move(board)) == 'c4f4'
+    assert str(black_minimax.move(board)) == "c4f4"

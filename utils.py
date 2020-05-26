@@ -48,7 +48,9 @@ def is_valid_fen(fen: str) -> bool:
     return True
 
 
-def get_piece_at(board: chess.Board, position: Union[str, chess.Square]) -> str:
+def get_piece_at(
+    board: chess.Board, position: Union[str, chess.Square]
+) -> str:
     """
     Gets chess symbol of piece at position on board
 
@@ -96,8 +98,9 @@ def display_pgn_text(pgn_obj: chess.pgn.Game) -> None:
         move_count += 1
 
 
-def render_svg_board(board: chess.Board, temp_dir: Union[str, Path],
-                     display_str: str) -> None:
+def render_svg_board(
+    board: chess.Board, temp_dir: Union[str, Path], display_str: str
+) -> None:
     """
     Renders board as svg object for displaying in jupyter notebook.
     Saves board state as SVG file and displays in jupyter
@@ -120,8 +123,11 @@ def render_svg_board(board: chess.Board, temp_dir: Union[str, Path],
     clear_output(wait=True)
 
 
-def walkthrough_pgn(pgn_obj: chess.pgn.Game, fen: str = FEN_MAPS['standard'],
-                    delay: float = 1.0) -> None:
+def walkthrough_pgn(
+    pgn_obj: chess.pgn.Game,
+    fen: str = FEN_MAPS["standard"],
+    delay: float = 1.0,
+) -> None:
     """
     Allows one to walkthrough pgn game in jupyter notebooks.
     Saves SVG object in temporary file and displays on notebooks
@@ -143,8 +149,9 @@ def walkthrough_pgn(pgn_obj: chess.pgn.Game, fen: str = FEN_MAPS['standard'],
             mover = "White" if move_count % 2 == 0 else "Black"
 
             board.push(move)
-            render_svg_board(board, temp,
-                             f"Move {move_count}_{mover} to move.SVG")
+            render_svg_board(
+                board, temp, f"Move {move_count}_{mover} to move.SVG"
+            )
 
             move_count += 1
             time.sleep(delay)

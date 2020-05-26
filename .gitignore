@@ -1,0 +1,12 @@
+# Ignore jupyter notebooks
+*.ipynb
+*.ipynb*
+
+# Ignore pycache
+*.pyc
+
+# Misc
+.mypy_cache/
+bin/
+include/
+lib/
