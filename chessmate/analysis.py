@@ -46,9 +46,9 @@ def evaluate_ending_board(board: chess.Board) -> str:
     return "Undetermined"
 
 
-class BoardEvaluation:
+class EvaluationFunction:
     """
-    Base class for board evaluation algorithms. Each BoardEvaluation
+    Base class for board evaluation algorithms. Each EvaluationFunction
     object is responsible for evaluating a given boardstate and
     returning a numeric metric from its evaluation. Standard for metric
     wherein positive evaluations are pro-white and negative pro-black
@@ -83,7 +83,7 @@ class BoardEvaluation:
         raise NotImplementedError("Function evaluate not implemented")
 
 
-class StandardEvaluation(BoardEvaluation):
+class StandardEvaluation(EvaluationFunction):
     """ Evaluation engine that tabulates value of all pieces on both
     sides according to the standard piece valuation and calculates
     difference as metric """
