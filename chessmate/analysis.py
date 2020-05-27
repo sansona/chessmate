@@ -54,12 +54,12 @@ class BoardEvaluation:
     wherein positive evaluations are pro-white and negative pro-black
 
     Every evaluation performed by the engine should be stored in the
-    board_state_evals attribute
+    evaluations attribute
 
     Attributes:
         name (str): name of evaluation engine
-        board_state_eval (Dict[chess.Board, float]): stores each board
-            state evaluated and the corresponding metric
+        evaluations (Dict[str, float]): stores each board
+            state evaluated as FEN and the corresponding metric
 
     Methods:
         evaluate (chess.Board) -> float: main function responsible for
@@ -68,12 +68,12 @@ class BoardEvaluation:
 
     def __init__(self):
         self.name: str = "Base"
-        self.board_state_evals: Dict[chess.Board, float] = {}
+        self.evaluations: Dict[str, float] = {}
 
     def evaluate(self, board: chess.Board) -> float:
         """
         Main function for evaluating given boardstate. Function should
-        evaluate boardstate and append evaluation in board_state_evals
+        evaluate boardstate and append evaluation in evaluations
 
         Args:
             board (chess.Board): board state to evaluate
@@ -96,52 +96,23 @@ class StandardEvaluation(BoardEvaluation):
     def evaluate(self, board: chess.Board) -> float:
         """
         Main function for evaluating given boardstate. Function should
-        evaluate boardstate and append evaluation in board_state_evals
+        evaluate boardstate and append evaluation in evaluations
 
         Args:
             board (chess.Board): board state to evaluate
         Returns:
             (float)
         """
-        evaluation = 0.0
+        val = 0.0
         for square in chess.SQUARES:
             piece = board.piece_type_at(square)
             color = board.color_at(square)
             if piece:
-                value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
+                piece_value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
                 if not color:
                     # BLACK encoded as False
-                    value *= -1
-                evaluation += value
-        self.board_state_evals[board] = evaluation
+                    piece_value *= -1
+                val += piece_value
+        self.evaluations[board.fen()] = val
 
-        return evaluation
-
-
-'''
-def tabulate_board_values(board: chess.Board) -> float:
-    """
-    Iterate through board, and determine net piece value difference
-
-    Args:
-        board(chess.Board)
-
-    Returns:
-        (float): containing net value difference
-    """
-    value_difference = 0.0
-
-    # Go through each square, find piece at square, add value to
-    # value_difference
-    for square in chess.SQUARES:
-        piece = board.piece_type_at(square)
-        color = board.color_at(square)
-        if piece:
-            value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
-            if not color:
-                # BLACK encoded as False
-                value *= -1
-            value_difference += value
-
-    return value_difference
-'''
+        return val

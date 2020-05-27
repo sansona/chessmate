@@ -7,7 +7,7 @@ import chess.pgn  # type: ignore
 import chess.svg  # type: ignore
 from tqdm import tqdm  # type: ignore
 
-from analysis import StandardEvaluation
+from analysis import evaluate_ending_board, StandardEvaluation
 from constants import COLOR_MAP, FEN_MAPS
 from utils import is_valid_fen, render_svg_board
 
@@ -291,7 +291,7 @@ class ChessPlayground(EnginePlay):
         self.game_pgns: List[chess.pgn.Game] = []
         self.all_results: List[str] = []
         self.all_move_counts: List[int] = []
-        self.all_material_differences: List(tuple) = []
+        self.all_material_differences: List[tuple] = []
 
     def __repr__(self):
         """ Print out current state of playground """

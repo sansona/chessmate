@@ -78,7 +78,8 @@ def test_piece_at_function_on_inprogress_board(in_progress_board):
     value of piece at square in a game in progress"""
     piece_at_square_occupied_by_pawn = get_piece_at(in_progress_board, "e4")
     piece_at_square_occupied_by_queen = get_piece_at(
-        in_progress_board, chess.E7)
+        in_progress_board, chess.E7
+    )
 
     assert piece_at_square_occupied_by_pawn == "P"
     assert piece_at_square_occupied_by_queen == "q"
