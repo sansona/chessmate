@@ -82,7 +82,7 @@ def minimax_engines():
     ]
 
 
-def test_base_engine(starting_board):
+def test_base_engine_move_function_no_errors(starting_board):
     """ Tests that errors are throwing properly if
     initialized without redefining evaluate & move"""
     eng = BaseEngine()
@@ -92,7 +92,7 @@ def test_base_engine(starting_board):
         eng.move(starting_board)
 
 
-def test_evaluate_function(starting_engines, starting_board):
+def test_evaluate_function_no_errors(starting_engines, starting_board):
     """ Tests that each engine is able to evaluate
     a given board. As long as engines all evaluate board
     without error, pass test """
@@ -100,7 +100,7 @@ def test_evaluate_function(starting_engines, starting_board):
         engine.evaluate(starting_board)
 
 
-def test_move_function(starting_engines, starting_board):
+def test_move_function_returns_move(starting_engines, starting_board):
     """ Tests that each engine can return an appropriate
     move given starting_board. Assert that move is UCI Move """
     for engine in starting_engines:
@@ -108,7 +108,7 @@ def test_move_function(starting_engines, starting_board):
         assert isinstance(engine_move, chess.Move)
 
 
-def test_random_capture_move(modified_boards):
+def test_random_capture_move_captures_when_available(modified_boards):
     """ Tests that RandomCapture captures piece when available instead
     of moving randomly """
     engine = RandomCapture()
@@ -118,7 +118,7 @@ def test_random_capture_move(modified_boards):
     assert str(move) == rec_move
 
 
-def test_capture_highest_value_move(modified_boards):
+def test_capture_highest_value_move_captures_highest_value(modified_boards):
     """ Tests that CaptureHighestValue captures highest value piece """
     engine = CaptureHighestValue()
     for board, rec_move in modified_boards:
@@ -126,7 +126,7 @@ def test_capture_highest_value_move(modified_boards):
         assert str(move) == rec_move
 
 
-def test_avoid_capture_move(modified_boards):
+def test_avoid_capture_move_avoids_available_captures(modified_boards):
     """ Tests that AvoidCapture avoids captures """
     engine = AvoidCapture()
     for board, rec_move in modified_boards:
@@ -134,7 +134,7 @@ def test_avoid_capture_move(modified_boards):
         assert str(move) != rec_move
 
 
-def test_scholars_mate_interrupt_resign():
+def test_scholars_mate_resigns_when_sequence_interrupted():
     """ Tests that ScholarsMate resigns when any move is blocked """
     engine = ScholarsMate()
 
@@ -152,7 +152,7 @@ def test_scholars_mate_interrupt_resign():
         assert engine.move(board) == chess.Move.null()
 
 
-def test_scholars_mate_black_resign():
+def test_scholars_mate_resign_if_played_on_black():
     """ Tests that ScholarsMate resigns if played on black """
     engine = ScholarsMate()
 
@@ -161,7 +161,7 @@ def test_scholars_mate_black_resign():
     assert engine.move(board) == chess.Move.null()
 
 
-def test_scholars_mate_resign_failed_mate():
+def test_scholars_mate_resign_after_failed_mate():
     """ Tests that ScholarsMate resigns if mate is not achieved
     after move sequence """
     engine = ScholarsMate()
@@ -177,7 +177,7 @@ def test_scholars_mate_resign_failed_mate():
 
 
 @pytest.mark.slow
-def test_minimax_depth_1_and_2_completion(minimax_engines):
+def test_minimax_depth_1_and_2_game_completion(minimax_engines):
     """ Tests that minimax at depths 1 & 2 doesn't hang """
     mm1 = minimax_engines[0]
     mm2 = minimax_engines[1]
@@ -188,7 +188,7 @@ def test_minimax_depth_1_and_2_completion(minimax_engines):
 
 
 @pytest.mark.slow
-def test_minimax_depth_3_completion(minimax_engines):
+def test_minimax_depth_3_game_completion(minimax_engines):
     """ Tests that minimax at depth 3 doesn't hang or return illegal moves.
     @ depth>=3, minimax evaluates own position in recursive call whereas @ depth<3,
     minimax only evaluates own position and opponents position once.
@@ -201,7 +201,7 @@ def test_minimax_depth_3_completion(minimax_engines):
 
 
 @pytest.mark.slow
-def test_minimax_depth_4_completion(minimax_engines):
+def test_minimax_depth_4_game_completion(minimax_engines):
     """ Tests that minimax at depth 4 doesn't hang """
     engine = minimax_engines[1]
     engine.depth = 4
@@ -210,7 +210,7 @@ def test_minimax_depth_4_completion(minimax_engines):
     simulation.play_game()
 
 
-def test_minimax_depth_1_evaluation(minimax_engines, modified_boards):
+def test_minimax_depth_1_evaluation_captures(minimax_engines, modified_boards):
     """ Tests that minimax depth 1 takes obvious captures """
     engine = minimax_engines[0]
     for board, rec_move in modified_boards:
@@ -218,7 +218,7 @@ def test_minimax_depth_1_evaluation(minimax_engines, modified_boards):
         assert str(move) == rec_move
 
 
-def test_minimax_depth_2_evaluation(minimax_engines):
+def test_minimax_depth_2_evaluation_captures(minimax_engines):
     """ Tests that minimax at depth 2 sees moves 2 steps ahead
     i.e obvious forks """
     black_knight_fork_fen = (
@@ -233,7 +233,7 @@ def test_minimax_depth_2_evaluation(minimax_engines):
         assert str(move) == rec_move
 
 
-def test_minimax_eval_side(minimax_engines):
+def test_minimax_evaluates_correct_side(minimax_engines):
     """ Tests that minimax evaluate function returns best move
     for own side i.e doesn't return best move for black when playing
     as white"""
@@ -255,7 +255,7 @@ def test_minimax_eval_side(minimax_engines):
 
 
 @pytest.mark.slow
-def test_minimax_no_pruning(minimax_engines):
+def test_minimax_no_pruning_captures_obvious_pieces(minimax_engines):
     """ Test that without alpha beta pruning, minimax still evaluates
     obvious positions """
     white_minimax, black_minimax = minimax_engines

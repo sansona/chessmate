@@ -60,29 +60,35 @@ def setup_playground():
     return playground
 
 
-def test_evaluate_ending_not_mated(not_mated_boards):
+def test_evaluate_ending_for_not_mated_positions(not_mated_boards):
     """ Tests that boards ending in resignation are correctly evaluated """
     for board in not_mated_boards:
         assert evaluate_ending_board(board) == "Game over by resignation"
 
 
-def test_evaluate_ending_stalemate(stalemate_boards):
+def test_evaluate_ending_for_stalemate_positions(stalemate_boards):
     """ Tests that boards ending in stalemate are correctly evaluated """
     for board in stalemate_boards:
         assert evaluate_ending_board(board) == "Stalemate"
 
 
-def test_display_all_results(setup_playground):
-    """ Tests that display_all_results runs """
+def test_display_all_results_no_errors(setup_playground):
+    """ Tests that display_all_results runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient. """
     display_all_results(setup_playground.all_results)
 
 
-def test_display_material_difference(setup_playground):
-    """ Tests that display_material_difference runs """
+def test_display_material_difference_no_errors(setup_playground):
+    """ Tests that display_material_difference runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient. """
     display_material_difference(setup_playground.all_material_differences, 0)
     display_material_difference(setup_playground.all_material_differences, 1)
 
 
-def test_display_all_material_differences(setup_playground):
-    """ Tests that all_display_material_difference runs """
+def test_display_all_material_differences_no_errors(setup_playground):
+    """ Tests that all_display_material_difference runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient."""
     display_all_material_differences(setup_playground.all_material_differences)
