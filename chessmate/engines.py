@@ -7,7 +7,7 @@ from typing import Dict, List, Union
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 
-from analysis import tabulate_board_values
+from analysis import StandardEvaluation
 from constants import CONVENTIONAL_PIECE_VALUES
 from utils import get_piece_at
 

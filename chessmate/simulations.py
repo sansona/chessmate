@@ -7,7 +7,7 @@ import chess.pgn  # type: ignore
 import chess.svg  # type: ignore
 from tqdm import tqdm  # type: ignore
 
-from analysis import evaluate_ending_board
+from analysis import StandardEvaluation
 from constants import COLOR_MAP, FEN_MAPS
 from utils import is_valid_fen, render_svg_board
 
@@ -158,7 +158,7 @@ class PlayVsEngine(EnginePlay):
             # Stay in loop until player enters a legal move - catches
             # non-UCI inputs & illegal moves
             input_str = str(input())
-            if input_str == "resign":
+            if input_str in ("res", "resign", "quit"):
                 return chess.Move.null()
 
             try:

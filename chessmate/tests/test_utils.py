@@ -5,7 +5,9 @@ import chess
 import chess.pgn
 import pytest
 
-from analysis import tabulate_board_values
+from analysis import StandardEvaluation
+from engines import ScholarsMate
+from simulations import ChessPlayground
 from utils import *
 
 sys.path.append("..")
@@ -37,6 +39,19 @@ def in_progress_board():
     )
     board = chess.Board(fen=in_progress_fen)
     return board
+
+
+@pytest.fixture
+def setup_playground():
+    """
+    Sets up test playground with 3 games played
+
+    Returns:
+            (ChessPlaygound)
+    """
+    playground = ChessPlayground(ScholarsMate(), ScholarsMate())
+    playground.play_multiple_games(3)
+    return playground
 
 
 def test_piece_at_function_on_starting_position(starting_board):
@@ -76,43 +91,23 @@ def test_piece_at_function_on_empty_square_inprogress_board(in_progress_board):
     assert not piece_at_empty_square
 
 
-def test_tabulate_starting_board_values(starting_board):
-    """ Tests that tabulate board values function is
-    properly evaluating initial board state """
-    starting_board_value = tabulate_board_values(starting_board)
-    assert starting_board_value == 0
+def test_display_all_results_no_errors(setup_playground):
+    """ Tests that display_all_results runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient. """
+    display_all_results(setup_playground.all_results)
 
 
-def test_tabulate_starting_board_values_after_replacement(starting_board):
-    """ Tests that tabulate board values function evaluates same value
-    after removing and replacing piece i.e no effect on evaluation from
-    removing and resetting a piece """
-    starting_board.set_piece_at(chess.E1, chess.Piece(6, chess.WHITE))
-    value_after_replacement = tabulate_board_values(starting_board)
-    assert value_after_replacement == 0
+def test_display_material_difference_no_errors(setup_playground):
+    """ Tests that display_material_difference runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient. """
+    display_material_difference(setup_playground.all_material_differences, 0)
+    display_material_difference(setup_playground.all_material_differences, 1)
 
 
-def test_tabulate_starting_board_values_after_exchange(starting_board):
-    """ Tests that tabulate board values function evaluates correct
-    value on board after exchange of pieces """
-    # Remove one black bishop and white queen
-    starting_board.remove_piece_at(chess.C8)
-    starting_board.remove_piece_at(chess.D1)
-    value_after_exchange = tabulate_board_values(starting_board)
-    assert value_after_exchange == -6.0
-
-
-def test_tabulate_in_progress_board_values(in_progress_board):
-    """ Tests that tabulate board values function is
-    properly evaluating in progress board state """
-    in_progress_board_value = tabulate_board_values(in_progress_board)
-    assert in_progress_board_value == 3.0
-
-
-def test_tabulate_after_capture_values(starting_board):
-    """ Tests that tabulate board values function is properly
-    evaluating board state after capture """
-    starting_board_value = tabulate_board_values(starting_board)
-    starting_board.remove_piece_at(chess.E1)
-    value_no_white_king = tabulate_board_values(starting_board)
-    assert value_no_white_king == -999.0
+def test_display_all_material_differences_no_errors(setup_playground):
+    """ Tests that all_display_material_difference runs. Since this function
+    displays in IPython console, having it run w/o errors is
+    sufficient."""
+    display_all_material_differences(setup_playground.all_material_differences)

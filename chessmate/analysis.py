@@ -1,38 +1,9 @@
 """ Functions for analyzing board states and results of games """
-from collections import Counter
-from typing import List
+from typing import Dict
 
 import chess
-import matplotlib.pyplot as plt  # type: ignore
 
 from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
-
-
-def tabulate_board_values(board: chess.Board) -> float:
-    """
-    Iterate through board, and determine net piece value difference
-
-    Args:
-        board (chess.Board)
-
-    Returns:
-        (float): containing net value difference
-    """
-    value_difference = 0.0
-
-    # Go through each square, find piece at square, add value to
-    # value_difference
-    for square in chess.SQUARES:
-        piece = board.piece_type_at(square)
-        color = board.color_at(square)
-        if piece:
-            value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
-            if not color:
-                # BLACK encoded as False
-                value *= -1
-            value_difference += value
-
-    return value_difference
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
@@ -75,87 +46,102 @@ def evaluate_ending_board(board: chess.Board) -> str:
     return "Undetermined"
 
 
-def display_all_results(all_results: List[str]) -> Counter:
+class BoardEvaluation:
     """
-    Wrapper for matplotlib to display results of all games in bar chart
+    Base class for board evaluation algorithms. Each BoardEvaluation
+    object is responsible for evaluating a given boardstate and
+    returning a numeric metric from its evaluation. Standard for metric
+    wherein positive evaluations are pro-white and negative pro-black
+
+    Every evaluation performed by the engine should be stored in the
+    board_state_evals attribute
+
+    Attributes:
+        name (str): name of evaluation engine
+        board_state_eval (Dict[chess.Board, float]): stores each board
+            state evaluated and the corresponding metric
+
+    Methods:
+        evaluate (chess.Board) -> float: main function responsible for
+            evaluation of board state
+    """
+
+    def __init__(self):
+        self.name: str = "Base"
+        self.board_state_evals: Dict[chess.Board, float] = {}
+
+    def evaluate(self, board: chess.Board) -> float:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in board_state_evals
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (float)
+        """
+        raise NotImplementedError("Function evaluate not implemented")
+
+
+class StandardEvaluation(BoardEvaluation):
+    """ Evaluation engine that tabulates value of all pieces on both
+    sides according to the standard piece valuation and calculates
+    difference as metric """
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Standard"
+
+    def evaluate(self, board: chess.Board) -> float:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in board_state_evals
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (float)
+        """
+        evaluation = 0.0
+        for square in chess.SQUARES:
+            piece = board.piece_type_at(square)
+            color = board.color_at(square)
+            if piece:
+                value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
+                if not color:
+                    # BLACK encoded as False
+                    value *= -1
+                evaluation += value
+        self.board_state_evals[board] = evaluation
+
+        return evaluation
+
+
+'''
+def tabulate_board_values(board: chess.Board) -> float:
+    """
+    Iterate through board, and determine net piece value difference
 
     Args:
-        all_results (List[str]): containing strings describing all game
-            results
+        board(chess.Board)
+
     Returns:
-        (collections.Counter): containing counts of all ending types
+        (float): containing net value difference
     """
-    counts = Counter(all_results)
+    value_difference = 0.0
 
-    _, ax = plt.subplots()
-    ax.bar(
-        counts.keys(),
-        counts.values(),
-        color="black",
-        width=0.75,
-        align="center",
-    )
-    ax.set_xlabel("Terminal conditions")
-    ax.set_ylabel("Number games")
-    ax.set_title("Terminal conditions")
+    # Go through each square, find piece at square, add value to
+    # value_difference
+    for square in chess.SQUARES:
+        piece = board.piece_type_at(square)
+        color = board.color_at(square)
+        if piece:
+            value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
+            if not color:
+                # BLACK encoded as False
+                value *= -1
+            value_difference += value
 
-    return counts
-
-
-def display_material_difference(
-    material_differences: List[tuple], game_index: int
-) -> None:
-    """
-    Wrapper for matplotlib to plot difference in piece total
-    values throughout game
-
-    Args:
-        material_differences (List[tuple]): contains mapping of value
-            differential for each move across each game played in form
-            (white engine evaluation, black engine evaluation) at each move
-        game_index (int): index of game played in iteration of simulation
-            to plot
-    """
-    game_values = material_differences[game_index]
-    engine_vals = [v[0] for v in game_values]
-    positive_mask = [True if e > 0 else False for e in engine_vals]
-
-    _, ax = plt.subplots(1, 1)
-    x = range(len(engine_vals))
-    ax.set_title(f"Game: {game_index}")
-    ax.fill_between(
-        x,
-        0,
-        engine_vals,
-        where=positive_mask,
-        facecolor="floralwhite",
-        interpolate=True,
-    )
-    ax.fill_between(
-        x,
-        0,
-        engine_vals,
-        where=[not x for x in positive_mask],
-        facecolor="black",
-        interpolate=True,
-    )
-    ax.plot(x, engine_vals, color="black", linewidth=0.75)
-    ax.axhline(y=0, color="black", linewidth=0.5)
-    ax.set_ylabel("Material difference")
-    ax.set_xlabel("Move index")
-
-
-def display_all_material_differences(
-    material_differences: List[tuple],
-) -> None:
-    """
-    Wrapper for display_material_difference to plot results of
-    all games
-
-    Args:
-        material_differences (List[tuple]): contains mapping of value
-            differential for each move across each game played in form
-            (white engine evaluation, black engine evaluation) at each move
-    """
-    for game_idx in range(len(material_differences)):
-        display_material_difference(material_differences, game_idx)
+    return value_difference
+'''
