@@ -40,11 +40,6 @@ def evaluate_ending_board(board: chess.Board) -> str:
         if condition():
             return title
 
-    # If none of the defined ending states found, game ended due to
-    # some variable endstate that would require further probing.
-    # This would be the case if playing some variation
-    return "Undetermined"
-
 
 class EvaluationFunction:
     """

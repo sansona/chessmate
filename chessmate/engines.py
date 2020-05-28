@@ -377,6 +377,8 @@ class MiniMax(BaseEngine):
         """
         if not isinstance(depth_val, int):
             raise TypeError(f"depth {depth_val} of type {type(depth_val)}")
+        if not depth_val >= 1:
+            raise ValueError(f"depth {depth_val} < 1")
         self._depth = depth_val
 
     def minimax(

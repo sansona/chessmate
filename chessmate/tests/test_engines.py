@@ -176,6 +176,33 @@ def test_scholars_mate_resign_after_failed_mate():
     assert engine.move(board) == chess.Move.null()
 
 
+def test_minimax_set_depth_to_str_raises_typeerror():
+    """ Tests that minimax depth setter function will raise TypeError
+    if string is passed to depth """
+    mm = MiniMax(color=chess.WHITE, depth=1)
+    with pytest.raises(TypeError):
+        mm.depth = "one"
+
+
+def test_minimax_set_depth_to_str_raises_typeerror():
+    """ Tests that minimax depth setter function will raise ValueError
+    if int < 1 is passed to depth """
+    mm = MiniMax(color=chess.WHITE, depth=1)
+    with pytest.raises(ValueError):
+        mm.depth = 0
+    with pytest.raises(ValueError):
+        mm.depth = -1
+
+
+def test_minimax_evaluate_invalid_color_raises_valueerror():
+    """ Tests that calling minimax evaluate function with
+    non-bool color raises ValueError"""
+    mm = MiniMax(color=chess.WHITE, depth=1)
+    mm.color = "white"
+    with pytest.raises(ValueError):
+        mm.evaluate(chess.Board())
+
+
 @pytest.mark.slow
 def test_minimax_depth_1_and_2_game_completion(minimax_engines):
     """ Tests that minimax at depths 1 & 2 doesn't hang """

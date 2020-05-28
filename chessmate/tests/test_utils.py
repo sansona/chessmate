@@ -92,6 +92,18 @@ def test_piece_at_function_on_empty_square_inprogress_board(in_progress_board):
     assert not piece_at_empty_square
 
 
+def test_display_pgn_text_no_errors(setup_playground):
+    """ Tests that display_pgn_text runs in console w/o errors"""
+    display_pgn_text(setup_playground.game_pgns[0])
+
+
+def test_walkthrough_pgn_no_errors(setup_playground):
+    """ Tests that walkthrough_pgn runs w/o errors. Note that since
+    this function relies on IPython functionality, nothing will appear
+    to happen """
+    walkthrough_pgn(setup_playground.game_pgns[0])
+
+
 def test_display_all_results_no_errors(setup_playground):
     """ Tests that display_all_results runs. Since this function
     displays in IPython console, having it run w/o errors is

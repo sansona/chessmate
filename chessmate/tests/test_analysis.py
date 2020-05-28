@@ -84,6 +84,14 @@ def evaluation_engines():
     return [StandardEvaluation()]
 
 
+def test_evaluate_ending_for_white_win_position():
+    """ Tests that boards correspond to mate are correctly evaluated """
+    white_to_mate = chess.Board(fen="8/8/8/2Q1k3/6Q1/3Q1Q2/4K3/8 w - - 0 1")
+    white_to_mate.push_uci("d3e4")
+
+    assert evaluate_ending_board(white_to_mate) == "White win by mate"
+
+
 def test_evaluate_ending_for_not_mated_positions(not_mated_boards):
     """ Tests that boards ending in resignation are correctly evaluated """
     for board in not_mated_boards:
@@ -101,6 +109,14 @@ def test_standard_eval_starting_board_values(starting_board):
     properly evaluating initial board state """
     starting_board_value = StandardEvaluation().evaluate(starting_board)
     assert starting_board_value == 0
+
+
+def test_base_eval_function_raises_notimplementederror_for_evaluate():
+    """ Tests that evaluate function raises NotImplementedError if
+    evaluate called """
+    evalfunc = EvaluationFunction()
+    with pytest.raises(NotImplementedError):
+        evalfunc.evaluate(chess.Board)
 
 
 def test_standard_eval_after_replacement_values(starting_board):
