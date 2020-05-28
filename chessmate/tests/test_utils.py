@@ -8,6 +8,7 @@ import pytest
 from analysis import StandardEvaluation
 from engines import ScholarsMate
 from simulations import ChessPlayground
+from constants import *
 from utils import *
 
 sys.path.append("..")
@@ -52,6 +53,19 @@ def setup_playground():
     playground = ChessPlayground(ScholarsMate(), ScholarsMate())
     playground.play_multiple_games(3)
     return playground
+
+
+@pytest.fixture
+def setup_piece_tables():
+    """ Sets ups all defined piece tables """
+    return [
+        PAWN_PIECE_TABLE_CONVENTIONAL,
+        KNIGHT_PIECE_TABLE_CONVENTIONAL,
+        BISHOP_PIECE_TABLE_CONVENTIONAL,
+        ROOK_PIECE_TABLE_CONVENTIONAL,
+        QUEEN_PIECE_TABLE_CONVENTIONAL,
+        ROOK_PIECE_TABLE_CONVENTIONAL,
+    ]
 
 
 def test_piece_at_function_on_starting_position(starting_board):
@@ -124,3 +138,21 @@ def test_display_all_material_differences_no_errors(setup_playground):
     displays in IPython console, having it run w/o errors is
     sufficient."""
     display_all_material_differences(setup_playground.all_material_differences)
+
+
+def test_piece_tables(setup_piece_tables):
+    """ Tests that piece tables are of correct shape i.e 8x8 """
+    for table in setup_piece_tables:
+        num_ranks = len(table)
+        assert num_ranks == 8
+
+        for rank in range(8):
+            num_file_in_rank = len(table[rank])
+            assert num_file_in_rank == 8
+
+
+def test_piece_tables(setup_piece_tables):
+    """ Tests that piece tables are floats """
+    for table in setup_piece_tables:
+        for rank in range(8):
+            assert all(isinstance(p, float) for p in table[rank])

@@ -245,3 +245,13 @@ def display_all_material_differences(
     """
     for game_idx in range(len(material_differences)):
         display_material_difference(material_differences, game_idx)
+
+
+def display_piece_value_table(piece_value_table):
+    """
+    Makes visual display of piece value table
+
+    Args:
+        piece_value_table ([List[Lists]])
+    """
+    pass

@@ -55,6 +55,8 @@ class EvaluationFunction:
         name (str): name of evaluation engine
         evaluations (Dict[str, float]): stores each board
             state evaluated as FEN and the corresponding metric
+        piece_values (Dict[str, float]): mapping of pieces to values.
+            By default use conventional piece values
 
     Methods:
         evaluate (chess.Board) -> float: main function responsible for
@@ -64,6 +66,7 @@ class EvaluationFunction:
     def __init__(self):
         self.name: str = "Base"
         self.evaluations: Dict[str, float] = {}
+        self.piece_values: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
 
     def evaluate(self, board: chess.Board) -> float:
         """
@@ -103,7 +106,7 @@ class StandardEvaluation(EvaluationFunction):
             piece = board.piece_type_at(square)
             color = board.color_at(square)
             if piece:
-                piece_value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
+                piece_value = self.piece_values[PIECE_NAMES[piece]]
                 if not color:
                     # BLACK encoded as False
                     piece_value *= -1
