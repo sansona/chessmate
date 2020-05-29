@@ -1,9 +1,14 @@
 """ Functions for analyzing board states and results of games """
 from typing import Dict
 
+import numpy as np
 import chess
 
-from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from utils import get_piece_value_from_table
+from constants.piece_values import (
+    CONVENTIONAL_PIECE_VALUES,
+    PIECE_TABLE_CONVENTIONAL,
+)
 from constants.misc import PIECE_NAMES
 
 
@@ -119,12 +124,21 @@ class StandardEvaluation(EvaluationFunction):
 
 class PieceValueEvaluation(EvaluationFunction):
     """ Evaluation engine that utilizes piece value tables
-    to evaluate position of piece in addition to defined value """
+    to evaluate position of piece in addition to defined values
+
+    Note that since the evaluate function requires a large number of iterations,
+    this implementation is computationally slow
+
+    Attributes:
+        value_tables (Dict[str, np.ndarray]: defined collection of piece
+            value tables. Default to conventional piece table
+    """
 
     def __init__(self):
         """ See parent docstring """
         super().__init__()
         self.name = "PieceValue"
+        self.value_tables: Dict[str, np.ndarray] = PIECE_TABLE_CONVENTIONAL
 
     def evaluate(self, board: chess.Board) -> float:
         """
@@ -141,10 +155,9 @@ class PieceValueEvaluation(EvaluationFunction):
             piece = board.piece_type_at(square)
             color = board.color_at(square)
             if piece:
-                piece_value = self.piece_values[PIECE_NAMES[piece]]
-                if not color:
-                    # BLACK encoded as False
-                    piece_value *= -1
+                piece_value = get_piece_value_from_table(
+                    PIECE_NAMES[piece], color, square, self.value_tables
+                )
                 val += piece_value
         self.evaluations[board.fen()] = val
 

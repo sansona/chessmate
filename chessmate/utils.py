@@ -15,6 +15,7 @@ import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
 
 from constants.fens import FEN_MAPS
+from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 
 
 @contextmanager
@@ -301,15 +302,5 @@ def get_piece_value_from_table(
         y = 7 - y
         x = 7 - x
 
-    # Note that since table is reversed index, search via. [rank][file]
-    return piece_table[y][x]
-
-
-def display_piece_value_table(piece_value_table):
-    """
-    Makes visual display of piece value table
-
-    Args:
-        piece_value_table ([List[Lists]])
-    """
-    pass
+    # Add piece table evaluation to conventional piece value
+    return CONVENTIONAL_PIECE_VALUES[piece_sym.upper()] + piece_table[y, x]

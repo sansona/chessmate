@@ -174,8 +174,8 @@ def test_get_piece_value_from_table_white_square():
     a2_pawn_value = get_piece_value_from_table(
         "P", chess.WHITE, "a2", piece_values.PIECE_TABLE_CONVENTIONAL
     )
-    assert a1_pawn_value == 0.0
-    assert a2_pawn_value == 0.5
+    assert a1_pawn_value == 1.0 + 0.0
+    assert a2_pawn_value == 1.0 + 0.5
 
 
 def test_get_piece_value_from_table_black_square():
@@ -189,5 +189,5 @@ def test_get_piece_value_from_table_black_square():
     d4_knight_value = get_piece_value_from_table(
         "N", chess.BLACK, "d4", piece_values.PIECE_TABLE_CONVENTIONAL
     )
-    assert c3_knight_value == 1.0
-    assert d4_knight_value == 2.0
+    assert c3_knight_value == 3.0 + 1.0
+    assert d4_knight_value == 3.0 + 2.0

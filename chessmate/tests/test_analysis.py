@@ -150,4 +150,23 @@ def test_standard_eval_after_capture_values(starting_board):
     evaluating board state after capture """
     starting_board.remove_piece_at(chess.E1)
     value_no_white_king = StandardEvaluation().evaluate(starting_board)
-    assert value_no_white_king == -999.0
+    assert value_no_white_king == -9999.9
+
+
+def test_piece_value_eval_in_progress_board_values(starting_board):
+    """ Tests that piece_value_eval properly calculates values
+    for a board in progress """
+    piece_val = PieceValueEvaluation()
+    assert piece_val.evaluate(in_progress_board) == 0.0
+
+
+def test_piece_value_eval_starting_board_values(in_progress_board):
+    """ Tests that piece_value_eval properly calculates values
+    for starting board"""
+    pass
+
+
+def test_piece_value_eval_in_progress_board_values(in_progress_board):
+    """ Tests that piece_value_eval properly calculates values
+    for a board in progress """
+    pass
