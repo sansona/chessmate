@@ -74,7 +74,7 @@ class EvaluationFunction:
         self.evaluations: Dict[str, float] = {}
         self.piece_values: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
 
-    def evaluate(self, board: chess.Board) -> float:
+    def evaluate(self, board: chess.Board) -> int:
         """
         Main function for evaluating given boardstate. Function should
         evaluate boardstate and append evaluation in evaluations
@@ -82,7 +82,7 @@ class EvaluationFunction:
         Args:
             board (chess.Board): board state to evaluate
         Returns:
-            (float)
+            (int)
         """
         raise NotImplementedError("Function evaluate not implemented")
 
@@ -97,7 +97,7 @@ class StandardEvaluation(EvaluationFunction):
         super().__init__()
         self.name = "Standard"
 
-    def evaluate(self, board: chess.Board) -> float:
+    def evaluate(self, board: chess.Board) -> int:
         """
         Main function for evaluating given boardstate. Function should
         evaluate boardstate and append evaluation in evaluations
@@ -105,9 +105,9 @@ class StandardEvaluation(EvaluationFunction):
         Args:
             board (chess.Board): board state to evaluate
         Returns:
-            (float)
+            (int)
         """
-        val = 0.0
+        val = 0
         for square in chess.SQUARES:
             piece = board.piece_type_at(square)
             color = board.color_at(square)
@@ -140,7 +140,7 @@ class PieceValueEvaluation(EvaluationFunction):
         self.name = "PieceValue"
         self.value_tables: Dict[str, np.ndarray] = PIECE_TABLE_CONVENTIONAL
 
-    def evaluate(self, board: chess.Board) -> float:
+    def evaluate(self, board: chess.Board) -> int:
         """
         Main function for evaluating given boardstate. Function should
         evaluate boardstate and append evaluation in evaluations
@@ -150,14 +150,20 @@ class PieceValueEvaluation(EvaluationFunction):
         Returns:
             (float)
         """
-        val = 0.0
+        val = 0
         for square in chess.SQUARES:
             piece = board.piece_type_at(square)
             color = board.color_at(square)
+
             if piece:
-                piece_value = get_piece_value_from_table(
+                # Get base piece value, add position based value from
+                # piece value table
+                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                piece_value += get_piece_value_from_table(
                     PIECE_NAMES[piece], color, square, self.value_tables
                 )
+                if not color:
+                    piece_value *= -1
                 val += piece_value
         self.evaluations[board.fen()] = val
 

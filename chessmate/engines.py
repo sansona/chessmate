@@ -45,16 +45,16 @@ class BaseEngine:
                 available in uci notation with values for each move
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
-            evaluation_engine (analysis.BoardEvaluation): engine for evaluating
+            evaluation_function (analysis.BoardEvaluation): engine for evaluating
                 board state
             material_difference (List[float]): difference in value on board
                 at each end step based off material as result of
-                evaluation_engine's evaluation
+                evaluation_function's evaluation
         """
         self.name: str = "Base"
         self.legal_moves: Dict[chess.Move, float] = {}
         self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
-        self.evaluation_engine = StandardEvaluation()
+        self.evaluation_function = StandardEvaluation()
         self.material_difference: List[float] = []
 
     def __repr__(self):
@@ -105,7 +105,7 @@ class BaseEngine:
         # Once game ends, material_difference is stored by
         # simulations all_material_differences variable
         self.material_difference = []
-        self.evaluation_engine.evaluations = {}
+        self.evaluation_function.evaluations = {}
 
 
 class Random(BaseEngine):
@@ -127,7 +127,9 @@ class Random(BaseEngine):
         }
 
         # Evaluate board state and store evaluation in material_difference
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board: chess.Board) -> chess.Move:
         """Selects random move. See parent docstring"""
@@ -166,7 +168,9 @@ class PrioritizePawnMoves(Random):
                 legal_move_list[i]: 1 for i in range(len(legal_move_list))
             }
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
 
 class RandomCapture(BaseEngine):
@@ -189,7 +193,9 @@ class RandomCapture(BaseEngine):
             else:
                 self.legal_moves[m] = 0
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board: chess.Board) -> chess.Move:
         """Select move that features capture out of random moves
@@ -231,7 +237,9 @@ class CaptureHighestValue(BaseEngine):
             else:
                 self.legal_moves[m] = self.value_mapping[piece_at_position]
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board: chess.Board) -> chess.Move:
         """Select move that features capture out of random moves
@@ -279,7 +287,9 @@ class AvoidCapture(RandomCapture):
             else:
                 self.legal_moves[m] = 0
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
 
 class ScholarsMate(BaseEngine):
@@ -300,7 +310,9 @@ class ScholarsMate(BaseEngine):
         for m in moves:
             self.legal_moves[m] = 0
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board: chess.Board) -> chess.Move:
         """ Run through scholar's mate sequence. If any moves become
@@ -400,7 +412,7 @@ class MiniMax(BaseEngine):
                     depth=>3 will be computationally slow for most CPUs
         """
         if depth == 0 or base_board.is_game_over():
-            return self.evaluation_engine.evaluate(base_board)
+            return self.evaluation_function.evaluate(base_board)
 
         # Evaluate position after each legal move, store result of
         # best move
@@ -465,7 +477,9 @@ class MiniMax(BaseEngine):
                 f"self.color value {self.color} not in (White, Black)"
             )
 
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board: chess.Board) -> chess.Move:
         """ Returns best move as selected by minimax algorithm """
@@ -511,7 +525,9 @@ class Stockfish(BaseEngine):
         """ Since stockfish abstracts away most of the evaluation logic,
         the chessmate evaluation function will consist only of setup/teardown """
         self.reset_move_variables()
-        self.material_difference.append(self.evaluation_engine.evaluate(board))
+        self.material_difference.append(
+            self.evaluation_function.evaluate(board)
+        )
 
     def move(self, board) -> chess.Move:
         """ Use stockfish evaluation to return best move """
