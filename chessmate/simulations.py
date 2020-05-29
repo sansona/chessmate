@@ -8,8 +8,9 @@ import chess.svg  # type: ignore
 from tqdm import tqdm  # type: ignore
 
 from analysis import evaluate_ending_board, StandardEvaluation
-from constants import COLOR_MAP, FEN_MAPS
 from utils import is_valid_fen, render_svg_board
+from constants.fens import FEN_MAPS
+from constants.misc import COLOR_MAP
 
 
 class EnginePlay:

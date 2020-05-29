@@ -59,13 +59,31 @@ def setup_playground():
 def setup_piece_tables():
     """ Sets ups all defined piece tables """
     return [
-        PAWN_PIECE_TABLE_CONVENTIONAL,
-        KNIGHT_PIECE_TABLE_CONVENTIONAL,
-        BISHOP_PIECE_TABLE_CONVENTIONAL,
-        ROOK_PIECE_TABLE_CONVENTIONAL,
-        QUEEN_PIECE_TABLE_CONVENTIONAL,
-        ROOK_PIECE_TABLE_CONVENTIONAL,
+        piece_values.PAWN_PIECE_TABLE_CONVENTIONAL,
+        piece_values.KNIGHT_PIECE_TABLE_CONVENTIONAL,
+        piece_values.BISHOP_PIECE_TABLE_CONVENTIONAL,
+        piece_values.ROOK_PIECE_TABLE_CONVENTIONAL,
+        piece_values.QUEEN_PIECE_TABLE_CONVENTIONAL,
+        piece_values.ROOK_PIECE_TABLE_CONVENTIONAL,
     ]
+
+
+def test_get_square_at_position_lowercase_str():
+    """ Tests that get_square_at_position return proper square
+    for lowercase inputs """
+    assert get_square_at_position("a2") == chess.A2
+
+
+def test_get_square_at_position_uppercase_str():
+    """ Tests that get_square_at_position return proper square
+    for uppercase inputs """
+    assert get_square_at_position("A2") == chess.A2
+
+
+def test_get_square_at_position_square_input():
+    """ Tests that get_square_at_position return proper square
+    for chess.square inputs """
+    assert get_square_at_position(chess.A2) == chess.A2
 
 
 def test_piece_at_function_on_starting_position(starting_board):
@@ -141,18 +159,35 @@ def test_display_all_material_differences_no_errors(setup_playground):
 
 
 def test_piece_tables(setup_piece_tables):
-    """ Tests that piece tables are of correct shape i.e 8x8 """
+    """ Tests that piece tables are of correct shape (8x8 )"""
     for table in setup_piece_tables:
-        num_ranks = len(table)
-        assert num_ranks == 8
-
-        for rank in range(8):
-            num_file_in_rank = len(table[rank])
-            assert num_file_in_rank == 8
+        assert table.shape == (8, 8)
 
 
-def test_piece_tables(setup_piece_tables):
-    """ Tests that piece tables are floats """
-    for table in setup_piece_tables:
-        for rank in range(8):
-            assert all(isinstance(p, float) for p in table[rank])
+def test_get_piece_value_from_table_white_square():
+    """ Tests that get piece_value_from_table function returns
+    correct values for white squares"""
+    a1_pawn_value = get_piece_value_from_table(
+        "P", chess.WHITE, "a1", piece_values.PIECE_TABLE_CONVENTIONAL
+    )
+
+    a2_pawn_value = get_piece_value_from_table(
+        "P", chess.WHITE, "a2", piece_values.PIECE_TABLE_CONVENTIONAL
+    )
+    assert a1_pawn_value == 0.0
+    assert a2_pawn_value == 0.5
+
+
+def test_get_piece_value_from_table_black_square():
+    """ Tests that get piece_value_from_table function returns
+    correct values for black squares. Note that black tables are
+    rotated 180 from white tables """
+    c3_knight_value = get_piece_value_from_table(
+        "N", chess.BLACK, "c3", piece_values.PIECE_TABLE_CONVENTIONAL
+    )
+
+    d4_knight_value = get_piece_value_from_table(
+        "N", chess.BLACK, "d4", piece_values.PIECE_TABLE_CONVENTIONAL
+    )
+    assert c3_knight_value == 1.0
+    assert d4_knight_value == 2.0

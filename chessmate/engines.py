@@ -9,8 +9,8 @@ import chess.pgn  # type: ignore
 from stockfish import Stockfish
 
 from analysis import StandardEvaluation
-from constants import CONVENTIONAL_PIECE_VALUES
 from utils import get_piece_at
+from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 
 
 class BaseEngine:

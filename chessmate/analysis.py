@@ -3,7 +3,8 @@ from typing import Dict
 
 import chess
 
-from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
+from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from constants.misc import PIECE_NAMES
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
@@ -90,6 +91,40 @@ class StandardEvaluation(EvaluationFunction):
         """ See parent docstring """
         super().__init__()
         self.name = "Standard"
+
+    def evaluate(self, board: chess.Board) -> float:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in evaluations
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (float)
+        """
+        val = 0.0
+        for square in chess.SQUARES:
+            piece = board.piece_type_at(square)
+            color = board.color_at(square)
+            if piece:
+                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                if not color:
+                    # BLACK encoded as False
+                    piece_value *= -1
+                val += piece_value
+        self.evaluations[board.fen()] = val
+
+        return val
+
+
+class PieceValueEvaluation(EvaluationFunction):
+    """ Evaluation engine that utilizes piece value tables
+    to evaluate position of piece in addition to defined value """
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "PieceValue"
 
     def evaluate(self, board: chess.Board) -> float:
         """

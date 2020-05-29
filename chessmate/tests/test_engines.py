@@ -5,7 +5,7 @@ import chess
 import chess.pgn
 import pytest
 
-from constants import FEN_MAPS
+from constants.fens import FEN_MAPS
 from engines import *
 from simulations import ChessPlayground
 
