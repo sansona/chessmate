@@ -135,14 +135,16 @@ def test_standard_eval_after_exchange_values(starting_board):
     starting_board.remove_piece_at(chess.C8)
     starting_board.remove_piece_at(chess.D1)
     value_after_exchange = StandardEvaluation().evaluate(starting_board)
-    assert value_after_exchange == -650
+    black_bishop_white_queen_value_difference = -650
+    assert value_after_exchange == black_bishop_white_queen_value_difference
 
 
 def test_standard_eval_in_progress_board_values(in_progress_board):
     """ Tests that StandardEvaluation.evaluate is
     properly evaluating in progress board state """
     in_progress_board_value = StandardEvaluation().evaluate(in_progress_board)
-    assert in_progress_board_value == 350
+    in_progress_known_difference = 350
+    assert in_progress_board_value == in_progress_known_difference
 
 
 def test_standard_eval_after_capture_values(starting_board):
@@ -150,23 +152,21 @@ def test_standard_eval_after_capture_values(starting_board):
     evaluating board state after capture """
     starting_board.remove_piece_at(chess.E1)
     value_no_white_king = StandardEvaluation().evaluate(starting_board)
-    assert value_no_white_king == -99999
+    missing_white_king_value = -99999
+    assert value_no_white_king == missing_white_king_value
 
 
-def test_piece_value_eval_in_progress_board_values(starting_board):
-    """ Tests that piece_value_eval properly calculates values
-    for a board in progress """
-    piece_val = PieceValueEvaluation()
-    assert piece_val.evaluate(in_progress_board) == 0
-
-
-def test_piece_value_eval_starting_board_values(in_progress_board):
+def test_piece_position_eval_starting_board_values(starting_board):
     """ Tests that piece_value_eval properly calculates values
     for starting board"""
-    pass
+    piece_val = PiecePositionEvaluation()
+    starting_board_known_value = -340
+    assert piece_val.evaluate(starting_board) == starting_board_known_value
 
 
-def test_piece_value_eval_in_progress_board_values(in_progress_board):
+def test_piece_position_eval_in_progress_board_values(in_progress_board):
     """ Tests that piece_value_eval properly calculates values
     for a board in progress """
-    pass
+    piece_val = PiecePositionEvaluation()
+    in_progress_position_value = 231
+    assert piece_val.evaluate(in_progress_board) == in_progress_position_value

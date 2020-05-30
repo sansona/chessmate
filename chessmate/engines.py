@@ -6,7 +6,6 @@ from typing import Dict, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
-from stockfish import Stockfish
 
 from analysis import StandardEvaluation
 from utils import get_piece_at
@@ -486,54 +485,3 @@ class MiniMax(BaseEngine):
         """ Returns best move as selected by minimax algorithm """
         self.evaluate(board)
         return self.best_move
-
-
-class Stockfish(BaseEngine):
-    """ Wrapper around stockfish python library. Since the stockfish
-    library comes with a bunch of functionality already, this chessmate
-    wrapper will be moderately barebones """
-
-    def __init__(self):
-        # See stockfish library documentation for params
-        # https://github.com/zhelyabuzhsky/stockfish
-        super().__init__()
-        self.name = "Stockfish"
-        self.contempt: int = 0
-        self.min_split_depth: int = 0
-        self.threads: int = 1
-        self.ponder: bool = False
-        self.hash: int = 16
-        self.skill_level: int = 20
-        self.move_overhead: int = 30
-        self.minimum_thinking_time: int = 20
-        self.slow_mover: int = 80
-
-        self.stockfish_eng = Stockfish(
-            parameters={
-                "Contempt": self.contempt,
-                "Min Split Depth": self.min_split_depth,
-                "Threads": self.threads,
-                "Ponder": self.ponder,
-                "Hash": self.hash,
-                "Skill Level": self.skill_level,
-                "Move Overhead": self.move_overhead,
-                "Minimum Thinking Time": self.minimum_thinking_time,
-                "Slow Mover": self.slow_mover,
-            }
-        )
-
-    def evaluate(self, board: chess.Board) -> None:
-        """ Since stockfish abstracts away most of the evaluation logic,
-        the chessmate evaluation function will consist only of setup/teardown
-        """
-        self.reset_move_variables()
-        self.material_difference.append(
-            self.evaluation_function.evaluate(board)
-        )
-
-    def move(self, board) -> chess.Move:
-        """ Use stockfish evaluation to return best move """
-        self.evaluate(self, board)
-
-        self.stockfish_eng.set_fen_position(board.fen())
-        return chess.Move.from_uci(self.stockfish_eng.get_best_move())

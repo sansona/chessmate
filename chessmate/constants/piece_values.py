@@ -10,6 +10,25 @@ CONVENTIONAL_PIECE_VALUES = {
     "K": 99999,
 }
 
+FISCHER_PIECE_VALUES = {
+    "P": 100,
+    "N": 300,
+    "B": 350,
+    "R": 500,
+    "Q": 900,
+    "K": 99999,
+}
+
+# Yevgeny Gik average mobility values
+MOBILITY_PIECE_VALUES = {
+    "P": 100,
+    "N": 240,
+    "B": 400,
+    "R": 640,
+    "Q": 1040,
+    "K": 99999,
+}
+
 # Convention for piece tables is each rank in own array.
 # NOTE: to access a specific file and rank, use table[rank][file]
 # NOTE: the piece values are from the perspective of white i.e
