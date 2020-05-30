@@ -10,7 +10,6 @@ pandas==0.24.2
 Cython==0.29.7
 mypy_extensions==0.4.1
 brotli==1.0.7
-chess==0.1
 cryptography==2.9.2
 ipaddr==2.2.0
 ipython==7.14.0
