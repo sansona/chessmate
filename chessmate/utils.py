@@ -8,6 +8,7 @@ from tempfile import TemporaryDirectory
 from typing import Union, List, Dict
 import numpy as np  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
+from matplotlib.ticker import MaxNLocator
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
@@ -241,6 +242,7 @@ def display_material_difference(
         facecolor="black",
         interpolate=True,
     )
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
     ax.plot(x, engine_vals, color="black", linewidth=0.75)
     ax.axhline(y=0, color="black", linewidth=0.5)
     ax.set_ylabel("Material difference")
