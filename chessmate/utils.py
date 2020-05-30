@@ -3,15 +3,18 @@ import time
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
+from collections import Counter
 from tempfile import TemporaryDirectory
-from typing import Union
+from typing import Union, List, Dict
+import numpy as np  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
 
-import chess
-import chess.pgn
+import chess  # type: ignore
+import chess.pgn  # type: ignore
 import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
 
-from constants import FEN_MAPS
+from constants.fens import FEN_MAPS
 
 
 @contextmanager
@@ -50,6 +53,25 @@ def is_valid_fen(fen: str) -> bool:
     return True
 
 
+def get_square_at_position(position: Union[str, chess.Square]) -> chess.Square:
+    """
+    Square position sanitizer for when either a string
+    or chess.Square can be entered as a position
+
+    Args:
+        position( Union[str, chess.Square])
+    Returns:
+        (chess.Square)
+    """
+    if isinstance(position, str):
+        file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
+        square = chess.square(file, rank)
+    elif isinstance(position, chess.Square):
+        square = position
+
+    return square
+
+
 def get_piece_at(
     board: chess.Board, position: Union[str, chess.Square]
 ) -> str:
@@ -67,11 +89,7 @@ def get_piece_at(
         (str): symbol of piece at square if any
     """
     # Convert position to chess.Square
-    if isinstance(position, str):
-        file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
-        square = chess.square(file, rank)
-    elif isinstance(position, chess.Square):
-        square = position
+    square = get_square_at_position(position)
 
     piece = board.piece_at(square)
 
@@ -157,3 +175,132 @@ def walkthrough_pgn(
 
             move_count += 1
             time.sleep(delay)
+
+
+def display_all_results(all_results: List[str]) -> Counter:
+    """
+    Wrapper for matplotlib to display results of all games in bar chart
+
+    Args:
+        all_results (List[str]): containing strings describing all game
+            results
+    Returns:
+        (collections.Counter): containing counts of all ending types
+    """
+    counts = Counter(all_results)
+
+    _, ax = plt.subplots()
+    ax.bar(
+        counts.keys(),
+        counts.values(),
+        color="black",
+        width=0.75,
+        align="center",
+    )
+    ax.set_xlabel("Terminal conditions")
+    ax.set_ylabel("Number games")
+    ax.set_title("Terminal conditions")
+
+    return counts
+
+
+def display_material_difference(
+    material_differences: List[tuple], game_index: int
+) -> None:
+    """
+    Wrapper for matplotlib to plot difference in piece total
+    values throughout game
+
+    Args:
+        material_differences (List[tuple]): contains mapping of value
+            differential for each move across each game played in form
+            (white engine evaluation, black engine evaluation) at each move
+        game_index (int): index of game played in iteration of simulation
+            to plot
+    """
+    game_values = material_differences[game_index]
+    engine_vals = [v[0] for v in game_values]
+    positive_mask = [True if e > 0 else False for e in engine_vals]
+
+    _, ax = plt.subplots(1, 1)
+    x = range(len(engine_vals))
+    ax.set_title(f"Game: {game_index}")
+    ax.fill_between(
+        x,
+        0,
+        engine_vals,
+        where=positive_mask,
+        facecolor="floralwhite",
+        interpolate=True,
+    )
+    ax.fill_between(
+        x,
+        0,
+        engine_vals,
+        where=[not x for x in positive_mask],
+        facecolor="black",
+        interpolate=True,
+    )
+    ax.plot(x, engine_vals, color="black", linewidth=0.75)
+    ax.axhline(y=0, color="black", linewidth=0.5)
+    ax.set_ylabel("Material difference")
+    ax.set_xlabel("Move index")
+
+
+def display_all_material_differences(
+    material_differences: List[tuple],
+) -> None:
+    """
+    Wrapper for display_material_difference to plot results of
+    all games
+
+    Args:
+        material_differences (List[tuple]): contains mapping of value
+            differential for each move across each game played in form
+            (white engine evaluation, black engine evaluation) at each move
+    """
+    for game_idx in range(len(material_differences)):
+        display_material_difference(material_differences, game_idx)
+
+
+def get_piece_value_from_table(
+    piece_sym: str,
+    piece_color: Union[bool, chess.Color],
+    position: Union[str, chess.Square],
+    piece_value_tables: Dict[str, np.ndarray],
+):
+    """
+    Gets value of piece from set of defined piece_value_tables
+
+    Args:
+        piece_sym (str): symbol of piece to be used as key in piece_value_table
+        piece_color(Union[bool, chess.Color]): color of piece, to be used to
+            determine need to flip tables
+        position (Union[str, chess.Square]): str or chess.Square object of
+            square
+        piece_value_table (Dict[str, np.ndarray]): Mapping of pieces to
+            piece_value_tables to be used
+
+    Return:
+        (float): value of piece at position for piece_value_table
+    """
+    # For black eval, rotate table 180 deg
+    if not piece_color:
+        piece_value_tables = {
+            p: np.rot90(t, 2) for p, t in piece_value_tables.items()
+        }
+
+    piece_table = piece_value_tables[piece_sym.upper()]
+    square = get_square_at_position(position)
+
+    # Since the table is reverse indexed i.e table[0] = rank 0, to get
+    # black positions, need to subtract from 7. Use x & y instead
+    # of file and rank to avoid confusion since x, y coordinates in
+    # piece value table don't map perfectly on to board
+    y, x = chess.square_rank(square), chess.square_file(square)
+    if not piece_color:
+        y = 7 - y
+        x = 7 - x
+
+    # Returns only the piece value position eval
+    return piece_table[y, x]

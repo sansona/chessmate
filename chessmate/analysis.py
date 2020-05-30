@@ -1,38 +1,15 @@
 """ Functions for analyzing board states and results of games """
-from collections import Counter
-from typing import List
+from typing import Dict
 
-import chess
-import matplotlib.pyplot as plt  # type: ignore
+import numpy as np  # type: ignore
+import chess  # type: ignore
 
-from constants import CONVENTIONAL_PIECE_VALUES, PIECE_NAMES
-
-
-def tabulate_board_values(board: chess.Board) -> float:
-    """
-    Iterate through board, and determine net piece value difference
-
-    Args:
-        board (chess.Board)
-
-    Returns:
-        (float): containing net value difference
-    """
-    value_difference = 0.0
-
-    # Go through each square, find piece at square, add value to
-    # value_difference
-    for square in chess.SQUARES:
-        piece = board.piece_type_at(square)
-        color = board.color_at(square)
-        if piece:
-            value = CONVENTIONAL_PIECE_VALUES[PIECE_NAMES[piece]]
-            if not color:
-                # BLACK encoded as False
-                value *= -1
-            value_difference += value
-
-    return value_difference
+from utils import get_piece_value_from_table
+from constants.piece_values import (
+    CONVENTIONAL_PIECE_VALUES,
+    PIECE_TABLE_CONVENTIONAL,
+)
+from constants.misc import PIECE_NAMES
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
@@ -69,93 +46,126 @@ def evaluate_ending_board(board: chess.Board) -> str:
         if condition():
             return title
 
-    # If none of the defined ending states found, game ended due to
-    # some variable endstate that would require further probing.
-    # This would be the case if playing some variation
-    return "Undetermined"
 
-
-def display_all_results(all_results: List[str]) -> Counter:
+class EvaluationFunction:
     """
-    Wrapper for matplotlib to display results of all games in bar chart
+    Base class for board evaluation algorithms. Each EvaluationFunction
+    object is responsible for evaluating a given boardstate and
+    returning a numeric metric from its evaluation. Standard for metric
+    wherein positive evaluations are pro-white and negative pro-black
 
-    Args:
-        all_results (List[str]): containing strings describing all game
-            results
-    Returns:
-        (collections.Counter): containing counts of all ending types
+    Every evaluation performed by the engine should be stored in the
+    evaluations attribute
+
+    Attributes:
+        name (str): name of evaluation engine
+        evaluations (Dict[str, float]): stores each board
+            state evaluated as FEN and the corresponding metric
+        piece_values (Dict[str, float]): mapping of pieces to values.
+            By default use conventional piece values
+
+    Methods:
+        evaluate (chess.Board) -> float: main function responsible for
+            evaluation of board state
     """
-    counts = Counter(all_results)
 
-    _, ax = plt.subplots()
-    ax.bar(
-        counts.keys(),
-        counts.values(),
-        color="black",
-        width=0.75,
-        align="center",
-    )
-    ax.set_xlabel("Terminal conditions")
-    ax.set_ylabel("Number games")
-    ax.set_title("Terminal conditions")
+    def __init__(self):
+        self.name: str = "Base"
+        self.evaluations: Dict[str, int] = {}
+        self.piece_values: Dict[str, int] = CONVENTIONAL_PIECE_VALUES
 
-    return counts
+    def evaluate(self, board: chess.Board) -> int:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in evaluations
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (int)
+        """
+        raise NotImplementedError("Function evaluate not implemented")
 
 
-def display_material_difference(
-    material_differences: List[tuple], game_index: int
-) -> None:
+class StandardEvaluation(EvaluationFunction):
+    """ Evaluation engine that tabulates value of all pieces on both
+    sides according to the standard piece valuation and calculates
+    difference as metric """
+
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Standard"
+
+    def evaluate(self, board: chess.Board) -> int:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in evaluations
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (int)
+        """
+        val = 0
+        for square in chess.SQUARES:
+            piece = board.piece_type_at(square)
+            color = board.color_at(square)
+            if piece:
+                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                if not color:
+                    # BLACK encoded as False
+                    piece_value *= -1
+                val += piece_value
+        self.evaluations[board.fen()] = val
+
+        return val
+
+
+class PiecePositionEvaluation(EvaluationFunction):
     """
-    Wrapper for matplotlib to plot difference in piece total
-    values throughout game
+    Evaluation engine that utilizes piece value tables
+    to evaluate position of piece in addition to defined values
 
-    Args:
-        material_differences (List[tuple]): contains mapping of value
-            differential for each move across each game played in form
-            (white engine evaluation, black engine evaluation) at each move
-        game_index (int): index of game played in iteration of simulation
-            to plot
+    Note that since the evaluate function requires a large number of
+    iterations, this implementation is computationally slow
+
+    Attributes:
+        value_tables (Dict[str, np.ndarray]: defined collection of piece
+            value tables. Default to conventional piece table
     """
-    game_values = material_differences[game_index]
-    engine_vals = [v[0] for v in game_values]
-    positive_mask = [True if e > 0 else False for e in engine_vals]
 
-    _, ax = plt.subplots(1, 1)
-    x = range(len(engine_vals))
-    ax.set_title(f"Game: {game_index}")
-    ax.fill_between(
-        x,
-        0,
-        engine_vals,
-        where=positive_mask,
-        facecolor="floralwhite",
-        interpolate=True,
-    )
-    ax.fill_between(
-        x,
-        0,
-        engine_vals,
-        where=[not x for x in positive_mask],
-        facecolor="black",
-        interpolate=True,
-    )
-    ax.plot(x, engine_vals, color="black", linewidth=0.75)
-    ax.axhline(y=0, color="black", linewidth=0.5)
-    ax.set_ylabel("Material difference")
-    ax.set_xlabel("Move index")
+    def __init__(self):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Piece Position"
+        self.value_tables: Dict[str, np.ndarray] = PIECE_TABLE_CONVENTIONAL
 
+    def evaluate(self, board: chess.Board) -> int:
+        """
+        Main function for evaluating given boardstate. Function should
+        evaluate boardstate and append evaluation in evaluations
 
-def display_all_material_differences(
-    material_differences: List[tuple],
-) -> None:
-    """
-    Wrapper for display_material_difference to plot results of
-    all games
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (float)
+        """
+        val = 0
+        for square in chess.SQUARES:
+            piece = board.piece_type_at(square)
+            color = board.color_at(square)
 
-    Args:
-        material_differences (List[tuple]): contains mapping of value
-            differential for each move across each game played in form
-            (white engine evaluation, black engine evaluation) at each move
-    """
-    for game_idx in range(len(material_differences)):
-        display_material_difference(material_differences, game_idx)
+            if piece:
+                # Get base piece value, add position based value from
+                # piece value table
+                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                piece_value += get_piece_value_from_table(
+                    PIECE_NAMES[piece], color, square, self.value_tables
+                )
+                if not color:
+                    piece_value *= -1
+                val += piece_value
+        self.evaluations[board.fen()] = val
+
+        return val

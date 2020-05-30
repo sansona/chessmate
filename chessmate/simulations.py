@@ -8,8 +8,9 @@ import chess.svg  # type: ignore
 from tqdm import tqdm  # type: ignore
 
 from analysis import evaluate_ending_board
-from constants import COLOR_MAP, FEN_MAPS
 from utils import is_valid_fen, render_svg_board
+from constants.fens import FEN_MAPS
+from constants.misc import COLOR_MAP
 
 
 class EnginePlay:
@@ -158,7 +159,7 @@ class PlayVsEngine(EnginePlay):
             # Stay in loop until player enters a legal move - catches
             # non-UCI inputs & illegal moves
             input_str = str(input())
-            if input_str == "resign":
+            if input_str in ("res", "resign", "quit"):
                 return chess.Move.null()
 
             try:
@@ -291,7 +292,7 @@ class ChessPlayground(EnginePlay):
         self.game_pgns: List[chess.pgn.Game] = []
         self.all_results: List[str] = []
         self.all_move_counts: List[int] = []
-        self.all_material_differences: List(tuple) = []
+        self.all_material_differences: List[tuple] = []
 
     def __repr__(self):
         """ Print out current state of playground """
