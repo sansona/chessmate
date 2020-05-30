@@ -62,14 +62,14 @@ To evaluate the results of a simulation:
 
 Since the ```ScholarsMate``` engine either successfully mates or resigns, we'd expect a small percentage of games to be won by white mating and the rest black by resignation.
 ```
-from chessmate.analysis import display_all_results
+from chessmate.utils import display_all_results
 display_all_results(simulation.all_results)
 ```
 ![results](https://user-images.githubusercontent.com/17757035/82768134-f3b2b880-9de1-11ea-9b96-8a3be118fb80.png)
 
 To view the difference in material across a game or games
 ```
-from chessmate.analysis import display_material_difference
+from chessmate.utils import display_material_difference
 
 # Use CaptureHighestvalue on white and Random engine on black
 simulation = ChessPlayground(CaptureHighestValue(), Random())
