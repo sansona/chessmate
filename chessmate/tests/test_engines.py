@@ -9,9 +9,6 @@ from constants.fens import FEN_MAPS
 from engines import *
 from simulations import ChessPlayground
 
-sys.path.append("..")
-
-
 @pytest.fixture
 def starting_board():
     """

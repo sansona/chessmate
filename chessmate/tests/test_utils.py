@@ -11,8 +11,6 @@ from simulations import ChessPlayground
 from constants import *
 from utils import *
 
-sys.path.append("..")
-
 
 @pytest.fixture
 def starting_board():
