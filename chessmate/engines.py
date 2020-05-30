@@ -45,7 +45,8 @@ class BaseEngine:
                 available in uci notation with values for each move
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
-            evaluation_function (analysis.BoardEvaluation): engine for evaluating
+            evaluation_function (analysis.BoardEvaluation): engine for
+            evaluating
                 board state
             material_difference (List[float]): difference in value on board
                 at each end step based off material as result of
@@ -523,7 +524,8 @@ class Stockfish(BaseEngine):
 
     def evaluate(self, board: chess.Board) -> None:
         """ Since stockfish abstracts away most of the evaluation logic,
-        the chessmate evaluation function will consist only of setup/teardown """
+        the chessmate evaluation function will consist only of setup/teardown
+        """
         self.reset_move_variables()
         self.material_difference.append(
             self.evaluation_function.evaluate(board)

@@ -6,11 +6,11 @@ from pathlib import Path
 from collections import Counter
 from tempfile import TemporaryDirectory
 from typing import Union, List, Dict
-import numpy as np
+import numpy as np  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 
-import chess
-import chess.pgn
+import chess  # type: ignore
+import chess.pgn  # type: ignore
 import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
 
@@ -276,7 +276,8 @@ def get_piece_value_from_table(
         piece_sym (str): symbol of piece to be used as key in piece_value_table
         piece_color(Union[bool, chess.Color]): color of piece, to be used to
             determine need to flip tables
-        position (Union[str, chess.Square]): str or chess.Square object of square
+        position (Union[str, chess.Square]): str or chess.Square object of
+            square
         piece_value_table (Dict[str, np.ndarray]): Mapping of pieces to
             piece_value_tables to be used
 

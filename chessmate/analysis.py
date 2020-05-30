@@ -1,8 +1,8 @@
 """ Functions for analyzing board states and results of games """
 from typing import Dict
 
-import numpy as np
-import chess
+import numpy as np  # type: ignore
+import chess  # type: ignore
 
 from utils import get_piece_value_from_table
 from constants.piece_values import (
@@ -71,8 +71,8 @@ class EvaluationFunction:
 
     def __init__(self):
         self.name: str = "Base"
-        self.evaluations: Dict[str, float] = {}
-        self.piece_values: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
+        self.evaluations: Dict[str, int] = {}
+        self.piece_values: Dict[str, int] = CONVENTIONAL_PIECE_VALUES
 
     def evaluate(self, board: chess.Board) -> int:
         """
@@ -123,11 +123,12 @@ class StandardEvaluation(EvaluationFunction):
 
 
 class PieceValueEvaluation(EvaluationFunction):
-    """ Evaluation engine that utilizes piece value tables
+    """
+    Evaluation engine that utilizes piece value tables
     to evaluate position of piece in addition to defined values
 
-    Note that since the evaluate function requires a large number of iterations,
-    this implementation is computationally slow
+    Note that since the evaluate function requires a large number of
+    iterations, this implementation is computationally slow
 
     Attributes:
         value_tables (Dict[str, np.ndarray]: defined collection of piece
@@ -137,7 +138,7 @@ class PieceValueEvaluation(EvaluationFunction):
     def __init__(self):
         """ See parent docstring """
         super().__init__()
-        self.name = "PieceValue"
+        self.name = "Piece Values"
         self.value_tables: Dict[str, np.ndarray] = PIECE_TABLE_CONVENTIONAL
 
     def evaluate(self, board: chess.Board) -> int:
@@ -168,3 +169,42 @@ class PieceValueEvaluation(EvaluationFunction):
         self.evaluations[board.fen()] = val
 
         return val
+
+
+class InterpolatedPieceValues(EvaluationFunction):
+    """
+    Evaluation that interpolates piece value tables based off game
+    progression.
+
+    Note that since the evaluate function requires a large number of
+    iterations, this implementation is computationally slow
+
+    Attributes:
+        starting_game_tables (Dict[str, np.ndarray]): tables for beginning
+            positions
+        midgame_tables (Dict[str, np.ndarray]): tables for midgame positions
+        endgame_tables (Dict[str, np.ndarray]): tables for endgame positions
+        start_midgame_val (int): board value at which to begin midgame
+        start_endgame_val (int): board value at which to begin endgame
+    """
+
+    def __init__(self):
+        """ See parent docstring """
+        self.name = "Interpolated Piece Values"
+        self.starting_game_tables: Dict[str, np.ndarray]
+        self.midgame_tables: Dict[str, np.ndarray]
+        self.endgame_tables: Dict[str, np.ndarray]
+        self.start_midgame_val: int
+        self.start_endgame_val: int
+
+    def evaluate(self, board: chess.Board) -> int:
+        """
+        Evaluates board state based utilizing piece value table corresponding
+        to stage of game
+
+        Args:
+            board (chess.Board): board state to evaluate
+        Returns:
+            (float)
+        """
+        pass
