@@ -2,8 +2,9 @@ language: python
 python:
   - "3.6"
   - "3.7"
-  - "3.8"
 install:
   - pip install -r requirements.txt
+before_script:
+  - cd chessmate
 script:
-  - python -m pytest tests
+  - python -m pytest tests --runslow

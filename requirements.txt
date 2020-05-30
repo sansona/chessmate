@@ -18,6 +18,6 @@ lockfile==0.12.2
 ordereddict==1.1
 protobuf==3.12.1
 pyOpenSSL==19.1.0
-tensorflow==2.2.0
+tqdm==4.46.0
 usercustomize==1.0.0
 wincertstore==0.2

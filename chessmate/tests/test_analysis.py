@@ -7,9 +7,6 @@ import pytest
 
 from analysis import *
 
-sys.path.append("..")
-
-
 @pytest.fixture
 def starting_board():
     """
