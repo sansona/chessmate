@@ -343,8 +343,8 @@ class ScholarsMate(BaseEngine):
 
 class MiniMax(BaseEngine):
     """
-    Base class for engines utilizing the MiniMax algorithm. Inherits from
-    BaseEngine.
+    Implemented with alpha-beta pruning and move ordering via.
+    MVV_LVA by default
 
     Attributes:
         name (str): name of engine
