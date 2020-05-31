@@ -178,6 +178,30 @@ def walkthrough_pgn(
             time.sleep(delay)
 
 
+def export_pgn(pgn_obj: chess.pgn.Game, fname: Union[str, Path]) -> None:
+    """
+    Exports game pgn to pgn file
+
+    Args:
+        pgn_obj (chess.pgn.Game)
+        fname (str/Path): name of file to save as
+    """
+    print(pgn_obj, file=open(fname, "w"), end="\n\n")
+
+
+def walkthrough_pgn_file(fname: Union[str, Path], delay: float = 1.0) -> None:
+    """
+    Wrapper for walkthrough_pgn for when loading pgn directly from file
+
+    Args:
+        fname (str/Path): path to pgn file
+        delay (float): time between moves for display to update
+    """
+    pgn = open(fname, encoding="utf-8")
+    game = chess.pgn.read_game(pgn)
+    walkthrough_pgn(game, delay=delay)
+
+
 def display_all_results(all_results: List[str]) -> Counter:
     """
     Wrapper for matplotlib to display results of all games in bar chart

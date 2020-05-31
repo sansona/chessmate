@@ -2,7 +2,6 @@
 many simulations is computationally and time intensive, only
 explicitly testing the simulation objects here and NOT
 the engines themselves """
-import sys
 from contextlib import contextmanager
 
 import chess
@@ -12,8 +11,6 @@ import pytest
 from engines import AvoidCapture, CaptureHighestValue
 from simulations import *
 from utils import not_raises
-
-sys.path.append("..")
 
 N_GAMES = 10
 

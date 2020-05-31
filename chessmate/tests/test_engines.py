@@ -1,6 +1,4 @@
 """ Test suite for engines """
-import sys
-
 import chess
 import chess.pgn
 import pytest
@@ -8,6 +6,7 @@ import pytest
 from constants.fens import FEN_MAPS
 from engines import *
 from simulations import ChessPlayground
+
 
 @pytest.fixture
 def starting_board():

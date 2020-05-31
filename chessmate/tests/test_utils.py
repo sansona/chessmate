@@ -1,6 +1,5 @@
 """ Test suite for assortment of helper functions """
-import sys
-
+import os
 import chess
 import chess.pgn
 import pytest
@@ -132,6 +131,30 @@ def test_walkthrough_pgn_no_errors(setup_playground):
     this function relies on IPython functionality, nothing will appear
     to happen """
     walkthrough_pgn(setup_playground.game_pgns[0])
+
+
+def test_export_pgn_exports_file(setup_playground):
+    """ Tests that export_pgn function exports file"""
+    exported_fname = "test_export_pgn"
+    export_pgn(setup_playground.game_pgns[0], exported_fname)
+    pgn_files_in_cwd = [
+        f for f in os.listdir(".") if f.startswith(exported_fname)
+    ]
+    os.remove(exported_fname)
+
+    # Check that single pgn file with exported_fname written
+    assert len(pgn_files_in_cwd) == 1
+
+
+def test_walkthrough_pgn_file_no_errors(setup_playground):
+    """ Tests that walkthrough_pgn_file results in no errors.
+    Note that since this displays to the IPython console,
+    will appear as if nothing happened """
+    exported_fname = "test_walkthrough_pgn_file"
+    export_pgn(setup_playground.game_pgns[0], exported_fname)
+
+    walkthrough_pgn_file(exported_fname)
+    os.remove(exported_fname)
 
 
 def test_display_all_results_no_errors(setup_playground):
