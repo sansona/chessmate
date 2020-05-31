@@ -9,6 +9,7 @@ import chess.pgn  # type: ignore
 
 from analysis import StandardEvaluation
 from utils import get_piece_at
+from heuristics import MVV_LVA
 from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 
 
@@ -355,6 +356,8 @@ class MiniMax(BaseEngine):
         alpha_beta_pruning (bool): if want to prune trees. Default=True
         alpha (float): alpha value in pruning, default=-inf
         beta (float): beta value in pruning, default= inf
+        move_ordering (bool): True to utilize move ordering heuristic
+        ordering_heuristic (Callable): heuristic for move ordering
 
     Methods:
         minimax(base_board, maximizing, depth): main algorithmic loop for
@@ -370,6 +373,8 @@ class MiniMax(BaseEngine):
         self.alpha_beta_pruning: bool = True
         self.alpha: float = float("-inf")
         self.beta: float = float("inf")
+        self.move_ordering = True
+        self.ordering_heuristic = MVV_LVA
 
     @property
     def depth(self) -> int:
@@ -418,10 +423,14 @@ class MiniMax(BaseEngine):
         # best move
         if maximizing:
             max_val = -float("inf")
-            # Shuffle moves to prevent move ordering from impacting game
-            # results
-            legal_moves = list(base_board.legal_moves)
-            random.shuffle(legal_moves)
+            # If running w/ heuristic, execute heuristic. Else, randomly
+            # order legal_moves
+            if self.move_ordering:
+                legal_moves = self.ordering_heuristic(base_board)
+            else:
+                legal_moves = list(base_board.legal_moves)
+                random.shuffle(legal_moves)
+
             for move in legal_moves:
                 base_board.push_uci(str(move))
                 val = self.minimax(base_board, False, depth - 1, alpha, beta)

@@ -51,3 +51,14 @@ def test_mvv_lva_fischer_returns_sorted_captures():
     captures_sorted = [pawn_capture_bishop, pawn_capture_knight]
 
     assert MVV_LVA(board, FISCHER_PIECE_VALUES) == captures_sorted
+
+
+def test_mvv_lva_no_captures_returns_random_sorted():
+    """ Tests that MVV_LVA returns a randomly sorted list of legal moves if
+    given board with no available captures """
+    board = chess.Board()
+    legal_move_list = list(board.legal_moves)
+    # To check whether random list generated from MVV_LVA, check that
+    # lists are not identical but when sorted are
+    assert MVV_LVA(board) != legal_move_list
+    assert set(MVV_LVA(board)) == set(legal_move_list)
