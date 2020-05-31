@@ -83,15 +83,11 @@ def get_piece_at(
         board (chess.Board): current board state in python-chess object
         position (str/chess.Square): position of square i.e chess.A1 or "A1"
 
-    Raises:
-        AttributeError: if no piece on board at position
-
     Returns:
         (str): symbol of piece at square if any
     """
     # Convert position to chess.Square
     square = get_square_at_position(position)
-
     piece = board.piece_at(square)
 
     if piece:
