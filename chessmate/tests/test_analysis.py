@@ -1,11 +1,10 @@
 """ Test suite for assortment of analysis functions """
-import sys
-
 import chess
 import chess.pgn
 import pytest
 
 from analysis import *
+
 
 @pytest.fixture
 def starting_board():

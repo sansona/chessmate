@@ -1,6 +1,4 @@
 """ Test suite for assortment of helper functions """
-import sys
-
 import chess
 import chess.pgn
 import pytest
