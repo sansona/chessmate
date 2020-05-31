@@ -453,8 +453,11 @@ class MiniMax(BaseEngine):
         # elif not strictly necessary but increasing readability
         elif not maximizing:
             min_val = float("inf")
-            legal_moves = list(base_board.legal_moves)
-            random.shuffle(legal_moves)
+            if self.move_ordering:
+                legal_moves = self.ordering_heuristic(base_board)
+            else:
+                legal_moves = list(base_board.legal_moves)
+                random.shuffle(legal_moves)
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
