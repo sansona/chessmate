@@ -10,10 +10,10 @@ from typing import Dict, List, Union
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
-from matplotlib.ticker import MaxNLocator  # type: ignore
 import numpy as np  # type: ignore
 import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
+from matplotlib.ticker import MaxNLocator  # type: ignore
 
 from constants.fens import FEN_MAPS
 

@@ -1,5 +1,6 @@
 """ Test suite for engines """
 from typing import List
+
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import pytest  # type: ignore
