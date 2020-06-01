@@ -2,7 +2,7 @@
 import random
 from typing import Dict, List
 
-import chess
+import chess  # type: ignore
 
 from analysis import StandardEvaluation
 from constants.misc import PIECE_INDEXING
@@ -16,7 +16,6 @@ def zobrist_hash_function(board: chess.Board, hash_table: List) -> int:
     Args:
         board (chess.Board): boardstate
         hash_table (List): randomly generated hash table
-
     Returns:
         (int): hashed board
     """
@@ -36,7 +35,7 @@ def zobrist_hash_function(board: chess.Board, hash_table: List) -> int:
 class TranspositionTable:
     """
     Base class for transposition tables
- 
+
     Attributes:
         hash_function (Callable): function that hashed board to int
         hash_table (List): hash table to feed into hash function.
@@ -45,7 +44,7 @@ class TranspositionTable:
         table (Dict[int, int]): table to store results
 
     Methods:
-        hash_board_to_table (chess.Board): hashes and evaluates
+        hash_current_board (chess.Board): hashes and evaluates
             board based off hash_function and evaluation_function
             respectively, store hashed board eval in table
     """
@@ -77,10 +76,10 @@ class TranspositionTable:
         """
         self._hash_table = new_hash_table
 
-    def hash_board_to_table(self, board: chess.Board):
+    def hash_current_board(self, board: chess.Board) -> None:
         """
         Adds hashed boardstate to table with evaluation
- 
+
         Args:
             board (chess.Board): board state
         """

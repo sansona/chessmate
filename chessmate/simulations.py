@@ -27,7 +27,8 @@ class EnginePlay:
     Methods:
         play_game (): general function to play a standalone game
         append_move_to_tree (chess.Move): appends move to game tree
-            representation"""
+            representation. Used to store game state
+    """
 
     def __init__(self):
         self.game: chess.pgn.Game = chess.pgn.Game()
@@ -47,7 +48,6 @@ class EnginePlay:
 
         Args:
             fen_str (str): fen representation of board
-
         Raise:
             ValueError: if FEN is invalid given board setup
         """
@@ -69,7 +69,6 @@ class EnginePlay:
 
         Args:
             fen_str (str): fen representation of board
-
         Raise:
             ValueError: if FEN is invalid given board setup
         """
@@ -127,7 +126,8 @@ class PlayVsEngine(EnginePlay):
         self._player_side: Union[chess.Color, bool] = chess.WHITE
 
     def __repr__(self):
-        """ Print out current state of playvsengine """
+        """ Print out current state of playvsengine. Useful for
+        printing out machinations of PlayVsEngine"""
         return f"""engine: {self.engine}
                 player_side: {self._player_side}
                 FEN: {self._board.fen}"""
@@ -152,7 +152,8 @@ class PlayVsEngine(EnginePlay):
         """
         Allows player to push UCI move with current boardstate
 
-        (chess.Move): UCI object of move input
+        Returns
+            (chess.Move): UCI object of move input
         """
         legal_move = False
         while not legal_move:
@@ -162,6 +163,7 @@ class PlayVsEngine(EnginePlay):
             if input_str in ("res", "resign", "quit"):
                 return chess.Move.null()
 
+            # Catch non-UCI moves
             try:
                 input_move = chess.Move.from_uci(input_str)
             except ValueError:
@@ -172,6 +174,7 @@ class PlayVsEngine(EnginePlay):
                 legal_move = True
                 self._board.push_uci(str(input_move))
             else:
+                # Catch non-legal moves
                 self.display_board(f"Not legal move - {str(input_move)}")
 
         self.append_move_to_tree(input_move)
@@ -261,25 +264,25 @@ class ChessPlayground(EnginePlay):
         black_engine (ChessEngine): engine for determining black moves
         terminal_conditions (Dict[function]): in form "name of terminal
             condition": "boolean method to test for condition"
-        game_pgns (List[chess.pgn.Game]): list of all pgn data for
+        game_pgns (List[chess.pgn.Game]): list for storage of all pgn data for
             games played
-        all_results (List[str]): containing strings describing all game
+        all_results (List[str]): storage containing strings describing all game
             results
-        all_move_counts (List[int]): contains count of number of moves in
-            each game played
+        all_move_counts (List[int]): storage for count of number of move
+            in each game played
         all_material_differences (List[tuple]): contains mapping of value
             differential for each move across each game played in form
             (white engine evaluation, black engine evaluation) at each move
 
     Methods:
         play_game() -> None: plays a single game
-        play_multiple_games(N) -> None: plays N games
+        play_multiple_games(N) -> None: plays N games. Wrapper around
+            play_game()
     """
 
     def __init__(self, white_engine, black_engine):
         """
         Setup empty game with defined engines for both sides
-        Engines should evaluate board state and return a uci move
 
         Args:
             white_engine (ChessEngine)

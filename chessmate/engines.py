@@ -46,13 +46,12 @@ class BaseEngine:
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
             evaluation_function (analysis.BoardEvaluation): engine for
-            evaluating
-                board state
+                evaluating board state
             material_difference (List[float]): difference in value on board
                 at each end step based off material as result of
                 evaluation_function's evaluation
         """
-        self.name: str = "Base"
+        self.name: str = "Base Engine"
         self.legal_moves: Dict[chess.Move, float] = {}
         self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
         self.evaluation_function = StandardEvaluation()
@@ -71,10 +70,8 @@ class BaseEngine:
 
         Args:
             board (chess.board): current board state in python-chess object
-
         Raises:
             NotImplementedError: if not redefined in child class
-
         Returns:
             (Dict[chess.Move: float]): dict mapping uci moves to
                 evaluated value metric
@@ -87,10 +84,8 @@ class BaseEngine:
 
         Args:
             board (chess.board): current board state in python-chess object
-
         Raises:
             NotImplementedError: if not redefined in child class
-
         Returns:
             (chess.Move): uci notation object of chosen move
         """
@@ -407,14 +402,15 @@ class MiniMax(BaseEngine):
         beta: float,
     ) -> float:
         """
-        Evaluate result of each legal move on board via. minimax algorithm
+        Recursively evaluate result of each legal move on board via. minimax
+        algorithm
         Reference: https://www.youtube.com/watch?v=l-hh51ncgDI
 
         Args:
             base_board (chess.Board): current board state
             maximizing (bool): True for white, False for black
             depth (int): depth to search. Init at self._depth for base. Note:
-                    depth=>3 will be computationally slow for most CPUs
+                depth=>3 will be computationally slow for most CPUs
         """
         if depth == 0 or base_board.is_game_over():
             return self.evaluation_function.evaluate(base_board)

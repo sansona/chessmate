@@ -23,6 +23,8 @@ def evaluate_ending_board(board: chess.Board) -> str:
     """
     result = board.result()
 
+    # chessmate is setup by which if this function is called without
+    # a clear winner, the game is resigned by the function caller
     if not board.is_game_over():
         return "Game over by resignation"
     if result == "1-0":
@@ -45,6 +47,7 @@ def evaluate_ending_board(board: chess.Board) -> str:
     for title, condition in terminal_conditions.items():
         if condition():
             return title
+    return "Undefined"
 
 
 class EvaluationFunction:
@@ -70,14 +73,15 @@ class EvaluationFunction:
     """
 
     def __init__(self):
-        self.name: str = "Base"
+        self.name: str = "Base Evaluation Function"
         self.evaluations: Dict[str, int] = {}
         self.piece_values: Dict[str, int] = CONVENTIONAL_PIECE_VALUES
 
     def evaluate(self, board: chess.Board) -> int:
         """
         Main function for evaluating given boardstate. Function should
-        evaluate boardstate and append evaluation in evaluations
+        evaluate boardstate, append evaluation in evaluations, and
+        return evaluation
 
         Args:
             board (chess.Board): board state to evaluate
@@ -95,12 +99,11 @@ class StandardEvaluation(EvaluationFunction):
     def __init__(self):
         """ See parent docstring """
         super().__init__()
-        self.name = "Standard"
+        self.name = "Standard Evaluation Function"
 
     def evaluate(self, board: chess.Board) -> int:
         """
-        Main function for evaluating given boardstate. Function should
-        evaluate boardstate and append evaluation in evaluations
+        Evaluate boardstate via. material difference on board
 
         Args:
             board (chess.Board): board state to evaluate
@@ -109,6 +112,7 @@ class StandardEvaluation(EvaluationFunction):
         """
         val = 0
         for square in chess.SQUARES:
+            # For each piece on board, get value of piece on board.
             piece = board.piece_type_at(square)
             color = board.color_at(square)
             if piece:
@@ -119,6 +123,7 @@ class StandardEvaluation(EvaluationFunction):
                 val += piece_value
         self.evaluations[board.fen()] = val
 
+        # Return difference in piece values between white & black
         return val
 
 
@@ -143,13 +148,13 @@ class PiecePositionEvaluation(EvaluationFunction):
 
     def evaluate(self, board: chess.Board) -> int:
         """
-        Main function for evaluating given boardstate. Function should
-        evaluate boardstate and append evaluation in evaluations
+        Evaluate board via. piece position/value tables in addition
+        to material differences
 
         Args:
             board (chess.Board): board state to evaluate
         Returns:
-            (float)
+            (int)
         """
         val = 0
         for square in chess.SQUARES:

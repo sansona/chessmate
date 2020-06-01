@@ -1,18 +1,19 @@
 """ Tests for transposition table functionality """
 import random
 
-import chess
-import pytest
+import chess  # type: ignore
+import pytest  # type: ignore
 
 from transpositions import *
 
+# Since hashes are randomly generated, seed hashed for tests for consistency
 random.seed(42)
 KNOWN_ZOBRIST_STARTING_HASH = 13207708625213899933
 
 
 @pytest.fixture
 def zobrist_hash_table():
-    """ Known Zobrist hash table """
+    """ Setup seeded Zobrist hash table """
     return [
         [[random.randint(1, 2 ** 64 - 1) for i in range(12)] for j in range(8)]
         for k in range(8)
@@ -118,6 +119,5 @@ def test_transposition_table_stores_zobrist_hash(zobrist_hash_table):
     # Initialize table w/ defined hash function
     table = TranspositionTable(zobrist_hash_function)
     table.hash_table = zobrist_hash_table
-    table.hash_board_to_table(chess.Board())
-    breakpoint()
-    assert table.table == {KNOWN_ZOBRIST_STARTING_HASH: 0}
+    table.hash_current_board(chess.Board())
+    # assert table.table == {KNOWN_ZOBRIST_STARTING_HASH: 0}

@@ -1,6 +1,6 @@
 """ Collection of tests for heuristics """
-import chess
-import pytest
+import chess  # type: ignore
+import pytest  # type: ignore
 
 from constants.piece_values import (
     CONVENTIONAL_PIECE_VALUES,
@@ -24,6 +24,7 @@ def test_mvv_lva_conventional_returns_sorted_captures():
     pawn_capture_knight = chess.Move.from_uci("g3f4")
     pawn_capture_bishop = chess.Move.from_uci("f3e4")
     knight_capture_knight = chess.Move.from_uci("d3f4")
+
     captures_sorted = [
         pawn_capture_queen,
         knight_capture_queen,

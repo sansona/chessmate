@@ -3,7 +3,7 @@ board evaluation """
 import random
 from typing import Dict, List
 
-import chess
+import chess  # type: ignore
 
 from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 from utils import get_piece_at
@@ -19,7 +19,6 @@ def MVV_LVA(
 
     Args:
         board (chess.Board): current board state to evaluate
-
     Returns:
         (List[chess.Move]): sorted list of moves according to MVV_LVA capture
             heuristic
