@@ -1,11 +1,12 @@
 """ Collection of heuristic related evaluation - move sorting,
 board evaluation """
-from typing import List, Dict
 import random
+from typing import Dict, List
+
 import chess
 
-from utils import get_piece_at
 from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from utils import get_piece_at
 
 
 def MVV_LVA(

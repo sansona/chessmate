@@ -2,11 +2,11 @@
 import chess
 import pytest
 
-from heuristics import *
 from constants.piece_values import (
     CONVENTIONAL_PIECE_VALUES,
     FISCHER_PIECE_VALUES,
 )
+from heuristics import *
 
 
 def test_mvv_lva_conventional_returns_sorted_captures():

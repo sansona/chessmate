@@ -1,19 +1,19 @@
 """ Utility functions """
 import time
+from collections import Counter
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from collections import Counter
 from tempfile import TemporaryDirectory
-from typing import Union, List, Dict
-import numpy as np  # type: ignore
-import matplotlib.pyplot as plt  # type: ignore
-from matplotlib.ticker import MaxNLocator
+from typing import Dict, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
+import numpy as np  # type: ignore
 import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
+from matplotlib.ticker import MaxNLocator
 
 from constants.fens import FEN_MAPS
 

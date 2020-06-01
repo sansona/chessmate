@@ -1,7 +1,8 @@
 """ Tests for transposition table functionality """
 import random
-import pytest
+
 import chess
+import pytest
 
 from transpositions import *
 
@@ -110,3 +111,13 @@ def test_zobrist_hash_function_side_invariate(zobrist_hash_table):
     )
 
     assert white_play_hash == black_play_hash
+
+
+def test_transposition_table_stores_zobrist_hash(zobrist_hash_table):
+    """ Tests that TranspositionTable stores zobrist hash in table """
+    # Initialize table w/ defined hash function
+    table = TranspositionTable(zobrist_hash_function)
+    table.hash_table = zobrist_hash_table
+    table.hash_board_to_table(chess.Board())
+    breakpoint()
+    assert table.table == {KNOWN_ZOBRIST_STARTING_HASH: 0}

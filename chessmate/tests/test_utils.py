@@ -1,13 +1,14 @@
 """ Test suite for assortment of helper functions """
 import os
+
 import chess
 import chess.pgn
 import pytest
 
 from analysis import StandardEvaluation
+from constants import *
 from engines import ScholarsMate
 from simulations import ChessPlayground
-from constants import *
 from utils import *
 
 

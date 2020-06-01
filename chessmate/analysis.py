@@ -1,15 +1,15 @@
 """ Functions for analyzing board states and results of games """
 from typing import Dict
 
-import numpy as np  # type: ignore
 import chess  # type: ignore
+import numpy as np  # type: ignore
 
-from utils import get_piece_value_from_table
+from constants.misc import PIECE_NAMES
 from constants.piece_values import (
     CONVENTIONAL_PIECE_VALUES,
     PIECE_TABLE_CONVENTIONAL,
 )
-from constants.misc import PIECE_NAMES
+from utils import get_piece_value_from_table
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
