@@ -2,10 +2,8 @@
 import chess  # type: ignore
 import pytest  # type: ignore
 
-from constants.piece_values import (
-    CONVENTIONAL_PIECE_VALUES,
-    FISCHER_PIECE_VALUES,
-)
+from constants.piece_values import (CONVENTIONAL_PIECE_VALUES,
+                                    FISCHER_PIECE_VALUES)
 from heuristics import *
 
 
