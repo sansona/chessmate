@@ -44,7 +44,9 @@ class TranspositionTable:
         stored_values (Dict[int, int]): table to store results
 
     Methods:
-        hash_current_board (chess.Board): hashes and evaluates
+        hash_current_board (chess.Board): hashes current board WITHOUT storing
+            value. Used for checking membership
+        store_current_board (chess.Board): hashes and evaluates
             board based off hash_function and evaluation_function
             respectively, store hashed board eval in stored_values
     """
@@ -82,13 +84,25 @@ class TranspositionTable:
         """
         self._hash_table = new_hash_table
 
-    def hash_current_board(self, board: chess.Board) -> None:
+    def hash_current_board(self, board: chess.Board) -> int:
+        """
+        Hashes current board WITHOUT storing hash.
+
+        Args:
+            board (chess.Board): board state
+        Returns:
+            (int)
+        """
+        hash_ = self.hash_function(board, self._hash_table)
+        return hash_
+
+    def store_current_board(self, board: chess.Board) -> None:
         """
         Adds hashed boardstate to stored_values with evaluation
 
         Args:
             board (chess.Board): board state
         """
-        hash_ = self.hash_function(board, self._hash_table)
+        hash_ = self.hash_current_board(board)
         evaluation = self.evaluation_function().evaluate(board)
         self.stored_values[hash_] = evaluation

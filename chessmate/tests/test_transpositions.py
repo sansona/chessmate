@@ -131,7 +131,7 @@ def test_transposition_table_stores_zobrist_hash(known_zobrist_hash):
     # Initialize table w/ defined hash function
     table = TranspositionTable(zobrist_hash_function)
     table.hash_table = known_zobrist_hash[1]
-    table.hash_current_board(chess.Board())
+    table.store_current_board(chess.Board())
 
     # Check that known starting board hash evaluated to 0 and appended to table
     assert table.stored_values == {known_zobrist_hash[0]: 0}
@@ -142,7 +142,7 @@ def test_transposition_table_contains_works(known_zobrist_hash):
     for hashes that exist and False otherwise """
     table = TranspositionTable(zobrist_hash_function)
     table.hash_table = known_zobrist_hash[1]
-    table.hash_current_board(chess.Board())
+    table.store_current_board(chess.Board())
 
     assert known_zobrist_hash[0] in table
 
@@ -154,7 +154,7 @@ def test_transposition_table_with_random_hash_stores_data():
 
     # Note that this test uses a randomly generated hash table, NOT
     # the seeded one
-    table.hash_current_board(
+    table.store_current_board(
         chess.Board(fen="8/8/3q4/3k4/8/8/8/3K4 w - - 0 1")
     )
     assert len(table) == 1
@@ -166,7 +166,7 @@ def test_nonstandard_eval_transposition_stores_correct_standard_eval():
     standard starting board """
     table = TranspositionTable(zobrist_hash_function)
     table.evaluation_function = PiecePositionEvaluation
-    table.hash_current_board(chess.Board())
+    table.store_current_board(chess.Board())
     piece_position_starting_eval = -340
 
     assert piece_position_starting_eval in table.stored_values.values()
@@ -178,7 +178,7 @@ def test_nonstandard_eval_transposition_stores_correct_random_board_eval():
     in progress board """
     table = TranspositionTable(zobrist_hash_function)
     table.evaluation_function = PiecePositionEvaluation
-    table.hash_current_board(
+    table.store_current_board(
         chess.Board(fen="8/8/8/3kq3/8/8/4Q3/4K3 w - - 0 1")
     )
     piece_position_in_progress_eval = 45
@@ -206,7 +206,7 @@ def test_multiple_moves_stored_in_transposition_table(known_zobrist_hash):
         board_pos = chess.Board(fen=fen)
         _hash = zobrist_hash_function(board_pos, known_zobrist_hash[1])
         opening_sequence_zobrist_hashes.append(_hash)
-        table.hash_current_board(chess.Board(fen=fen))
+        table.store_current_board(chess.Board(fen=fen))
 
     # Check that all hashes of moves are in table
     assert all(
@@ -242,7 +242,7 @@ def test_multiple_moves_stored_in_transposition_table_nonstandard_eval(
         # Hash fen and map to correct eval in opening_sequence_zobrist_hashes
         _hash = zobrist_hash_function(board_pos, known_zobrist_hash[1])
         opening_sequence_zobrist_hashes[_hash] = opening_sequence_fen[fen]
-        table.hash_current_board(chess.Board(fen=fen))
+        table.store_current_board(chess.Board(fen=fen))
 
     # Check that values stored in transposition table are same as those from
     # known hashes

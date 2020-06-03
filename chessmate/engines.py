@@ -11,6 +11,7 @@ from analysis import StandardEvaluation
 from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 from heuristics import MVV_LVA
 from utils import get_piece_at
+from transpositions import TranspositionTable, zobrist_hash_function
 
 
 class BaseEngine:
@@ -353,6 +354,8 @@ class MiniMax(BaseEngine):
         beta (float): beta value in pruning, default= inf
         move_ordering (bool): True to utilize move ordering heuristic
         ordering_heuristic (Callable): heuristic for move ordering
+        transposition-table (TranspositionTable): transposition table to
+            store hashes. Init with default zobrist hash
 
     Methods:
         minimax(base_board, maximizing, depth): main algorithmic loop for
@@ -370,6 +373,7 @@ class MiniMax(BaseEngine):
         self.beta: float = float("inf")
         self.move_ordering = True
         self.ordering_heuristic = MVV_LVA
+        self.transposition_table = TranspositionTable(zobrist_hash_function)
 
     @property
     def depth(self) -> int:
@@ -429,7 +433,16 @@ class MiniMax(BaseEngine):
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, False, depth - 1, alpha, beta)
+                # Hash current board and check for membership in transposition
+                # table
+                hash_ = self.transposition_table.hash_current_board(base_board)
+                if hash_ in self.transposition_table:
+                    val = self.transposition_table.stored_values[hash_]
+                else:
+                    # If current board not yet hashed, use minimax to eval
+                    val = self.minimax(
+                        base_board, False, depth - 1, alpha, beta
+                    )
                 popped_move = base_board.pop()
 
                 if val > max_val:
@@ -457,8 +470,15 @@ class MiniMax(BaseEngine):
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, True, depth - 1, alpha, beta)
+                hash_ = self.transposition_table.hash_current_board(base_board)
+                if hash_ in self.transposition_table:
+                    val = self.transposition_table.stored_values[hash_]
+                else:
+                    val = self.minimax(
+                        base_board, True, depth - 1, alpha, beta
+                    )
                 popped_move = base_board.pop()
+
                 if val < min_val:
                     min_val = val
                     if (not self.color) and (depth == self._depth):
