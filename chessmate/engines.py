@@ -10,8 +10,8 @@ import chess.pgn  # type: ignore
 from analysis import StandardEvaluation
 from constants.piece_values import CONVENTIONAL_PIECE_VALUES
 from heuristics import MVV_LVA
-from utils import get_piece_at
 from transpositions import TranspositionTable, zobrist_hash_function
+from utils import get_piece_at
 
 
 class BaseEngine:
