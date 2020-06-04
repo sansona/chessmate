@@ -5,8 +5,8 @@ import chess  # type: ignore
 import numpy as np  # type: ignore
 
 from constants.misc import PIECE_NAMES
-from constants.piece_values import (CONVENTIONAL_PIECE_VALUES,
-                                    PIECE_TABLE_CONVENTIONAL)
+from constants.piece_values import (ConventionalPieceTable,
+                                    ConventionalPieceValues)
 from utils import get_piece_value_from_table
 
 
@@ -73,7 +73,7 @@ class EvaluationFunction:
     def __init__(self):
         self.name: str = "Base Evaluation Function"
         self.evaluations: Dict[str, int] = {}
-        self.piece_values: Dict[str, int] = CONVENTIONAL_PIECE_VALUES
+        self.piece_values: Dict[str, int] = ConventionalPieceValues
 
     def evaluate(self, board: chess.Board) -> int:
         """
@@ -114,7 +114,7 @@ class StandardEvaluation(EvaluationFunction):
             piece = board.piece_type_at(square)
             color = board.color_at(square)
             if piece:
-                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                piece_value = self.piece_values[PIECE_NAMES[piece]].value
                 if not color:
                     # BLACK encoded as False
                     piece_value *= -1
@@ -142,7 +142,7 @@ class PiecePositionEvaluation(EvaluationFunction):
         """ See parent docstring """
         super().__init__()
         self.name = "Piece Position"
-        self.value_tables: Dict[str, np.ndarray] = PIECE_TABLE_CONVENTIONAL
+        self.value_tables: Dict[str, np.ndarray] = ConventionalPieceTable
 
     def evaluate(self, board: chess.Board) -> int:
         """
@@ -162,7 +162,7 @@ class PiecePositionEvaluation(EvaluationFunction):
             if piece:
                 # Get base piece value, add position based value from
                 # piece value table
-                piece_value = self.piece_values[PIECE_NAMES[piece]]
+                piece_value = self.piece_values[PIECE_NAMES[piece]].value
                 piece_value += get_piece_value_from_table(
                     PIECE_NAMES[piece], color, square, self.value_tables
                 )

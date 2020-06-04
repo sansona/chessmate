@@ -57,12 +57,12 @@ def setup_playground():
 def setup_piece_tables():
     """ Sets ups all defined piece tables """
     return [
-        piece_values.PAWN_PIECE_TABLE_CONVENTIONAL,
-        piece_values.KNIGHT_PIECE_TABLE_CONVENTIONAL,
-        piece_values.BISHOP_PIECE_TABLE_CONVENTIONAL,
-        piece_values.ROOK_PIECE_TABLE_CONVENTIONAL,
-        piece_values.QUEEN_PIECE_TABLE_CONVENTIONAL,
-        piece_values.ROOK_PIECE_TABLE_CONVENTIONAL,
+        piece_values.PAWN_ConventionalPieceTable,
+        piece_values.KNIGHT_ConventionalPieceTable,
+        piece_values.BISHOP_ConventionalPieceTable,
+        piece_values.ROOK_ConventionalPieceTable,
+        piece_values.QUEEN_ConventionalPieceTable,
+        piece_values.ROOK_ConventionalPieceTable,
     ]
 
 
@@ -190,11 +190,11 @@ def test_get_piece_value_from_table_white_square():
     """ Tests that get piece_value_from_table function returns
     correct values for white squares"""
     a1_pawn_value = get_piece_value_from_table(
-        "P", chess.WHITE, "a1", piece_values.PIECE_TABLE_CONVENTIONAL
+        "P", chess.WHITE, "a1", piece_values.ConventionalPieceTable
     )
 
     a2_pawn_value = get_piece_value_from_table(
-        "P", chess.WHITE, "a2", piece_values.PIECE_TABLE_CONVENTIONAL
+        "P", chess.WHITE, "a2", piece_values.ConventionalPieceTable
     )
     assert a1_pawn_value == 0
     assert a2_pawn_value == 5
@@ -205,11 +205,11 @@ def test_get_piece_value_from_table_black_square():
     correct values for black squares. Note that black tables are
     rotated 180 from white tables """
     c3_knight_value = get_piece_value_from_table(
-        "N", chess.BLACK, "c3", piece_values.PIECE_TABLE_CONVENTIONAL
+        "N", chess.BLACK, "c3", piece_values.ConventionalPieceTable
     )
 
     d4_knight_value = get_piece_value_from_table(
-        "N", chess.BLACK, "d4", piece_values.PIECE_TABLE_CONVENTIONAL
+        "N", chess.BLACK, "d4", piece_values.ConventionalPieceTable
     )
     assert c3_knight_value == 10
     assert d4_knight_value == 20

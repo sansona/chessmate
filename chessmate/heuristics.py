@@ -5,13 +5,12 @@ from typing import Dict, List
 
 import chess  # type: ignore
 
-from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from constants.piece_values import ConventionalPieceValues
 from utils import get_piece_at
 
 
 def MVV_LVA(
-    board: chess.Board,
-    piece_values: Dict[str, int] = CONVENTIONAL_PIECE_VALUES,
+    board: chess.Board, piece_values: Dict[str, int] = ConventionalPieceValues
 ) -> List[chess.Move]:
     """
     Most Valuable Victim - Least Valuable Aggressor implementation for
@@ -34,7 +33,8 @@ def MVV_LVA(
             victim_piece = get_piece_at(board, str(move)[2:]).upper()
             if aggressor_piece and victim_piece:
                 value_diff = (
-                    piece_values[victim_piece] - piece_values[aggressor_piece]
+                    piece_values[victim_piece].value
+                    - piece_values[aggressor_piece].value
                 )
 
                 if value_diff not in available_captures:

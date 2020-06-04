@@ -8,7 +8,7 @@ import chess  # type: ignore
 import chess.pgn  # type: ignore
 
 from analysis import StandardEvaluation
-from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from constants.piece_values import ConventionalPieceValues
 from heuristics import MVV_LVA
 from transpositions import TranspositionTable, zobrist_hash_function
 from utils import get_piece_at
@@ -54,7 +54,7 @@ class BaseEngine:
         """
         self.name: str = "Base Engine"
         self.legal_moves: Dict[chess.Move, float] = {}
-        self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
+        self.value_mapping: Dict[str, float] = ConventionalPieceValues
         self.evaluation_function = StandardEvaluation()
         self.material_difference: List[float] = []
 
@@ -232,7 +232,9 @@ class CaptureHighestValue(BaseEngine):
             if (not board.is_capture(m)) or (not piece_at_position):
                 self.legal_moves[m] = 0.0
             else:
-                self.legal_moves[m] = self.value_mapping[piece_at_position]
+                self.legal_moves[m] = self.value_mapping[
+                    piece_at_position
+                ].value
 
         self.material_difference.append(
             self.evaluation_function.evaluate(board)
