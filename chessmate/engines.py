@@ -341,8 +341,8 @@ class ScholarsMate(BaseEngine):
 
 class MiniMax(BaseEngine):
     """
-    Implemented with alpha-beta pruning and move ordering via.
-    MVV_LVA by default
+    Implemented with alpha-beta pruning, MVV_LVA move ordering, and a simple
+    transposition table by default
 
     Attributes:
         name (str): name of engine
@@ -445,6 +445,8 @@ class MiniMax(BaseEngine):
                     val = self.minimax(
                         base_board, False, depth - 1, alpha, beta
                     )
+                    # Store hash with evaluation of entire branch
+                    self.transposition_table.stored_values[hash_] = val
                 popped_move = base_board.pop()
 
                 if val > max_val:
@@ -479,6 +481,7 @@ class MiniMax(BaseEngine):
                     val = self.minimax(
                         base_board, True, depth - 1, alpha, beta
                     )
+                    self.transposition_table.stored_values[hash_] = val
                 popped_move = base_board.pop()
 
                 if val < min_val:

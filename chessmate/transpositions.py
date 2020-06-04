@@ -6,7 +6,7 @@ import chess  # type: ignore
 
 from analysis import StandardEvaluation
 from constants.misc import PIECE_INDEXING
-from utils import get_piece_at
+from utils import get_piece_at, is_valid_fen
 
 
 def zobrist_hash_function(board: chess.Board, hash_table: List) -> int:
@@ -46,6 +46,8 @@ class TranspositionTable:
     Methods:
         hash_current_board (chess.Board): hashes current board WITHOUT storing
             value. Used for checking membership
+        get_evaluation_from_fen (fen): gets evaluation of FEN board position
+            from stored_values if position previously evaluated
         store_current_board (chess.Board): hashes and evaluates
             board based off hash_function and evaluation_function
             respectively, store hashed board eval in stored_values
@@ -93,8 +95,23 @@ class TranspositionTable:
         Returns:
             (int)
         """
-        hash_ = self.hash_function(board, self._hash_table)
-        return hash_
+        return self.hash_function(board, self._hash_table)
+
+    def get_evaluation_from_fen(self, fen: str) -> int:
+        """
+        Gets evaluation of position via. FEN string if position evaluation
+        stored
+
+        Args:
+            fen (str): FEN of board state
+        Returns:
+            (int)
+        """
+        if is_valid_fen(fen):
+            hash_ = self.hash_current_board(chess.Board(fen=fen))
+            if hash_ in self.stored_values:
+                return self.stored_values[hash_]
+        return False
 
     def store_current_board(self, board: chess.Board) -> None:
         """

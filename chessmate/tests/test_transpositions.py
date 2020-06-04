@@ -247,3 +247,21 @@ def test_multiple_moves_stored_in_transposition_table_nonstandard_eval(
     # Check that values stored in transposition table are same as those from
     # known hashes
     assert opening_sequence_zobrist_hashes == table.stored_values
+
+
+def test_transposition_table_evaluate_from_fen(known_zobrist_hash):
+    """ Tests that retrieval of hashes from transposition table via.
+    get_evaluation_from_fen retrieves correct value """
+    table = TranspositionTable(zobrist_hash_function)
+    table.hash_table = known_zobrist_hash[1]
+
+    opening_sequence_fen = (
+        "rnbqkbnr/pppppppp/8/8/4P3/8/" "PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+    )
+
+    table.store_current_board(chess.Board(fen=opening_sequence_fen))
+
+    # Since only hash and evaluate one position, check that the right
+    # evaluation is returned
+    returned_eval = table.get_evaluation_from_fen(opening_sequence_fen)
+    assert returned_eval in table.stored_values.values()
