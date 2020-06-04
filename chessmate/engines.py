@@ -8,9 +8,10 @@ import chess  # type: ignore
 import chess.pgn  # type: ignore
 
 from analysis import StandardEvaluation
-from utils import get_piece_at
+from constants.piece_values import ConventionalPieceValues
 from heuristics import MVV_LVA
-from constants.piece_values import CONVENTIONAL_PIECE_VALUES
+from transpositions import TranspositionTable, zobrist_hash_function
+from utils import get_piece_at
 
 
 class BaseEngine:
@@ -46,15 +47,14 @@ class BaseEngine:
             value_mapping (Dict): maps type of piece to value system in
                 form {piece symbol: int}. Use conventional values by default
             evaluation_function (analysis.BoardEvaluation): engine for
-            evaluating
-                board state
+                evaluating board state
             material_difference (List[float]): difference in value on board
                 at each end step based off material as result of
                 evaluation_function's evaluation
         """
-        self.name: str = "Base"
+        self.name: str = "Base Engine"
         self.legal_moves: Dict[chess.Move, float] = {}
-        self.value_mapping: Dict[str, float] = CONVENTIONAL_PIECE_VALUES
+        self.value_mapping: Dict[str, float] = ConventionalPieceValues
         self.evaluation_function = StandardEvaluation()
         self.material_difference: List[float] = []
 
@@ -71,10 +71,8 @@ class BaseEngine:
 
         Args:
             board (chess.board): current board state in python-chess object
-
         Raises:
             NotImplementedError: if not redefined in child class
-
         Returns:
             (Dict[chess.Move: float]): dict mapping uci moves to
                 evaluated value metric
@@ -87,10 +85,8 @@ class BaseEngine:
 
         Args:
             board (chess.board): current board state in python-chess object
-
         Raises:
             NotImplementedError: if not redefined in child class
-
         Returns:
             (chess.Move): uci notation object of chosen move
         """
@@ -236,7 +232,9 @@ class CaptureHighestValue(BaseEngine):
             if (not board.is_capture(m)) or (not piece_at_position):
                 self.legal_moves[m] = 0.0
             else:
-                self.legal_moves[m] = self.value_mapping[piece_at_position]
+                self.legal_moves[m] = self.value_mapping[
+                    piece_at_position
+                ].value
 
         self.material_difference.append(
             self.evaluation_function.evaluate(board)
@@ -343,8 +341,8 @@ class ScholarsMate(BaseEngine):
 
 class MiniMax(BaseEngine):
     """
-    Implemented with alpha-beta pruning and move ordering via.
-    MVV_LVA by default
+    Implemented with alpha-beta pruning, MVV_LVA move ordering, and a simple
+    transposition table by default
 
     Attributes:
         name (str): name of engine
@@ -358,6 +356,8 @@ class MiniMax(BaseEngine):
         beta (float): beta value in pruning, default= inf
         move_ordering (bool): True to utilize move ordering heuristic
         ordering_heuristic (Callable): heuristic for move ordering
+        transposition-table (TranspositionTable): transposition table to
+            store hashes. Init with default zobrist hash
 
     Methods:
         minimax(base_board, maximizing, depth): main algorithmic loop for
@@ -375,6 +375,7 @@ class MiniMax(BaseEngine):
         self.beta: float = float("inf")
         self.move_ordering = True
         self.ordering_heuristic = MVV_LVA
+        self.transposition_table = TranspositionTable(zobrist_hash_function)
 
     @property
     def depth(self) -> int:
@@ -407,14 +408,15 @@ class MiniMax(BaseEngine):
         beta: float,
     ) -> float:
         """
-        Evaluate result of each legal move on board via. minimax algorithm
+        Recursively evaluate result of each legal move on board via. minimax
+        algorithm
         Reference: https://www.youtube.com/watch?v=l-hh51ncgDI
 
         Args:
             base_board (chess.Board): current board state
             maximizing (bool): True for white, False for black
             depth (int): depth to search. Init at self._depth for base. Note:
-                    depth=>3 will be computationally slow for most CPUs
+                depth=>3 will be computationally slow for most CPUs
         """
         if depth == 0 or base_board.is_game_over():
             return self.evaluation_function.evaluate(base_board)
@@ -433,7 +435,18 @@ class MiniMax(BaseEngine):
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, False, depth - 1, alpha, beta)
+                # Hash current board and check for membership in transposition
+                # table
+                hash_ = self.transposition_table.hash_current_board(base_board)
+                if hash_ in self.transposition_table:
+                    val = self.transposition_table.stored_values[hash_]
+                else:
+                    # If current board not yet hashed, use minimax to eval
+                    val = self.minimax(
+                        base_board, False, depth - 1, alpha, beta
+                    )
+                    # Store hash with evaluation of entire branch
+                    self.transposition_table.stored_values[hash_] = val
                 popped_move = base_board.pop()
 
                 if val > max_val:
@@ -461,8 +474,16 @@ class MiniMax(BaseEngine):
 
             for move in legal_moves:
                 base_board.push_uci(str(move))
-                val = self.minimax(base_board, True, depth - 1, alpha, beta)
+                hash_ = self.transposition_table.hash_current_board(base_board)
+                if hash_ in self.transposition_table:
+                    val = self.transposition_table.stored_values[hash_]
+                else:
+                    val = self.minimax(
+                        base_board, True, depth - 1, alpha, beta
+                    )
+                    self.transposition_table.stored_values[hash_] = val
                 popped_move = base_board.pop()
+
                 if val < min_val:
                     min_val = val
                     if (not self.color) and (depth == self._depth):

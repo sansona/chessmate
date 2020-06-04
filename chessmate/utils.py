@@ -1,19 +1,19 @@
 """ Utility functions """
 import time
+from collections import Counter
 from contextlib import contextmanager
 from io import StringIO
 from pathlib import Path
-from collections import Counter
 from tempfile import TemporaryDirectory
-from typing import Union, List, Dict
-import numpy as np  # type: ignore
-import matplotlib.pyplot as plt  # type: ignore
-from matplotlib.ticker import MaxNLocator
+from typing import Dict, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
+import numpy as np  # type: ignore
 import pytest  # type: ignore
 from IPython.display import SVG, clear_output, display  # type: ignore
+from matplotlib.ticker import MaxNLocator  # type: ignore
 
 from constants.fens import FEN_MAPS
 
@@ -36,11 +36,9 @@ def is_valid_fen(fen: str) -> bool:
 
     Args:
         fen (str): fen notation of board
-
     Raises:
         TypeError: if type(fen) not str
         ValueError: if fen is string but isn't in FEN format
-
     Returns:
         (bool): True if valid
     """
@@ -64,6 +62,7 @@ def get_square_at_position(position: Union[str, chess.Square]) -> chess.Square:
     Returns:
         (chess.Square)
     """
+    # Convert from string to chess.square via characters in string
     if isinstance(position, str):
         file, rank = ord(position[0].lower()) - 97, int(position[1]) - 1
         square = chess.square(file, rank)
@@ -82,16 +81,11 @@ def get_piece_at(
     Args:
         board (chess.Board): current board state in python-chess object
         position (str/chess.Square): position of square i.e chess.A1 or "A1"
-
-    Raises:
-        AttributeError: if no piece on board at position
-
     Returns:
         (str): symbol of piece at square if any
     """
     # Convert position to chess.Square
     square = get_square_at_position(position)
-
     piece = board.piece_at(square)
 
     if piece:
@@ -159,12 +153,15 @@ def walkthrough_pgn(
         fen (str): fen notation of board. Default to standard
         delay(float): time between moves for display to update
     """
+    # Load board as IO stream
     pgn_io = StringIO(str(pgn_obj))
     game = chess.pgn.read_game(pgn_io)
     board = chess.Board(fen=fen)
     game.setup(board=board)
     move_count = 1
 
+    # Make temporary directory, save SVG of each board state in
+    # tempdir, and display in console with delay between each display
     with TemporaryDirectory() as temp:
         for move in game.mainline_moves():
             mover = "White" if move_count % 2 == 0 else "Black"
@@ -189,17 +186,23 @@ def export_pgn(pgn_obj: chess.pgn.Game, fname: Union[str, Path]) -> None:
     print(pgn_obj, file=open(fname, "w"), end="\n\n")
 
 
-def walkthrough_pgn_file(fname: Union[str, Path], delay: float = 1.0) -> None:
+def walkthrough_pgn_file(
+    fname: Union[str, Path],
+    fen: str = FEN_MAPS["standard"],
+    delay: float = 1.0,
+) -> None:
     """
-    Wrapper for walkthrough_pgn for when loading pgn directly from file
+    Wrapper for walkthrough_pgn for when loading pgn directly from file.
+    Similar to walkthrough_pgn, designed to be loaded in IPython
 
     Args:
         fname (str/Path): path to pgn file
+        fen (str): fen notation of board. Default to standard
         delay (float): time between moves for display to update
     """
     pgn = open(fname, encoding="utf-8")
     game = chess.pgn.read_game(pgn)
-    walkthrough_pgn(game, delay=delay)
+    walkthrough_pgn(game, fen=fen, delay=delay)
 
 
 def display_all_results(all_results: List[str]) -> Counter:
@@ -294,7 +297,7 @@ def get_piece_value_from_table(
     piece_color: Union[bool, chess.Color],
     position: Union[str, chess.Square],
     piece_value_tables: Dict[str, np.ndarray],
-):
+) -> int:
     """
     Gets value of piece from set of defined piece_value_tables
 
@@ -306,9 +309,8 @@ def get_piece_value_from_table(
             square
         piece_value_table (Dict[str, np.ndarray]): Mapping of pieces to
             piece_value_tables to be used
-
     Return:
-        (float): value of piece at position for piece_value_table
+        (int): value of piece at position for piece_value_table
     """
     # For black eval, rotate table 180 deg
     if not piece_color:

@@ -1,7 +1,7 @@
 """ Test suite for assortment of analysis functions """
-import chess
-import chess.pgn
-import pytest
+import chess  # type: ignore
+import chess.pgn  # type: ignore
+import pytest  # type: ignore
 
 from analysis import *
 
@@ -77,7 +77,7 @@ def evaluation_engines():
     Returns:
         (List)
     """
-    return [StandardEvaluation()]
+    return [StandardEvaluation(), PiecePositionEvaluation()]
 
 
 def test_evaluate_ending_for_white_win_position():

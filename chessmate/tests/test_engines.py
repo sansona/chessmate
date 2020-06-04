@@ -1,7 +1,9 @@
 """ Test suite for engines """
-import chess
-import chess.pgn
-import pytest
+from typing import List
+
+import chess  # type: ignore
+import chess.pgn  # type: ignore
+import pytest  # type: ignore
 
 from constants.fens import FEN_MAPS
 from engines import *
@@ -292,7 +294,7 @@ def test_minimax_no_pruning_captures_obvious_pieces(minimax_engines):
         f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR b KQkq - 0 1"
     )
 
-    # White should capture blacks queen and vice-versa
+    # White should capture black's queen and vice-versa
     board = chess.Board(fen=capture_black_queen)
     assert str(white_minimax.move(board)) == "f4c4"
 

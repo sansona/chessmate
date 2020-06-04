@@ -1,12 +1,9 @@
 """ Collection of tests for heuristics """
-import chess
-import pytest
+import chess  # type: ignore
+import pytest  # type: ignore
 
+from constants.piece_values import ConventionalPieceValues, FischerPieceValues
 from heuristics import *
-from constants.piece_values import (
-    CONVENTIONAL_PIECE_VALUES,
-    FISCHER_PIECE_VALUES,
-)
 
 
 def test_mvv_lva_conventional_returns_sorted_captures():
@@ -24,6 +21,7 @@ def test_mvv_lva_conventional_returns_sorted_captures():
     pawn_capture_knight = chess.Move.from_uci("g3f4")
     pawn_capture_bishop = chess.Move.from_uci("f3e4")
     knight_capture_knight = chess.Move.from_uci("d3f4")
+
     captures_sorted = [
         pawn_capture_queen,
         knight_capture_queen,
@@ -32,7 +30,7 @@ def test_mvv_lva_conventional_returns_sorted_captures():
         knight_capture_knight,
     ]
 
-    assert MVV_LVA(board, CONVENTIONAL_PIECE_VALUES) == captures_sorted
+    assert MVV_LVA(board, ConventionalPieceValues) == captures_sorted
 
 
 def test_mvv_lva_fischer_returns_sorted_captures():
@@ -50,7 +48,7 @@ def test_mvv_lva_fischer_returns_sorted_captures():
     # Since Fischer values rank bishop over knight, should prioritize bishop
     captures_sorted = [pawn_capture_bishop, pawn_capture_knight]
 
-    assert MVV_LVA(board, FISCHER_PIECE_VALUES) == captures_sorted
+    assert MVV_LVA(board, FischerPieceValues) == captures_sorted
 
 
 def test_mvv_lva_no_captures_returns_random_sorted():
