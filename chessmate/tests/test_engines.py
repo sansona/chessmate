@@ -268,20 +268,8 @@ def test_minimax_no_pruning_captures_obvious_pieces(minimax_engines):
     white_minimax.alpha_beta_pruning = False
     black_minimax.alpha_beta_pruning = False
 
-<<<<<<< HEAD
-    capture_black_queen = (
-        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR w KQkq - 0 1"
-    )
-    capture_white_queen = (
-        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR b KQkq - 0 1"
-    )
-
-    # White should capture black's queen and vice-versa
-    board = chess.Board(fen=capture_black_queen)
-=======
     # White should capture blacks queen and vice-versa
     board = chess.Board(fen=load_fen("capture_black_queen_2"))
->>>>>>> 92d995c... Refactored misc fen to fen_fixtures file
     assert str(white_minimax.move(board)) == "f4c4"
 
     board = chess.Board(fen=load_fen("capture_white_queen_2"))

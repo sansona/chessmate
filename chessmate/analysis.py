@@ -5,8 +5,8 @@ import chess  # type: ignore
 import numpy as np  # type: ignore
 
 from constants.misc import PIECE_NAMES
-from constants.piece_values import (CONVENTIONAL_PIECE_VALUES,
-                                    PIECE_TABLE_CONVENTIONAL)
+from constants.piece_values import (ConventionalPieceValues,
+                                    ConventionalPieceTable)
 from utils import get_piece_value_from_table
 
 
