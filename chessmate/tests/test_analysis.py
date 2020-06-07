@@ -4,6 +4,7 @@ import chess.pgn  # type: ignore
 import pytest  # type: ignore
 
 from analysis import *
+from utils import load_fen
 
 
 @pytest.fixture
@@ -27,10 +28,8 @@ def in_progress_board():
     Returns:
         (chess.Board)
     """
-    in_progress_fen = (
-        "2kr1bnr/2ppqppp/p7/2p1p3/" "3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0 1"
-    )
-    board = chess.Board(fen=in_progress_fen)
+
+    board = chess.Board(fen=load_fen("in_progress_fen"))
     return board
 
 
@@ -42,15 +41,8 @@ def not_mated_boards():
     Returns:
         List[chess.Board]
     """
-    not_mated_fen = [
-        (
-            "r1b1kbnr/ppp1qQp1/2np3p/4p3/"
-            "2BNP3/8/PPPP1PPP/RNB1K2R w KQkq - 0 1"
-        ),
-        ("rnbqkbnr/pp1ppppp/2p5/8/" "4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"),
-    ]
 
-    return [chess.Board(fen=f) for f in not_mated_fen]
+    return [chess.Board(fen=f) for f in load_fen("not_mated_fens")]
 
 
 @pytest.fixture
@@ -61,12 +53,7 @@ def stalemate_boards():
     Returns:
         List[chess.Board]
     """
-    stalemate_fen = [
-        "8/8/8/8/8/4k3/4p3/4K3 w - - 0 1",
-        "8/8/8/8/8/4k3/4p3/4K3 w - - 0 1",
-    ]
-
-    return [chess.Board(fen=f) for f in stalemate_fen]
+    return [chess.Board(fen=load_fen("stalemate_fen"))]
 
 
 @pytest.fixture
@@ -82,7 +69,7 @@ def evaluation_engines():
 
 def test_evaluate_ending_for_white_win_position():
     """ Tests that boards correspond to mate are correctly evaluated """
-    white_to_mate = chess.Board(fen="8/8/8/2Q1k3/6Q1/3Q1Q2/4K3/8 w - - 0 1")
+    white_to_mate = chess.Board(fen=load_fen("white_to_mate"))
     white_to_mate.push_uci("d3e4")
 
     assert evaluate_ending_board(white_to_mate) == "White win by mate"
