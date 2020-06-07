@@ -1,5 +1,5 @@
 # chessmate
-> chessmate is a python package built around ```python-chess``` that enables a programmatic approach to analyses and defining of chess engines.
+> chessmate is a framework built around ```python-chess``` that enables a programmatic approach to analyses and defining of chess engines.
 
 ## Usage
 
@@ -13,8 +13,10 @@ Examples of some simple engines included in ```chessmate``` are:
   2. ```PrioritizePawnMoves``` - prioritizes all moves pawn related
   3. ```CaptureHighestValue``` - prioritize capturing the highest value piece available
   4. ```ScholarsMate``` - obeys standard Scholar's Mate sequence and resigns if unsuccessful
+  
+Also included in the ```engines``` is the ```MiniMax``` engine, which utilizes the MiniMax algorithm to evaluate board states. The MiniMax algorithm provided comes with most bells and whistles: alpha-beta pruning, move ordering via. MVV-LVA, and a transposition table.
 
-Since almost all chess engines can be boiled down to this basic progression, the chessmate engine schema provides a simple but powerful framework for developing and analyzing engines
+Since almost all chess engines can be boiled down to this basic progression, the chessmate engine schema provides a simple but powerful framework for developing and analyzing engines. More powerful chess engines (Stockfish, DeepBlue, etc) can be written to fit this schema and thus be analyzed within ```chessmate```.
 
 ### Evaluation functions
 Each engine consists of an evaluation function which inherits from ```chessmate.analysis.EvaluationFunction```. An evaluation function can be defined mathematically as ```f(boardstate) = evaluation``` where evaluation is a numeric representation of the state of the board. If we expand the definition of an engine to ```f(eval_function(boardstate)) = move```, we can start optimizing engines via. the evaluation function. 
@@ -27,6 +29,17 @@ Each engine is by default configured with the ```StandardEvaluation``` function 
 
 ### Piece values and piece value tables
 Each evaluation function utilizes defined piece values and piece value tables from ```chessmate.constants.piece_values```. Piece values provide the fundamental value of a piece on a board. By defining the value of each piece under a given condition, the evaluation function can be made to prioritize certain pieces, boardstates, or strategies.
+
+### Move ordering
+```chessmate``` engines come predefined with move-ordering capabilities defined in ```heuristics.py```. Move ordering is defined as a heuristic function which is then incorporated into the engine. For example, adding SEE move ordering to the minimax algorithm is as simple as:
+```
+def SEE(board: chess.Board) - > List[chess.Move]:
+  """ Move ordering via SEE algorithm """
+  pass
+  
+minimax = MiniMax(color=chess.WHITE)
+minimax.ordering_heuristic = SEE
+```
   
 ---
 ### Game simulations
