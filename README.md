@@ -1,4 +1,5 @@
 # chessmate
+[![Build Status](https://travis-ci.org/sansona/chessmate.svg?branch=master)](https://travis-ci.org/sansona/chessmate)
 > chessmate is a framework built around ```python-chess``` that enables a programmatic approach to analyses and defining of chess engines.
 
 ## Usage
@@ -102,6 +103,6 @@ walkthrough_pgn(simulation.game_pgns[0])
 ## Meta
 Jiaming Chen –  jiaming.justin.chen@gmail.com
 
-Distributed under the MIT license. See ``LICENSE`` for more information.
+Distributed under the GPL 3 (or any later version) license. See ``LICENSE`` for more information.
 
 [https://github.com/sansona/chessmate](https://github.com/sansona/)
