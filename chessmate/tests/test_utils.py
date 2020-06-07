@@ -33,10 +33,8 @@ def in_progress_board():
     Returns:
         (chess.Board)
     """
-    in_progress_fen = (
-        "2kr1bnr/2ppqppp/p7/2p1p3/" "3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0 1"
-    )
-    board = chess.Board(fen=in_progress_fen)
+
+    board = chess.Board(fen=load_fen("in_progress_fen"))
     return board
 
 
@@ -64,6 +62,19 @@ def setup_piece_tables():
         piece_values.QUEEN_ConventionalPieceTable,
         piece_values.ROOK_ConventionalPieceTable,
     ]
+
+
+def test_load_fen_retrieves_existing_fen():
+    """ Tests that load fen function retrieves fen that exists """
+    pre_existing_fen = load_fen("starting_fen")
+    assert pre_existing_fen == chess.STARTING_FEN
+
+
+def test_load_fen_retrieves_undefined_fen():
+    """ Tests that load fen function returns empty string for FEN that
+    hasn't been defined """
+    nonexistent_fen = load_fen("nonexistent_fen")
+    assert not nonexistent_fen
 
 
 def test_get_square_at_position_lowercase_str():

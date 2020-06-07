@@ -10,7 +10,7 @@ import pytest
 
 from engines import AvoidCapture, CaptureHighestValue
 from simulations import *
-from utils import not_raises
+from utils import load_fen, not_raises
 
 N_GAMES = 10
 
@@ -36,9 +36,7 @@ def setup_engines():
 def test_engineplay_board_setter_with_valid_fen_no_errors(setup_engineplay):
     """ Tests that setting a valid FEN string to EnginePlay raises no
     errors """
-    setup_engineplay.board = (
-        "r1bqkbnr/ppp1pppp/8/3p4/3nP3/" "2N2N2/PPP2PPP/R1B1KB1R w KQkq - 0 1"
-    )
+    setup_engineplay.board = load_fen("in_progress_fen")
 
 
 def test_engineplay_board_setter_with_invalid_fen_typeerror(setup_engineplay):

@@ -8,6 +8,7 @@ import pytest  # type: ignore
 from constants.fens import FEN_MAPS
 from engines import *
 from simulations import ChessPlayground
+from utils import load_fen
 
 
 @pytest.fixture
@@ -32,20 +33,10 @@ def modified_boards() -> List[tuple]:
     Returns:
         {List[tuple]}
     """
-    capture_black_knight = (
-        "r1bqkbnr/ppp1pppp/8/3p4/3nP3/" "2N2N2/PPP2PPP/R1B1KB1R w KQkq - 0 1"
-    )
-    capture_black_queen = (
-        "rnb1kbnr/pppp1ppp/8/3qp3/" "4P3/5N2/PPP1QPPP/RNB1KB1R w KQkq - 0 1"
-    )
-    capture_rook_or_knight = (
-        "r1bqkbnr/pppppp1p/6p1/8/1n1B4/" "2P5/PP2PPPP/RN1QKBNR w KQkq - 0 1"
-    )
-
     return [
-        (chess.Board(fen=capture_black_knight), "f3d4"),
-        (chess.Board(fen=capture_black_queen), "e4d5"),
-        (chess.Board(fen=capture_rook_or_knight), "d4h8"),
+        (chess.Board(fen=load_fen("capture_black_knight")), "f3d4"),
+        (chess.Board(fen=load_fen("capture_black_queen")), "e4d5"),
+        (chess.Board(fen=load_fen("capture_rook_or_knight")), "d4h8"),
     ]
 
 
@@ -137,15 +128,12 @@ def test_scholars_mate_resigns_when_sequence_interrupted():
     engine = ScholarsMate()
 
     # In both board states, white is interrupted from completed sequence
-    blocked_queen_fen = (
-        "r1bqkbnr/pppp1p1p/2n3p1/4p2Q/"
-        "2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
-    )
-    captured_queen_fen = (
-        "r1b1kbnr/pppp1ppp/2n5/4p2q/" "2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
-    )
+    interrupted_fen_sequences = [
+        load_fen("blocked_queen_fen"),
+        load_fen("captured_queen_fen"),
+    ]
 
-    for interrupted_fen in (blocked_queen_fen, captured_queen_fen):
+    for interrupted_fen in interrupted_fen_sequences:
         board = chess.Board(fen=interrupted_fen)
         assert engine.move(board) == chess.Move.null()
 
@@ -246,10 +234,10 @@ def test_minimax_depth_1_evaluation_captures(minimax_engines, modified_boards):
 def test_minimax_depth_2_evaluation_captures(minimax_engines):
     """ Tests that minimax at depth 2 sees moves 2 steps ahead
     i.e obvious forks """
-    black_knight_fork_fen = (
-        "rnb1kb1r/ppppp1pp/8/8/3n4/8/" "PPPP1PPP/RNB1KBNR b KQkq - 0 1"
-    )
-    fork_boards = [(chess.Board(fen=black_knight_fork_fen), "d4c2")]
+
+    fork_boards = [
+        (chess.Board(fen=load_fen("black_knight_fork_fen")), "d4c2")
+    ]
 
     engine = minimax_engines[1]
     engine.alpha_beta_pruning = False
@@ -264,18 +252,11 @@ def test_minimax_evaluates_correct_side(minimax_engines):
     as white"""
     white_minimax, black_minimax = minimax_engines
 
-    capture_black_queen = (
-        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR w KQkq - 0 1"
-    )
-    capture_white_queen = (
-        f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR b KQkq - 0 1"
-    )
-
     # White should capture blacks queen and vice-versa
-    board = chess.Board(fen=capture_black_queen)
+    board = chess.Board(fen=load_fen("capture_black_queen_2"))
     assert str(white_minimax.move(board)) == "f4c4"
 
-    board = chess.Board(fen=capture_white_queen)
+    board = chess.Board(fen=load_fen("capture_white_queen_2"))
     assert str(black_minimax.move(board)) == "c4f4"
 
 
@@ -287,6 +268,7 @@ def test_minimax_no_pruning_captures_obvious_pieces(minimax_engines):
     white_minimax.alpha_beta_pruning = False
     black_minimax.alpha_beta_pruning = False
 
+<<<<<<< HEAD
     capture_black_queen = (
         f"rnb1kbnr/pppppppp/8/8/2q2Q2/8/" f"PPPPPPPP/RNB1KBNR w KQkq - 0 1"
     )
@@ -296,7 +278,11 @@ def test_minimax_no_pruning_captures_obvious_pieces(minimax_engines):
 
     # White should capture black's queen and vice-versa
     board = chess.Board(fen=capture_black_queen)
+=======
+    # White should capture blacks queen and vice-versa
+    board = chess.Board(fen=load_fen("capture_black_queen_2"))
+>>>>>>> 92d995c... Refactored misc fen to fen_fixtures file
     assert str(white_minimax.move(board)) == "f4c4"
 
-    board = chess.Board(fen=capture_white_queen)
+    board = chess.Board(fen=load_fen("capture_white_queen_2"))
     assert str(black_minimax.move(board)) == "c4f4"

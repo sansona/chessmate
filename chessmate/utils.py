@@ -12,6 +12,7 @@ import chess.pgn  # type: ignore
 import matplotlib.pyplot as plt  # type: ignore
 import numpy as np  # type: ignore
 import pytest  # type: ignore
+import yaml
 from IPython.display import SVG, clear_output, display  # type: ignore
 from matplotlib.ticker import MaxNLocator  # type: ignore
 
@@ -28,6 +29,20 @@ def not_raises(exception):
         yield
     except exception:
         raise pytest.fail(f"DID RAISE {exception}")
+
+
+def load_fen(fen_name):
+    """
+    Loads predefined FENs from fen_fixtures
+
+    Args:
+        fen_name (str): name of predefined FEN in yaml file
+    Returns:
+        (str)
+    """
+    with open("tests/fen_fixtures.yaml") as f:
+        fen_dict = yaml.safe_load(f)
+        return fen_dict.get(fen_name)
 
 
 def is_valid_fen(fen: str) -> bool:
