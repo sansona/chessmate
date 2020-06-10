@@ -5,11 +5,11 @@ from typing import Callable, Dict, List, Union
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import chess.svg  # type: ignore
+from chessmate.constants.fens import FEN_MAPS
+from chessmate.constants.misc import COLOR_MAP
 from tqdm import tqdm  # type: ignore
 
 from analysis import evaluate_ending_board
-from constants.fens import FEN_MAPS
-from constants.misc import COLOR_MAP
 from utils import is_valid_fen, render_svg_board
 
 
