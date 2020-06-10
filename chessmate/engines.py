@@ -6,9 +6,9 @@ from typing import Dict, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
-from chessmate.constants.piece_values import ConventionalPieceValues
 
 from analysis import StandardEvaluation
+from chessmate.constants.piece_values import ConventionalPieceValues
 from heuristics import MVV_LVA
 from transpositions import TranspositionTable, zobrist_hash_function
 from utils import get_piece_at
