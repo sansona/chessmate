@@ -1,4 +1,4 @@
-""" Repository for FEN constants used across library """
+""" Repository for FEN constants.used across library """
 
 # maps commonly used FENs to unique strs
 pawns = "pppppppp"

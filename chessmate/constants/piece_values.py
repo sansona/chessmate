@@ -1,4 +1,4 @@
-""" Repository for piece value constants used across library """
+""" Repository for piece value constants.used across library """
 from enum import Enum
 
 import numpy as np  # type: ignore
