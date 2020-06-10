@@ -108,6 +108,12 @@ walkthrough_pgn(simulation.game_pgns[0])
 ![display](https://user-images.githubusercontent.com/17757035/82768462-07f7b500-9de4-11ea-83ec-97975e9e9017.png)
 
 ---
+## Contributing
+Contributions at all levels are welcome! I'm happy to discuss with anyone
+the potential for contributions. Please see ```CONTRIBUTING.md``` for some
+general guidelines and message [me](mailto:jiaming.justin.chen@gmail.com) with any questions!
+
+---
 ## Meta
 Jiaming Chen –  jiaming.justin.chen@gmail.com
 
