@@ -2,14 +2,13 @@
 import random
 import sys
 
+sys.path.append("..")
+
 import chess  # type: ignore
 import pytest  # type: ignore
 
 from chessmate.analysis import PiecePositionEvaluation
 from chessmate.transpositions import *
-
-sys.path.append("..")
-
 
 
 # Since hashes are randomly generated, seed hashed for tests for consistency

@@ -1,6 +1,8 @@
 """ Test suite for engines """
-import sys
 from typing import List
+import sys
+
+sys.path.append("..")
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
@@ -10,10 +12,6 @@ from chessmate.constants.fens import FEN_MAPS
 from chessmate.engines import *
 from chessmate.simulations import ChessPlayground
 from chessmate.utils import load_fen
-
-sys.path.append("..")
-
-
 
 
 @pytest.fixture

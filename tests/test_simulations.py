@@ -3,7 +3,8 @@ many simulations is computationally and time intensive, only
 explicitly testing the simulation objects here and NOT
 the engines themselves """
 import sys
-from contextlib import contextmanager
+
+sys.path.append("..")
 
 import chess
 import chess.pgn
@@ -12,9 +13,6 @@ import pytest
 from chessmate.engines import AvoidCapture, CaptureHighestValue
 from chessmate.simulations import *
 from chessmate.utils import load_fen, not_raises
-
-sys.path.append("..")
-
 
 
 N_GAMES = 10
