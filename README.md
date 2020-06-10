@@ -1,7 +1,15 @@
 # chessmate
 [![Build Status](https://travis-ci.org/sansona/chessmate.svg?branch=master)](https://travis-ci.org/sansona/chessmate)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 > chessmate is a framework built around ```python-chess``` that enables a programmatic approach to analyses and defining of chess engines.
 
+---
+## Installation
+Requires python 3.5 and higher
+
+```pip install chessmate```
+
+---
 ## Usage
 
 ### Engines
@@ -88,7 +96,7 @@ from chessmate.utils import display_material_difference
 # Use CaptureHighestvalue on white and Random engine on black
 simulation = ChessPlayground(CaptureHighestValue(), Random())
 simulation.play_multiple_games(10)
-display_material_difference(simulation.game_pgns, game_index=0)
+display_material_difference(simulation.all_material_differences, game_index=0)
 ```
 ![game_0](https://user-images.githubusercontent.com/17757035/82845850-0210db00-9e9b-11ea-8183-48958edbc418.png)
 
