@@ -3,6 +3,7 @@ from typing import Dict
 
 import chess  # type: ignore
 import numpy as np  # type: ignore
+
 from chessmate.constants.misc import PIECE_NAMES
 from chessmate.constants.piece_values import (ConventionalPieceTable,
                                               ConventionalPieceValues)

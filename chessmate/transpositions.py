@@ -3,6 +3,7 @@ import random
 from typing import Dict, List
 
 import chess  # type: ignore
+
 from chessmate.analysis import StandardEvaluation
 from chessmate.constants.misc import PIECE_INDEXING
 from chessmate.utils import get_piece_at, is_valid_fen
