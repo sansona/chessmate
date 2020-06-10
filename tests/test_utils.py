@@ -2,8 +2,6 @@
 import os
 import sys
 
-sys.path.append("..")
-
 import chess
 import chess.pgn
 import pytest
@@ -13,6 +11,10 @@ from chessmate.constants import *
 from chessmate.engines import ScholarsMate
 from chessmate.simulations import ChessPlayground
 from chessmate.utils import *
+
+sys.path.append("..")
+
+
 
 
 @pytest.fixture

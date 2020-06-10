@@ -1,14 +1,16 @@
 """ Tests for transposition table functionality """
-import sys
-
-sys.path.append("..")
 import random
+import sys
 
 import chess  # type: ignore
 import pytest  # type: ignore
 
 from chessmate.analysis import PiecePositionEvaluation
 from chessmate.transpositions import *
+
+sys.path.append("..")
+
+
 
 # Since hashes are randomly generated, seed hashed for tests for consistency
 random.seed(42)

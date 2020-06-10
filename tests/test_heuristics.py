@@ -1,16 +1,16 @@
 """ Collection of tests for heuristics """
 import sys
 
-sys.path.append("..")
 import chess  # type: ignore
 import pytest  # type: ignore
 
-from chessmate.constants.piece_values import (
-    ConventionalPieceValues,
-    FischerPieceValues,
-)
+from chessmate.constants.piece_values import (ConventionalPieceValues,
+                                              FischerPieceValues)
 from chessmate.heuristics import *
 from chessmate.utils import load_fen
+
+sys.path.append("..")
+
 
 
 def test_mvv_lva_conventional_returns_sorted_captures():
