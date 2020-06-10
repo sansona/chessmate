@@ -1,4 +1,7 @@
 """ Tests for transposition table functionality """
+import sys
+
+sys.path.append("..")
 import random
 
 import chess  # type: ignore

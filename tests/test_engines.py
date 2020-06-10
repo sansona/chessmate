@@ -1,5 +1,8 @@
 """ Test suite for engines """
 from typing import List
+import sys
+
+sys.path.append("..")
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore

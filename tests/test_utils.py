@@ -1,5 +1,8 @@
 """ Test suite for assortment of helper functions """
 import os
+import sys
+
+sys.path.append("..")
 
 import chess
 import chess.pgn

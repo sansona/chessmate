@@ -1,4 +1,8 @@
 """ Test suite for assortment of analysis functions """
+import sys
+
+sys.path.append("..")
+
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import pytest  # type: ignore
