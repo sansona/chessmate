@@ -4,9 +4,8 @@ import random
 from typing import Dict, List
 
 import chess  # type: ignore
-
 from chessmate.constants.piece_values import ConventionalPieceValues
-from utils import get_piece_at
+from chessmate.utils import get_piece_at
 
 
 def MVV_LVA(

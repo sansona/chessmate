@@ -13,10 +13,9 @@ import matplotlib.pyplot as plt  # type: ignore
 import numpy as np  # type: ignore
 import pytest  # type: ignore
 import yaml
+from chessmate.constants.fens import FEN_MAPS
 from IPython.display import SVG, clear_output, display  # type: ignore
 from matplotlib.ticker import MaxNLocator  # type: ignore
-
-from chessmate.constants.fens import FEN_MAPS
 
 
 @contextmanager

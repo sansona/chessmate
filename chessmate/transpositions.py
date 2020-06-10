@@ -3,10 +3,9 @@ import random
 from typing import Dict, List
 
 import chess  # type: ignore
-
-from analysis import StandardEvaluation
+from chessmate.analysis import StandardEvaluation
 from chessmate.constants.misc import PIECE_INDEXING
-from utils import get_piece_at, is_valid_fen
+from chessmate.utils import get_piece_at, is_valid_fen
 
 
 def zobrist_hash_function(board: chess.Board, hash_table: List) -> int:
