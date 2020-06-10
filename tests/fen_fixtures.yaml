@@ -1,0 +1,20 @@
+# Repository for selected FEN boards for testing. Note that this differs from ../fens.py in that
+# fens.py is a collection of malleable FENs
+starting_fen : "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+capture_black_knight : "r1bqkbnr/ppp1pppp/8/3p4/3nP3/2N2N2/PPP2PPP/R1B1KB1R w KQkq - 0 1"
+capture_black_queen : "rnb1kbnr/pppp1ppp/8/3qp3/4P3/5N2/PPP1QPPP/RNB1KB1R w KQkq - 0 1"
+capture_rook_or_knight : "r1bqkbnr/pppppp1p/6p1/8/1n1B4/2P5/PP2PPPP/RN1QKBNR w KQkq - 0 1"
+blocked_queen : "r1bqkbnr/pppp1p1p/2n3p1/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
+captured_queen : "r1b1kbnr/pppp1ppp/2n5/4p2q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 0 1"
+black_knight_fork_fen : "rnb1kb1r/ppppp1pp/8/8/3n4/8/PPPP1PPP/RNB1KBNR b KQkq - 0 1"
+capture_black_queen_2 : "rnb1kbnr/pppppppp/8/8/2q2Q2/8/PPPPPPPP/RNB1KBNR w KQkq - 0 1"
+capture_white_queen_2 : "rnb1kbnr/pppppppp/8/8/2q2Q2/8/PPPPPPPP/RNB1KBNR b KQkq - 0 1"
+statemate_fen : "8/8/8/8/8/4k3/4p3/4K3 w - - 0 1"
+in_progress_fen : "2kr1bnr/2ppqppp/p7/2p1p3/3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0 1"
+white_to_mate : "8/8/8/2Q1k3/6Q1/3Q1Q2/4K3/8 w - - 0 1"
+white_aggressor : "rnb1k2r/pppppppp/8/2q5/1P2bn2/3N1PP1/P1PPP2P/R1BQKBNR w KQkq - 0 1"
+white_capture_bishop_or_knight : "rnbqk2r/pppppppp/8/8/3bn3/2P2P2/PP1PP1PP/RNBQKBNR w KQkq - 0 1"
+
+not_mated_fens :
+  - "r1b1kbnr/ppp1qQp1/2np3p/4p3/2BNP3/8/PPPP1PPP/RNB1K2R w KQkq - 0 1"
+  - "rnbqkbnr/pp1ppppp/2p5/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 1 2"
