@@ -1,13 +1,15 @@
 """ Functions for analyzing board states and results of games """
-from typing import Dict
+from typing import Dict, Union
 
 import chess  # type: ignore
 import numpy as np  # type: ignore
 
 from chessmate.constants.misc import PIECE_NAMES
-from chessmate.constants.piece_values import (ConventionalPieceTable,
-                                              ConventionalPieceValues)
-from chessmate.utils import get_piece_value_from_table
+from chessmate.constants.piece_values import (
+    ConventionalPieceTable,
+    ConventionalPieceValues,
+)
+from chessmate.utils import get_piece_value_from_table, is_valid_fen
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
@@ -30,10 +32,6 @@ def evaluate_ending_board(board: chess.Board) -> str:
     if result == "0-1":
         return "Black win by mate"
 
-    # A different design pattern may be to move this var to the init
-    # so as to not keep initializing it on each call, but I want to
-    # explicitly initialize it on each call since it's dependent on
-    # the current board state
     terminal_conditions = {
         "Checkmate": board.is_checkmate,
         "Stalemate": board.is_stalemate,
@@ -46,6 +44,35 @@ def evaluate_ending_board(board: chess.Board) -> str:
         if condition():
             return title
     return "Undefined"
+
+
+def get_engine_evaluations(
+    board: Union[chess.Board, str], *args
+) -> Dict[str, str]:
+    """
+    Given a board state and a list of engines, return a list of moves
+    recommended by each engine
+
+    Args:
+        board (Union[chess.Board, str]): Board or FEN string of board
+            position to analyze
+        args (chessmate.engines.BaseEngine): engines used in evaluation
+    Raises:
+        TypeError: if incorrect type entered for board
+    Returns:
+        Dict[str, str]: name of engine, recommended move by engine
+    """
+    if (not isinstance(board, chess.Board)) and (not is_valid_fen(board)):
+        raise TypeError(f"Invalid type {type(board)}")
+    if isinstance(board, str):
+        board = chess.Board(fen=board)
+
+    recommended_moves = {}
+    for eng in args:
+        move = str(eng.move(board))
+        recommended_moves[eng.name] = move
+
+    return recommended_moves
 
 
 class EvaluationFunction:
