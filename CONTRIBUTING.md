@@ -12,3 +12,10 @@ To make things easy, check out the issues or suggestions marked as [good first i
 I recommend the following resources to learn about computational chess:
   - [chessprogramming](https://www.chessprogramming.org/Main_Page)
   - [Myopic Rhino series on Chess Programming](https://www.gamedev.net/articles/programming/artificial-intelligence/chess-programming-part-i-getting-started-r1014/)
+
+### General steps - from [Dan Bader](https://github.com/dbader/readme-template)
+  1. Fork ```chessmate``` (https://github.com/yourname/chessmate/fork)
+  2. Create your feature branch (```git checkout -b feature/fooBar```)
+  3. Commit your changes (```git commit -am 'Add some fooBar'```)
+  4. Push to the branch (```git push origin feature/fooBar```)
+  5. Create a new Pull Request
