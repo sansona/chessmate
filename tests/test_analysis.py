@@ -1,14 +1,17 @@
 """ Test suite for assortment of analysis functions """
 import sys
 
-sys.path.append("..")
-
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import pytest  # type: ignore
 
 from chessmate.analysis import *
+from chessmate.engines import AvoidCapture, MiniMax, Random
 from chessmate.utils import load_fen
+
+sys.path.append("..")
+
+
 
 
 @pytest.fixture
@@ -157,3 +160,42 @@ def test_piece_position_eval_in_progress_board_values(in_progress_board):
     piece_val = PiecePositionEvaluation()
     in_progress_position_value = 231
     assert piece_val.evaluate(in_progress_board) == in_progress_position_value
+
+
+def test_get_engine_evaluation_wrong_input():
+    """ Tests that get_engine_evaluations will raise TypeError if called with
+    incorrect board type """
+    with pytest.raises(TypeError):
+        get_engine_evaluations(0)
+
+
+def test_get_engine_evaluation_runs_with_board_input():
+    """ Tests that get_engine_evaluations will evaluate given chess.board as
+    input
+    """
+    eval_ = get_engine_evaluations(
+        chess.Board(),
+        Random(),
+        AvoidCapture(),
+        MiniMax(color=chess.WHITE, depth=1),
+    )
+    # Check that each engine evaluated
+    assert set(["Random", "Avoid Capture", "MiniMax"]) == set(eval_.keys())
+    # Check that evaluations from each engine are legal chess moves
+    assert all(len(v) == 4 for v in eval_.values())
+
+
+def test_get_engine_evaluation_runs_with_fen_input():
+    """ Tests that get_engine_evaluations will evaluate given FEN as
+    input
+    """
+    eval_ = get_engine_evaluations(
+        load_fen("starting_fen"),
+        Random(),
+        AvoidCapture(),
+        MiniMax(color=chess.WHITE, depth=1),
+    )
+    # Check that each engine evaluated
+    assert set(["Random", "Avoid Capture", "MiniMax"]) == set(eval_.keys())
+    # Check that evaluations from each engine are legal chess moves
+    assert all(len(v) == 4 for v in eval_.values())
