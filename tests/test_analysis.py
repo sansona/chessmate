@@ -1,15 +1,17 @@
 """ Test suite for assortment of analysis functions """
 import sys
 
-sys.path.append("..")
-
 import chess  # type: ignore
 import chess.pgn  # type: ignore
 import pytest  # type: ignore
 
 from chessmate.analysis import *
+from chessmate.engines import AvoidCapture, MiniMax, Random
 from chessmate.utils import load_fen
-from chessmate.engines import Random, AvoidCapture, MiniMax
+
+sys.path.append("..")
+
+
 
 
 @pytest.fixture
