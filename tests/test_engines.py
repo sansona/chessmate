@@ -147,8 +147,8 @@ def test_capture_highest_value_piece_bishop(minor_boards):
 def test_capture_highest_value_piece_knight(modified_boards):
     """ Tests that knights capture the highest value piece possible """
     engine = PrioritizeKnightMoves()
-    board = modified_boards[1][0]
-    rec_move = modified_boards[1][1]
+    board = minor_boards[1][0]
+    rec_move = minor_boards[1][1]
     move = engine.move(board)
     assert str(move) == rec_move
 
