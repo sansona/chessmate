@@ -220,7 +220,7 @@ class PrioritizeKnightMoves(Random):
                 possible_moves[i]: 1 for i in range(len(possible_moves))
             }
         self.material_difference.append(
-            self.evaluantion_function.evaluate(board)
+            self.evaluation_function.evaluate(board)
         )
 
 
