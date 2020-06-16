@@ -211,7 +211,7 @@ class PrioritizeKnightMoves(Random):
 
         possible_moves = list(board.legal_moves)
         for m in possible_moves:
-            if get_piece_at(board, str(m)[:2].upper()) == "K":
+            if get_piece_at(board, str(m)[:2].upper()) == "N":
                 self.legal_moves[m] = 1
 
         # If no knight moves available, all moves are same priority
