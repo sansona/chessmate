@@ -5,10 +5,8 @@ import chess  # type: ignore
 import numpy as np  # type: ignore
 
 from chessmate.constants.misc import PIECE_NAMES
-from chessmate.constants.piece_values import (
-    ConventionalPieceTable,
-    ConventionalPieceValues,
-)
+from chessmate.constants.piece_values import (ConventionalPieceTable,
+                                              ConventionalPieceValues)
 from chessmate.utils import get_piece_value_from_table, is_valid_fen
 
 

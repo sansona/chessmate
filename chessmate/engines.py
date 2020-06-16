@@ -2,7 +2,7 @@
 Collection of chess engines that evaluate board state and select best moves
 """
 import random
-from typing import Dict, List, Iterable, Union
+from typing import Dict, Iterable, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
