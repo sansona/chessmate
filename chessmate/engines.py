@@ -179,18 +179,19 @@ class PrioritizeBishopMoves(Random):
         self.name = "Prioritize Bishop Moves"
 
     def evaluate(self, board: chess.Board) -> None:
-        """Assigns same value to each move since eventually going to choose random move """
+        """ Assigns same value to each move since eventually going to choose
+        random move """
         self.reset_move_variables()
 
-        possible_moves = list(board.legal_moves)
-        for m in possible_moves:
+        legal_move_list = list(board.legal_moves)
+        for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "B":
                 self.legal_moves[m] = 1
 
         # If no bishop moves available, all moves are same priority
         if not self.legal_moves:
             self.legal_moves = {
-                possible_moves[i]: 1 for i in range(len(possible_moves))
+                legal_move_list[i]: 1 for i in range(len(legal_move_list))
             }
         self.material_difference.append(
             self.evaluation_function.evaluate(board)
@@ -209,15 +210,15 @@ class PrioritizeKnightMoves(Random):
     def evaluate(self, board: chess.Board) -> None:
         self.reset_move_variables()
 
-        possible_moves = list(board.legal_moves)
-        for m in possible_moves:
+        legal_move_list = list(board.legal_moves)
+        for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "N":
                 self.legal_moves[m] = 1
 
         # If no knight moves available, all moves are same priority
         if not self.legal_moves:
             self.legal_moves = {
-                possible_moves[i]: 1 for i in range(len(possible_moves))
+                legal_move_list[i]: 1 for i in range(len(possible_moves))
             }
         self.material_difference.append(
             self.evaluation_function.evaluate(board)
