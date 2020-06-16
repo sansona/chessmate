@@ -169,7 +169,7 @@ class PrioritizePawnMoves(Random):
         )
 
 
-class PrioritizeBishopMoves(Random):
+class PrioritizeBishopMoves(BaseEngine):
     """ Engine that only moves bishops when an option.
     Default to random engines if no bishop moves available """
 
@@ -179,19 +179,20 @@ class PrioritizeBishopMoves(Random):
         self.name = "Prioritize Bishop Moves"
 
     def evaluate(self, board: chess.Board) -> None:
-        """ Assigns same value to each move since eventually going to choose
-        random move """
+        """ Assigns values to each move depending on if
+        capturing is involved """
         self.reset_move_variables()
 
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "B":
-                if board.is_capture(m):
-                    self.legal_moves[m] = self.value_mapping[
-                        get_piece_at(board, str(m)[2:4]).upper()
-                    ].value
-                else:
+                piece_at_position = get_piece_at(board, str(m)[2:4]).upper()
+                if (not board.is_capture(m)) or (not piece_at_position):
                     self.legal_moves[m] = 1
+                else:
+                    self.legal_moves[m] = self.value_mapping[
+                        piece_at_position
+                    ].value
 
         # If no bishop moves available, all moves are same priority
         if not self.legal_moves:
@@ -202,8 +203,32 @@ class PrioritizeBishopMoves(Random):
             self.evaluation_function.evaluate(board)
         )
 
+    def move(self, board: chess.Board) -> chess.Move:
+        """ Select move that yields highest value.
+        Copied from CaptureHighestValue """
+        self.evaluate(board)
 
-class PrioritizeKnightMoves(Random):
+        if not [*self.legal_moves]:
+            return chess.Move.null()
+
+        highest_capture_val, highest_capture_uci = 0.0, None
+
+        # Find move with highest capture value
+        for m in list(self.legal_moves):
+            if self.legal_moves[m] > highest_capture_val:
+                highest_capture_val, highest_capture_uci = (
+                    self.legal_moves[m],
+                    m,
+                )
+
+        # If any captures available, return highest value capture. Else,
+        # return random move
+        if highest_capture_uci:
+            return highest_capture_uci
+        return random.choice([*self.legal_moves])
+
+
+class PrioritizeKnightMoves(BaseEngine):
     """ Engine that only moves knights when an option.
     Default to random engines if no bishop moves available """
 
@@ -213,17 +238,20 @@ class PrioritizeKnightMoves(Random):
         self.name = "Prioritize Knight Moves"
 
     def evaluate(self, board: chess.Board) -> None:
+        """ Assigns value to moves based on if
+        capturing is involved """
         self.reset_move_variables()
 
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "N":
-                if board.is_capture(m):
-                    self.legal_moves[m] = self.value_mapping[
-                        get_piece_at(board, str(m)[2:4]).upper()
-                    ].value
-                else:
+                piece_at_position = get_piece_at(board, str(m)[2:4]).upper()
+                if (not board.is_capture(m)) or (not piece_at_position):
                     self.legal_moves[m] = 1
+                else:
+                    self.legal_moves[m] = self.value_mapping[
+                        piece_at_position
+                    ].value
 
         # If no knight moves available, all moves are same priority
         if not self.legal_moves:
@@ -233,6 +261,30 @@ class PrioritizeKnightMoves(Random):
         self.material_difference.append(
             self.evaluation_function.evaluate(board)
         )
+
+    def move(self, board: chess.Board) -> chess.Move:
+        """ Select move that yields highest value.
+        Copied from CaptureHighestValue """
+        self.evaluate(board)
+
+        if not [*self.legal_moves]:
+            return chess.Move.null()
+
+        highest_capture_val, highest_capture_uci = 0.0, None
+
+        # Find move with highest capture value
+        for m in list(self.legal_moves):
+            if self.legal_moves[m] > highest_capture_val:
+                highest_capture_val, highest_capture_uci = (
+                    self.legal_moves[m],
+                    m,
+                )
+
+        # If any captures available, return highest value capture. Else,
+        # return random move
+        if highest_capture_uci:
+            return highest_capture_uci
+        return random.choice([*self.legal_moves])
 
 
 class RandomCapture(BaseEngine):
