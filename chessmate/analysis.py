@@ -1,18 +1,20 @@
 """ Functions for analyzing board states and results of games """
-from typing import Dict, Union
+from typing import Dict, Iterable, Union
 
 import chess  # type: ignore
 import numpy as np  # type: ignore
 
 from chessmate.constants.misc import PIECE_NAMES
-from chessmate.constants.piece_values import (ConventionalPieceTable,
-                                              ConventionalPieceValues)
+from chessmate.constants.piece_values import (
+    ConventionalPieceTable,
+    ConventionalPieceValues,
+)
 from chessmate.utils import get_piece_value_from_table, is_valid_fen
 
 
 def evaluate_ending_board(board: chess.Board) -> str:
     """
-    Determines conditions leading to end of game
+    Given ending board state, determines conditions leading to end of game
 
     Args:
         board (chess.Board)
@@ -48,8 +50,8 @@ def get_engine_evaluations(
     board: Union[chess.Board, str], *args
 ) -> Dict[str, str]:
     """
-    Given a board state and a list of engines, return a list of moves
-    recommended by each engine
+    Given a board state and a list of engines, return list of each engine's
+    recommended move
 
     Args:
         board (Union[chess.Board, str]): Board or FEN string of board
@@ -87,7 +89,7 @@ class EvaluationFunction:
         name (str): name of evaluation engine
         evaluations (Dict[str, float]): stores each board
             state evaluated as FEN and the corresponding metric
-        piece_values (Dict[str, float]): mapping of pieces to values.
+        piece_values (Iterable): mapping of pieces to values.
             By default use conventional piece values
 
     Methods:
@@ -95,10 +97,10 @@ class EvaluationFunction:
             evaluation of board state
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.name: str = "Base Evaluation Function"
         self.evaluations: Dict[str, int] = {}
-        self.piece_values: Dict[str, int] = ConventionalPieceValues
+        self.piece_values: Iterable = ConventionalPieceValues
 
     def evaluate(self, board: chess.Board) -> int:
         """
@@ -119,10 +121,10 @@ class StandardEvaluation(EvaluationFunction):
     sides according to the standard piece valuation and calculates
     difference as metric """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Standard Evaluation Function"
+        self.name: str = "Standard Evaluation Function"
 
     def evaluate(self, board: chess.Board) -> int:
         """
@@ -163,10 +165,10 @@ class PiecePositionEvaluation(EvaluationFunction):
             value tables. Default to conventional piece table
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Piece Position"
+        self.name: str = "Piece Position"
         self.value_tables: Dict[str, np.ndarray] = ConventionalPieceTable
 
     def evaluate(self, board: chess.Board) -> int:

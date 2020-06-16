@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name="chessmate",
-    version="1.0.5",
+    version="1.0.8",
     description="Framework for defining and analyzing chess engines",
     keywords="Chess chess",
     long_description=README,

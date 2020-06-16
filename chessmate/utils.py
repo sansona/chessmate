@@ -31,7 +31,7 @@ def not_raises(exception):
         raise pytest.fail(f"DID RAISE {exception}")
 
 
-def load_fen(fen_name):
+def load_fen(fen_name: str):
     """
     Loads predefined FENs from fen_fixtures
 

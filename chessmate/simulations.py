@@ -30,7 +30,7 @@ class EnginePlay:
             representation. Used to store game state
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.game: chess.pgn.Game = chess.pgn.Game()
         self._fen: str = FEN_MAPS["standard"]
         self._board: chess.Board = chess.Board(fen=self._fen)
@@ -118,7 +118,7 @@ class PlayVsEngine(EnginePlay):
             utils.render_svg_board()
     """
 
-    def __init__(self, engine):
+    def __init__(self, engine) -> None:
         """ Setups empty board and engine """
         super().__init__()
         self.engine = engine
@@ -280,7 +280,7 @@ class ChessPlayground(EnginePlay):
             play_game()
     """
 
-    def __init__(self, white_engine, black_engine):
+    def __init__(self, white_engine, black_engine) -> None:
         """
         Setup empty game with defined engines for both sides
 

@@ -53,7 +53,7 @@ class TranspositionTable:
             respectively, store hashed board eval in stored_values
     """
 
-    def __init__(self, hash_function):
+    def __init__(self, hash_function) -> None:
         self.hash_function = hash_function
         self._hash_table = [
             [

@@ -1,7 +1,7 @@
 """ Collection of heuristic related evaluation - move sorting,
 board evaluation """
 import random
-from typing import Dict, List
+from typing import Dict, Iterable, List
 
 import chess  # type: ignore
 
@@ -10,7 +10,7 @@ from chessmate.utils import get_piece_at
 
 
 def MVV_LVA(
-    board: chess.Board, piece_values: Dict[str, int] = ConventionalPieceValues
+    board: chess.Board, piece_values: Iterable = ConventionalPieceValues
 ) -> List[chess.Move]:
     """
     Most Valuable Victim - Least Valuable Aggressor implementation for

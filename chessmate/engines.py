@@ -2,7 +2,7 @@
 Collection of chess engines that evaluate board state and select best moves
 """
 import random
-from typing import Dict, List, Union
+from typing import Dict, List, Iterable, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
@@ -44,8 +44,8 @@ class BaseEngine:
             name (str): name of engine
             legal_moves (Dict[chess.Move, float]): list of all legal moves
                 available in uci notation with values for each move
-            value_mapping (Dict): maps type of piece to value system in
-                form {piece symbol: int}. Use conventional values by default
+            value_mapping (Enum): maps type of piece to value system in
+                pre-defined enum. Use conventional values by default
             evaluation_function (analysis.BoardEvaluation): engine for
                 evaluating board state
             material_difference (List[float]): difference in value on board
@@ -54,8 +54,8 @@ class BaseEngine:
         """
         self.name: str = "Base Engine"
         self.legal_moves: Dict[chess.Move, float] = {}
-        self.value_mapping: Dict[str, float] = ConventionalPieceValues
-        self.evaluation_function = StandardEvaluation()
+        self.value_mapping: Iterable = ConventionalPieceValues
+        self.evaluation_function: StandardEvaluation = StandardEvaluation()
         self.material_difference: List[float] = []
 
     def __repr__(self):
@@ -108,10 +108,10 @@ class BaseEngine:
 class Random(BaseEngine):
     """ Engine that simply chooses random legal move """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Random"
+        self.name: str = "Random"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns same value to each move since eventually going to choose
@@ -144,10 +144,10 @@ class PrioritizePawnMoves(Random):
     """ Engine that only moves pawns when an option. Default to random
     engines if no pawn moves available"""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Prioritize Pawn Moves"
+        self.name: str = "Prioritize Pawn Moves"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns same value to each move since eventually going to choose
@@ -174,10 +174,10 @@ class RandomCapture(BaseEngine):
     """ Engine that prioritizes capturing any piece
     if the option presents itself """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Random Capture"
+        self.name: str = "Random Capture"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns highest value to capture moves and no value to others """
@@ -216,10 +216,10 @@ class CaptureHighestValue(BaseEngine):
     """ Engine that prioritizes capturing the highest value piece if
     the option presents itself """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Capture Highest Value"
+        self.name: str = "Capture Highest Value"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns highest value to capture moves based off value system """
@@ -268,10 +268,10 @@ class CaptureHighestValue(BaseEngine):
 class AvoidCapture(RandomCapture):
     """ Engine that prioritizes NOT capturing a piece whenver possible """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Avoid Capture"
+        self.name: str = "Avoid Capture"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns value to no capture moves and no value to captures """
@@ -296,10 +296,10 @@ class ScholarsMate(BaseEngine):
     scholar's mate is defined for white play, engine will forfeit
     is on black side. """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """ See parent docstring """
         super().__init__()
-        self.name = "Scholar's Mate"
+        self.name: str = "Scholar's Mate"
 
     def evaluate(self, board: chess.Board) -> None:
         """ Inits scholar's mate play as legal_moves """
@@ -364,9 +364,9 @@ class MiniMax(BaseEngine):
             minimax algorithm.
     """
 
-    def __init__(self, color: Union[chess.Color, bool], depth: int):
+    def __init__(self, color: Union[chess.Color, bool], depth: int) -> None:
         super().__init__()
-        self.name = "MiniMax"
+        self.name: str = "MiniMax"
         self.color: Union[chess.Color, bool] = color
         self._depth: int = depth
         self.best_move: chess.Move = chess.Move.null()
@@ -417,6 +417,8 @@ class MiniMax(BaseEngine):
             maximizing (bool): True for white, False for black
             depth (int): depth to search. Init at self._depth for base. Note:
                 depth=>3 will be computationally slow for most CPUs
+        Returns:
+            (float): value of maximizing or minimizing move
         """
         if depth == 0 or base_board.is_game_over():
             return self.evaluation_function.evaluate(base_board)
