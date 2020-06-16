@@ -53,6 +53,8 @@ def starting_engines():
     return [
         Random(),
         PrioritizePawnMoves(),
+        PrioritizeBishopMoves(),
+        PrioritizeKnightMoves(),
         RandomCapture(),
         CaptureHighestValue(),
         AvoidCapture(),

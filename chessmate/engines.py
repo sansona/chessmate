@@ -6,7 +6,6 @@ from typing import Dict, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
-
 from chessmate.analysis import StandardEvaluation
 from chessmate.constants.piece_values import ConventionalPieceValues
 from chessmate.heuristics import MVV_LVA
@@ -169,26 +168,26 @@ class PrioritizePawnMoves(Random):
             self.evaluation_function.evaluate(board)
         )
 
+
 class PrioritizeBishopMoves(Random):
-    """Engine that only moves bishops when an option.
-    Default to random engines if no bishop moves available"""
-    
+    """ Engine that only moves bishops when an option.
+    Default to random engines if no bishop moves available """
+
     def __init__(self):
         """See parent docstring"""
         super().__init__()
         self.name = "Prioritize Bishop Moves"
-        
+
     def evaluate(self, board: chess.Board) -> None:
         """Assigns same value to each move since eventually going to choose random move """
         self.reset_move_variables()
-        
+
         possible_moves = list(board.legal_moves)
         for m in possible_moves:
             if get_piece_at(board, str(m)[:2].upper()) == "B":
                 self.legal_moves[m] = 1
-        
-        #If no bishop moves available, all moves are same priority
-        
+
+        # If no bishop moves available, all moves are same priority
         if not self.legal_moves:
             self.legal_moves = {
                 possible_moves[i]: 1 for i in range(len(possible_moves))
@@ -196,23 +195,26 @@ class PrioritizeBishopMoves(Random):
         self.material_difference.append(
             self.evaluantion_function.evaluate(board)
         )
+
+
 class PrioritizeKnightMoves(Random):
-    """Like PrioritizeBishopMoves, but for knights"""
+    """ Engine that only moves knights when an option.
+    Default to random engines if no bishop moves available """
+
     def __init__(self):
         """See parent docstring"""
         super().__init__()
         self.name = "Prioritize Knight Moves"
-        
+
     def evaluate(self, board: chess.Board) -> None:
         self.reset_move_variables()
-        
+
         possible_moves = list(board.legal_moves)
         for m in possible_moves:
             if get_piece_at(board, str(m)[:2].upper()) == "K":
                 self.legal_moves[m] = 1
-        
-        #If no bishop moves available, all moves are same priority
-        
+
+        # If no knight moves available, all moves are same priority
         if not self.legal_moves:
             self.legal_moves = {
                 possible_moves[i]: 1 for i in range(len(possible_moves))
@@ -220,6 +222,8 @@ class PrioritizeKnightMoves(Random):
         self.material_difference.append(
             self.evaluantion_function.evaluate(board)
         )
+
+
 class RandomCapture(BaseEngine):
     """ Engine that prioritizes capturing any piece
     if the option presents itself """
