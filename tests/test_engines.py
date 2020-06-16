@@ -40,18 +40,6 @@ def modified_boards() -> List[tuple]:
         (chess.Board(fen=load_fen("capture_black_knight")), "f3d4"),
         (chess.Board(fen=load_fen("capture_black_queen")), "e4d5"),
         (chess.Board(fen=load_fen("capture_rook_or_knight")), "d4h8"),
-    ]
-
-
-def minor_board() -> List[tuple]:
-    """
-    Sets up boards with modified FENS for testing PrioritizeBishopMoves
-    and PrioritizeKnightMoves. Includes moves that should be taken
-
-    Returns:
-        {List[tuple]}
-    """
-    return [
         (chess.Board(fen=load_fen("bishop_or_knight_capture_queen")), "c1g5"),
         (chess.Board(fen=load_fen("bishop_or_knight_capture_queen")), "f3g5"),
     ]
@@ -134,20 +122,20 @@ def test_capture_highest_value_move_captures_highest_value(modified_boards):
         assert str(move) == rec_move
 
 
-def test_capture_highest_value_piece_bishop(minor_board):
+def test_capture_highest_value_piece_bishop(modified_boards):
     """ Tests that bishops capture the highest value piece possible """
     engine = PrioritizeBishopMoves()
-    board = minor_board[0][0]
-    rec_move = minor_board[0][1]
+    board = modified_boards[3][0]
+    rec_move = modified_boards[3][1]
     move = engine.move(board)
     assert str(move) == rec_move
 
 
-def test_capture_highest_value_piece_knight(minor_board):
+def test_capture_highest_value_piece_knight(modified_boards):
     """ Tests that knights capture the highest value piece possible """
     engine = PrioritizeKnightMoves()
-    board = minor_board[1][0]
-    rec_move = minor_board[1][1]
+    board = modified_boards[4][0]
+    rec_move = modified_boards[4][1]
     move = engine.move(board)
     assert str(move) == rec_move
 
