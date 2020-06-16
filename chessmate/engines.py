@@ -186,7 +186,12 @@ class PrioritizeBishopMoves(Random):
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "B":
-                self.legal_moves[m] = 1
+                if board.is_capture(m):
+                    self.legal_moves[m] = self.value_mapping[
+                        get_piece_at(board, str(m)[2:4]).upper()
+                    ].value
+                else:
+                    self.legal_moves[m] = 1
 
         # If no bishop moves available, all moves are same priority
         if not self.legal_moves:
@@ -213,7 +218,12 @@ class PrioritizeKnightMoves(Random):
         legal_move_list = list(board.legal_moves)
         for m in legal_move_list:
             if get_piece_at(board, str(m)[:2].upper()) == "N":
-                self.legal_moves[m] = 1
+                if board.is_capture(m):
+                    self.legal_moves[m] = self.value_mapping[
+                        get_piece_at(board, str(m)[2:4]).upper()
+                    ].value
+                else:
+                    self.legal_moves[m] = 1
 
         # If no knight moves available, all moves are same priority
         if not self.legal_moves:
