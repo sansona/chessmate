@@ -87,7 +87,6 @@ def starting_engines():
         PrioritizePawnMoves(),
         PrioritizeBishopMoves(),
         PrioritizeKnightMoves(),
-        PrioritizePieceMoves(),
         RandomCapture(),
         CaptureHighestValue(),
         AvoidCapture(),
@@ -175,7 +174,7 @@ def test_wrappped_class(versatile_board):
     """ Tests the same board for different pieces """
     board = chess.Board(fen=load_fen("anyone_captures_queen"))
     for i in range(0, len(versatile_board)):
-        engine = PrioritizePieceMove(versatile_board[i][1])
+        engine = PrioritizePieceMoves(versatile_board[i][1])
         rec_move = versatile_board[i][0]
         move = engine.move(board)
         assert str(move) == rec_move
