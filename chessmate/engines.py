@@ -382,6 +382,32 @@ class CaptureHighestValue(BaseEngine):
         return random.choice([*self.legal_moves])
 
 
+class PrioritizePieceMoves(CaptureHighestValue):
+    """ Engine that prioritizes moves for each type of piece in the game,
+    complete with weighting for capture moves """
+
+    def __init__(self, piece):
+        """ See parent docstring """
+        super().__init__()
+        self.name = "Prioritize Piece Moves"
+        self.piece = piece
+
+    def evaluate(self, board: chess.Board) -> None:
+        """ Assigns highest value to capture moves and small value to others """
+        self.reset_move_variables()
+
+        legal_move_list = list(board.legal_moves)
+        for m in legal_move_list:
+            if get_piece_at(board, str(m)[:2].upper()) == self.piece.upper():
+                piece_at_position = get_piece_at(board, str(m)[2:4]).upper()
+                if (not board.is_capture(m)) or (not piece_at_position):
+                    self.legal_moves[m] = 1
+                else:
+                    self.legal_moves[m] = self.value_mapping[
+                        piece_at_position
+                    ].value
+
+
 class AvoidCapture(RandomCapture):
     """ Engine that prioritizes NOT capturing a piece whenver possible """
 

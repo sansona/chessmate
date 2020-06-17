@@ -59,6 +59,23 @@ def minor_boards() -> List[tuple]:
 
 
 @pytest.fixture
+def versatile_board() -> List[tuple]:
+    """
+    Uses the same board, but has different recommended moves
+    based on which pieces are called in PrioritizePieceMove().
+    Capitalization varies to prove that capitalization does
+    not affect engine's performance.
+    """
+    return [
+        ("h4g5", "p"),
+        ("c1g5", "B"),
+        ("f3g5", "n"),
+        ("g3g5", "R"),
+        ("e5g5", "q"),
+    ]
+
+
+@pytest.fixture
 def starting_engines():
     """
         Sets up fresh initializations of all engines
@@ -70,6 +87,7 @@ def starting_engines():
         PrioritizePawnMoves(),
         PrioritizeBishopMoves(),
         PrioritizeKnightMoves(),
+        PrioritizePieceMoves(),
         RandomCapture(),
         CaptureHighestValue(),
         AvoidCapture(),
@@ -151,6 +169,16 @@ def test_capture_highest_value_piece_knight(minor_boards):
     rec_move = minor_boards[1][1]
     move = engine.move(board)
     assert str(move) == rec_move
+
+
+def test_wrappped_class(versatile_board):
+    """ Tests the same board for different pieces """
+    board = chess.Board(fen=load_fen("anyone_captures_queen"))
+    for i in range(0, len(versatile_board)):
+        engine = PrioritizePieceMove(versatile_board[i][1])
+        rec_move = versatile_board[i][0]
+        move = engine.move(board)
+        assert str(move) == rec_move
 
 
 def test_avoid_capture_move_avoids_available_captures(modified_boards):
