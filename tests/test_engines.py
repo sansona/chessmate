@@ -44,21 +44,6 @@ def modified_boards() -> List[tuple]:
 
 
 @pytest.fixture
-def minor_boards() -> List[tuple]:
-    """
-    Sets up boards specifically for the tests on PrioritizeKnightMoves
-    and PrioritizeBishopMoves. Includes recommended moves
-
-    Returns:
-        {List[tuple]}
-    """
-    return [
-        (chess.Board(fen=load_fen("bishop_or_knight_capture_queen")), "c1g5"),
-        (chess.Board(fen=load_fen("bishop_or_knight_capture_queen")), "f3g5"),
-    ]
-
-
-@pytest.fixture
 def versatile_board() -> List[tuple]:
     """
     Uses the same board, but has different recommended moves
@@ -85,8 +70,6 @@ def starting_engines():
     return [
         Random(),
         PrioritizePawnMoves(),
-        PrioritizeBishopMoves(),
-        PrioritizeKnightMoves(),
         RandomCapture(),
         CaptureHighestValue(),
         AvoidCapture(),
@@ -150,24 +133,6 @@ def test_capture_highest_value_move_captures_highest_value(modified_boards):
     for board, rec_move in modified_boards:
         move = engine.move(board)
         assert str(move) == rec_move
-
-
-def test_capture_highest_value_piece_bishop(minor_boards):
-    """ Tests that bishops capture the highest value piece possible """
-    engine = PrioritizeBishopMoves()
-    board = minor_boards[0][0]
-    rec_move = minor_boards[0][1]
-    move = engine.move(board)
-    assert str(move) == rec_move
-
-
-def test_capture_highest_value_piece_knight(minor_boards):
-    """ Tests that knights capture the highest value piece possible """
-    engine = PrioritizeKnightMoves()
-    board = minor_boards[1][0]
-    rec_move = minor_boards[1][1]
-    move = engine.move(board)
-    assert str(move) == rec_move
 
 
 def test_wrappped_class(versatile_board):

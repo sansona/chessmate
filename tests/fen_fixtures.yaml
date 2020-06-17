@@ -14,7 +14,6 @@ in_progress_fen : "2kr1bnr/2ppqppp/p7/2p1p3/3PP3/2N2N2/PPP2PPP/R1BQK2R w KQk - 0
 white_to_mate : "8/8/8/2Q1k3/6Q1/3Q1Q2/4K3/8 w - - 0 1"
 white_aggressor : "rnb1k2r/pppppppp/8/2q5/1P2bn2/3N1PP1/P1PPP2P/R1BQKBNR w KQkq - 0 1"
 white_capture_bishop_or_knight : "rnbqk2r/pppppppp/8/8/3bn3/2P2P2/PP1PP1PP/RNBQKBNR w KQkq - 0 1"
-bishop_or_knight_capture_queen: "rnb1kbnr/pppp1ppp/4p3/6q1/8/3P1N2/PPP1PPPP/RNBQKB1R w KQkq - 0 1"
 anyone_captures_queen: "rnb1k1nr/pppp2pp/4p3/4Q1q1/7P/3P1NR1/PPP1PPP1/RNB1KB2 w Qkq - 0 1"
 
 not_mated_fens :
