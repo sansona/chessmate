@@ -11,6 +11,7 @@ Requires python 3.5 and higher
 
 ---
 ## Usage
+A general introduction can be seen below. A more practical demo can be found in ```Usage.ipynb```.
 
 ### Engines
 The basic building block of chessmate is the engine. All engines inherit

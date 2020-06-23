@@ -1,7 +1,3 @@
-# Ignore jupyter notebooks
-*.ipynb
-*.ipynb*
-
 # Ignore pycache
 *.pyc
 
