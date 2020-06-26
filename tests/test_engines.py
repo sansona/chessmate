@@ -118,7 +118,7 @@ def test_capture_highest_value_move_captures_highest_value(modified_boards):
         assert str(move) == rec_move
 
 
-def test_prioritize_pieces_chooses_correct_move(versatile_board):
+def test_prioritize_pieces_chooses_correct_move():
     """ Tests the same board for different pieces """
     board = chess.Board(fen=load_fen("anyone_captures_queen"))
     versatile_board = [
