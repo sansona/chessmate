@@ -266,13 +266,14 @@ class CaptureHighestValue(BaseEngine):
 
 class PrioritizePieceMoves(CaptureHighestValue):
     """ Engine that prioritizes moves for each type of piece in the game,
-    complete with weighting for capture moves """
+    complete with weighting for capture moves. """
 
     def __init__(self, piece):
-        """ See parent docstring """
+        """ See parent docstring. Takes in a str, piece,
+        to determine which piece to examine. """
         super().__init__()
         self.name = "Prioritize Piece Moves"
-        self.piece = piece
+        self.piece: str = piece
 
     def evaluate(self, board: chess.Board) -> None:
         """ Assigns highest value to capture moves and small value to others """
