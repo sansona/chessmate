@@ -268,15 +268,15 @@ class PrioritizePieceMoves(CaptureHighestValue):
     """ Engine that prioritizes moves for each type of piece in the game,
     complete with weighting for capture moves. """
 
-    def __init__(self, piece):
+    def __init__(self, piece: str) -> None:
         """ See parent docstring. Takes in a str, piece,
         to determine which piece to examine. """
         super().__init__()
-        self.name = "Prioritize Piece Moves"
+        self.name: str = "Prioritize Piece Moves"
         self.piece: str = piece
 
     def evaluate(self, board: chess.Board) -> None:
-        """ Assigns highest value to capture moves and small value to others """
+        """ Assigns highest value to capture moves and no value to others """
         self.reset_move_variables()
 
         legal_move_list = list(board.legal_moves)
