@@ -119,18 +119,17 @@ def test_capture_highest_value_move_captures_highest_value(modified_boards):
 
 
 def test_prioritize_pieces_chooses_correct_move():
-    """ Tests the same board for different pieces """
+    """ Tests that PrioritizePieceMoves chooses the correct move
+    for different pieces """
     board = chess.Board(fen=load_fen("anyone_captures_queen"))
-    versatile_board = [
-        ("h4g5", "p"),
-        ("c1g5", "B"),
-        ("f3g5", "n"),
-        ("g3g5", "R"),
-        ("e5g5", "q"),
-    ]
-    for i in range(0, len(versatile_board)):
-        engine = PrioritizePieceMoves(versatile_board[i][1])
-        rec_move = versatile_board[i][0]
+    piece_to_move_map = {"p": "h4g5",
+            "B": "c1g5",
+            "n": "f3g5",
+            "R": "g3g5",
+            "q": "e5g5"}
+ 
+    for piece, rec_move in piece_to_move_map.items():
+        engine = PrioritizePieceMoves(piece=piece)
         move = engine.move(board)
         assert str(move) == rec_move
 

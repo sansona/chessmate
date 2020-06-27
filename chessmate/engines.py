@@ -6,6 +6,7 @@ from typing import Dict, Iterable, List, Union
 
 import chess  # type: ignore
 import chess.pgn  # type: ignore
+
 from chessmate.analysis import StandardEvaluation
 from chessmate.constants.piece_values import ConventionalPieceValues
 from chessmate.heuristics import MVV_LVA
