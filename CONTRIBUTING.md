@@ -11,6 +11,18 @@ To make things easy, check out the issues or suggestions marked as [good first i
 ### Tests
 Each new contribution should have corresponding test coverage. I'd like to retain >90% coverage on ```chessmate``` via. [coverage.py](https://coverage.readthedocs.io/en/coverage-5.1/). [pytest-cov](https://pypi.org/project/pytest-cov/) is a good option for killing two birds with one stone.
 
+### Commit messages
+Please follow the [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/#summary) standard for commit messages. Quoting from their website, the basic structure is:
+```
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+More details on the website. This is something I'm actively working towards as well but it should pay off in a cleaning and clearer commit tree.
+
 ### Resources
 I recommend the following resources to learn about computational chess:
   - [chessprogramming](https://www.chessprogramming.org/Main_Page)
