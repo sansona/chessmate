@@ -12,7 +12,7 @@ mypy_extensions==0.4.1
 brotli==1.0.7
 cryptography==2.9.2
 ipaddr==2.2.0
-ipython==7.14.0
+ipython==7.16.3
 keyring==21.2.1
 lockfile==0.12.2
 ordereddict==1.1
