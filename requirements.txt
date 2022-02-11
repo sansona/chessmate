@@ -16,7 +16,7 @@ ipython==7.14.0
 keyring==21.2.1
 lockfile==0.12.2
 ordereddict==1.1
-protobuf==3.12.1
+protobuf==3.15.0
 pre-commit==2.4.0
 pyOpenSSL==19.1.0
 tqdm==4.46.0
