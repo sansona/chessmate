@@ -1,6 +1,6 @@
 zipp==3.1.0
 ipywidgets==7.4.2
-numpy==1.16.3
+numpy==1.22.0
 pytest==5.4.2
 lxml==4.4.1
 importlib_metadata==1.6.0
